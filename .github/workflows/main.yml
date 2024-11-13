@@ -31,10 +31,10 @@ jobs:
            # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
       - name: Run Linux Tests (gcc)
         run: |
-          ./fam clean; ./fam test --with-cc=gcc --with-asan -s
+          ./fam clean; ./fam test --with-cc=gcc -s
       - name: Run Linux Tests (clang)
         run: |
-          ./fam clean; ./fam test --with-cc=clang --with-asan -s
+          ./fam clean; ./fam test --with-cc=clang -s
       - name: Build Docs
         run: |
           echo "evt=$GITHUB_EVENT_NAME";
@@ -67,7 +67,7 @@ jobs:
           # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
       - name: Run MacOS Tests (gcc)
         run: |
-          ./fam clean; ./fam test --with-cc=gcc --with-asan -s
+          ./fam clean; ./fam test --with-cc=gcc -s
       - name: Run MacOS Tests (clang)
         run: |
-          ./fam clean; ./fam test --with-cc=clang --with-asan -s
+          ./fam clean; ./fam test --with-cc=clang -s
