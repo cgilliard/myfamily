@@ -156,9 +156,7 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 				return NULL;
 			}
 			mmapped = true;
-			set_bytes((byte *)data4, '\0',
-					  MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
-						  BITMAP_SIZE);
+			set_bytes((byte *)data4, '\0', BITMAP_SIZE);
 			// set Ptr=0 to allocated so we never return null / also reserve the
 			// first value for other purposes
 			if (i == 0 && j == 0 && k == 0) data4[0] = 0x3;
