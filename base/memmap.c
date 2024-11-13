@@ -21,6 +21,7 @@
 
 #define MEMMAP_ENTRY_PER_LEVEL 512
 #define BITMAP_SIZE 64
+#define IMAX 32
 
 static unsigned int memmap_id = 0;
 _Thread_local int last_i[MAX_MEMMAPS] = {};
@@ -215,7 +216,7 @@ Ptr memmap_allocate(MemMap *mm) {
 					k = 0;
 					if (++j >= MEMMAP_ENTRY_PER_LEVEL) {
 						j = 0;
-						if (++i >= 32) {  // reduced range
+						if (++i >= IMAX) {	// reduced range
 							i = 0;
 						}
 						if (i == last_i[impl->memmap_id]) {
@@ -275,9 +276,9 @@ void memmap_free(MemMap *mm, Ptr ptr) {
 void memmap_cleanup(MemMap *mm) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	if (impl->data == NULL) return;
-	for (int i = 0; impl->data[i] && i < MEMMAP_ENTRY_PER_LEVEL; i++) {
-		for (int j = 0; impl->data[i][j] && j < MEMMAP_ENTRY_PER_LEVEL; j++) {
-			for (int k = 0; impl->data[i][j][k] && k < MEMMAP_ENTRY_PER_LEVEL;
+	for (int i = 0; i < IMAX && impl->data[i]; i++) {
+		for (int j = 0; j < MEMMAP_ENTRY_PER_LEVEL && impl->data[i][j]; j++) {
+			for (int k = 0; k < MEMMAP_ENTRY_PER_LEVEL && impl->data[i][j][k];
 				 k++) {
 				mmap_free(impl->data[i][j][k],
 						  MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
