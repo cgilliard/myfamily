@@ -65,7 +65,10 @@ Ptr slab_allocator_grow(SlabAllocatorImpl *impl) {
 	Ptr ret = memmap_allocate(&impl->mm);
 	if (ret == null) return null;
 	SlabList *sl = memmap_data(&impl->mm, ret);
-	if (sl == NULL) return null;
+	if (sl == NULL) {
+		SetErr(IllegalState);
+		return null;
+	}
 	sl->next = ptr_reserved;
 
 	return ret;
@@ -167,9 +170,10 @@ void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
 
 	if (!CAS(&slptr->next, &RESERVED_PTR, null))
 		panic("Double free attempt! ptr=%u", ptr);
-	if (AADD(&impl->free_size, 1) > impl->max_free_slabs) {
+	if (AADD(&impl->free_size, 1) >= impl->max_free_slabs) {
 		memmap_free(&impl->mm, ptr);
 		ASUB(&impl->total_slabs, 1);
+		ASUB(&impl->free_size, 1);
 		return;
 	}
 

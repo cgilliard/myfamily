@@ -503,3 +503,98 @@ Test(test_slab_allocator) {
 
 	slab_allocator_cleanup(&sa1);
 }
+
+Test(test_slab_allocator_recycle) {
+	long long size = 1024 * 1024 * 1;
+	int count = 5;
+	int alloc_size = 64;
+
+	SlabAllocator sa1;
+	fam_assert(!slab_allocator_init(&sa1, alloc_size, count + 5, count + 5));
+	Ptr slabs[count];
+
+	for (long long i = 0; i < size; i++) {
+		for (int j = 0; j < count; j++) {
+			slabs[j] = slab_allocator_allocate(&sa1);
+			fam_assert(slabs[j] != null);
+		}
+		for (int j = 0; j < count; j++) {
+			slab_allocator_free(&sa1, slabs[j]);
+		}
+	}
+
+	slab_allocator_cleanup(&sa1);
+}
+
+Test(test_slab_allocator_adv) {
+	SlabAllocator sa1;
+	int slab_len = 128;
+	fam_assert(!slab_allocator_init(&sa1, slab_len, 100000, 2000000));
+	int size = 50000;
+	Ptr *arr = mmap_allocate(sizeof(Ptr) * size);
+
+	for (int i = 0; i < size; i++) {
+		Ptr p = slab_allocator_allocate(&sa1);
+		arr[i] = p;
+		byte *parr = slab_get(&sa1, p);
+		parr[0] = (i + 2) % 256;
+		for (int j = 1; j < slab_len; j++) {
+			parr[j] = (((i + 2) + j) % 26) + 'a';
+		}
+	}
+
+	for (int i = 0; i < size; i++) {
+		byte *parr = slab_get(&sa1, arr[i]);
+		fam_assert_eq(parr[0], (i + 2) % 256);
+		for (int j = 1; j < slab_len; j++)
+			fam_assert_eq(parr[j], (((i + 2) + j) % 26) + 'a');
+		slab_allocator_free(&sa1, arr[i]);
+	}
+
+	slab_allocator_cleanup(&sa1);
+	mmap_free(arr, sizeof(Ptr) * size);
+}
+
+Test(test_slab_allocator_err_checks) {
+	fam_err = NoErrors;
+	fam_assert(!slab_get(NULL, 0));
+	fam_assert_eq(fam_err, IllegalArgument);
+
+	SlabAllocator sa;
+	fam_assert(slab_allocator_init(&sa, 8, 3, 3));
+
+	fam_err = NoErrors;
+	fam_assert(!slab_allocator_allocate(NULL));
+	fam_assert_eq(fam_err, IllegalArgument);
+
+	fam_assert(!slab_allocator_init(&sa, 8, 15, 5));
+
+	for (int i = 0; i < 5; i++) {
+		fam_assert(slab_allocator_allocate(&sa));
+	}
+
+	// sa is full
+	fam_assert(!slab_allocator_allocate(&sa));
+
+	slab_allocator_cleanup(&sa);
+
+	fam_assert(!slab_allocator_init(&sa, 128, 5, 100));
+	Ptr arr[10];
+
+	for (int i = 0; i < 10; i++) {
+		fam_assert(arr[i] = slab_allocator_allocate(&sa));
+	}
+
+	// The michael-scott queue has to have a single free slab
+	fam_assert_eq(slab_allocator_total_slabs(&sa), 11);
+
+	for (int i = 0; i < 10; i++) {
+		slab_allocator_free(&sa, arr[i]);
+	}
+
+	int fs = slab_allocator_free_size(&sa);
+	int ts = slab_allocator_total_slabs(&sa);
+	fam_assert_eq(slab_allocator_free_size(&sa), 5);
+
+	slab_allocator_cleanup(&sa);
+}

@@ -63,8 +63,8 @@ bool execute_tests(byte *name) {
 				int64 start_alloc = _allocation_sum;
 				test_arr[i]("test_dir", "resources_dir");
 				if (_allocation_sum != start_alloc)
-					println("%sFAIL%s: alloc_diff=%lli", BRIGHT_RED, RESET,
-							_allocation_sum - start_alloc);
+					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
+							BRIGHT_RED, RESET, _allocation_sum - start_alloc);
 				fam_assert_eq(_allocation_sum, start_alloc);
 			}
 		} else {
