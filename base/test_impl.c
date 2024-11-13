@@ -24,6 +24,8 @@
 
 #define MAX_BACKTRACE_ENTRIES 128
 
+#ifdef TEST
+
 int test_count = 0;
 test_fn_ptr test_arr[MAX_TESTS + 1];
 byte test_names[MAX_TESTS][MAX_TEST_NAME + 1];
@@ -60,14 +62,12 @@ bool execute_tests(byte *name) {
 			if (target_test[0] == 0 ||
 				!cstring_compare(target_test, test_names[i])) {
 				test_exe_count++;
-#ifdef TEST
 				__int128_t start_alloc = _allocation_sum;
 				test_arr[i]("test_dir", "resources_dir");
 				if (_allocation_sum != start_alloc)
 					println("%sFAIL%s: alloc_diff=%lli", BRIGHT_RED, RESET,
 							_allocation_sum - start_alloc);
 				fam_assert_eq(_allocation_sum, start_alloc);
-#endif	// TEST
 			}
 		} else {
 			println("%sFAIL:%s test '%s%s%s' failed!", BRIGHT_RED, RESET, GREEN,
@@ -190,3 +190,5 @@ void fail_assert() {
 
 	longjmp(test_jmp, 1);
 }
+
+#endif	// TEST
