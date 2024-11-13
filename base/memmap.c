@@ -292,6 +292,32 @@ void memmap_cleanup(MemMap *mm) {
 }
 
 #ifdef TEST
+void mmemap_force_cleanup(MemMap *mm) {
+	MemMapImpl *impl = (MemMapImpl *)mm;
+	if (impl->data == NULL) return;
+	for (int i = 0; i < IMAX; i++) {
+		if (impl->data[i]) {
+			for (int j = 0; j < MEMMAP_ENTRY_PER_LEVEL; j++) {
+				if (impl->data[i][j]) {
+					for (int k = 0; k < MEMMAP_ENTRY_PER_LEVEL; k++) {
+						if (impl->data[i][j][k]) {
+							mmap_free(impl->data[i][j][k],
+									  MEMMAP_ENTRY_PER_LEVEL * impl->size *
+											  sizeof(byte) +
+										  BITMAP_SIZE);
+							impl->data[i][j][k] = NULL;
+						}
+					}
+					mmap_free(impl->data[i][j],
+							  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+				}
+			}
+			mmap_free(impl->data[i], MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+		}
+	}
+	mmap_free(impl->data, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+}
+
 void memmap_reset() {
 	ASTORE(&memmap_id, 0);
 	for (int i = 0; i < MAX_MEMMAPS; i++)

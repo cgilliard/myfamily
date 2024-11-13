@@ -17,15 +17,19 @@
 #include <base/types.h>
 #include <sys/mman.h>
 
+__int128_t _allocation_sum = 0;
+
 size_t getpagesize();
 
 void *mmap_allocate(unsigned long long size) {
-	/*println("size=%llu,as=%llu", size, mmap_aligned_size(size));*/
-	return mmap(NULL, mmap_aligned_size(size), PROT_READ | PROT_WRITE,
-				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	void *ret = mmap(NULL, mmap_aligned_size(size), PROT_READ | PROT_WRITE,
+					 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if (ret) _allocation_sum += size;
+	return ret;
 }
 
 void mmap_free(void *ptr, unsigned long long size) {
+	_allocation_sum -= size;
 	if (munmap(ptr, mmap_aligned_size(size))) panic("unexpected mmap error!");
 }
 

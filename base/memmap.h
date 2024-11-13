@@ -40,6 +40,7 @@ void memmap_cleanup(MemMap *mm);
 #ifdef TEST
 void memmap_reset();
 void memmap_setijkl(int index, int i, int j, int k, int l);
+void mmemap_force_cleanup(MemMap *mm);
 #endif	// TEST
 
 #endif	// _BASE_MEMMAP__

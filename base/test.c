@@ -200,7 +200,7 @@ Test(test_large_memmap_kval) {
 			memmap_free(&mm1, ptrs[j]);
 		}
 	}
-	memmap_cleanup(&mm1);
+	mmemap_force_cleanup(&mm1);
 }
 
 Test(test_big_memmap) {

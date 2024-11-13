@@ -19,4 +19,8 @@ unsigned long long mmap_aligned_size(unsigned long long size);
 void *mmap_allocate(unsigned long long size);
 void mmap_free(void *, unsigned long long size);
 
+#ifdef TEST
+extern __int128_t _allocation_sum;
+#endif	// TEST
+
 #endif	// _BASE_MMAP__
