@@ -203,15 +203,18 @@ Test(test_large_memmap_kval) {
 }
 
 Test(test_big_memmap) {
+	memmap_reset();
 	MemMap mm1;
-	int size = 128;
+	// int size = 8;
 	// unsigned long long count = 1024ULL * 1024ULL * 1024ULL * 2ULL;
-	unsigned long long count = 10;
+	int size = 128;
+	unsigned long long count = 10000;
 	memmap_init(&mm1, size);
 	Ptr *ptrs = mmap_allocate(count * sizeof(Ptr));
 
 	for (unsigned long long i = 0; i < count; i++) {
 		ptrs[i] = memmap_allocate(&mm1);
+		fam_assert(ptrs[i] == i + 2);
 		byte *data = memmap_data(&mm1, ptrs[i]);
 		for (int j = 0; j < size; j++) {
 			data[j] = ((i + j) % 26) + 'a';
