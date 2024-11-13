@@ -1,7 +1,7 @@
 [![CI Pipeline](https://github.com/cgilliard/myfamily/actions/workflows/main.yml/badge.svg)](https://github.com/cgilliard/myfamily/actions/workflows/main.yml)
 [![Release Version](https://img.shields.io/github/v/release/cgilliard/myfamily.svg)](https://github.com/cgilliard/myfamily/releases)
 [![Docmentation](https://img.shields.io/static/v1?label=Documentation&message=Github+Pages&color=red)](https://cgilliard.github.io/myfamily/)
-[![Code Coverage](https://img.shields.io/static/v1?label=Code%20Coverage&message=39.13%&color=purple)](https://cgilliard.github.io/myfamily/code_coverage.html)
+[![Code Coverage](https://img.shields.io/static/v1?label=Code%20Coverage&message=72.96%&color=purple)](https://cgilliard.github.io/myfamily/code_coverage.html)
 [![License](https://img.shields.io/github/license/cgilliard/myfamily.svg)](https://github.com/cgilliard/myfamily/blob/master/LICENSE)
 
 <div>
