@@ -39,12 +39,11 @@ jobs:
         run: |
           echo "evt=$GITHUB_EVENT_NAME";
           if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-             echo "Running coverage scripts";
              git clone https://anything:${{ secrets.MyFamilyPat }}@github.com/cgilliard/myfamily.git _coverage
              cd _coverage
              git config user.name "Pipelines-Bot"
              git checkout main
-             ./fam clean; ./fam coverage --update-docs
+             ./fam clean; ./fam coverage --update-docs -s
              git config user.email "pipelinesbot.noreply@example.com"
              git config user.name "Pipelines-Bot"
              git commit -am "Pipelines-Bot: Updated repo (via build_docs script) Source Version is $GITHUB_SHA";
