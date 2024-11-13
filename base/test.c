@@ -167,8 +167,9 @@ Test(test_memmap_recycle) {
 }
 
 Test(test_memmap_cap_exceed) {
+	memmap_reset();
 	int size = 64;
-	for (int i = 0; i < MAX_MEMMAPS - 1; i++) {
+	for (int i = 0; i < MAX_MEMMAPS + 1; i++) {
 		MemMap mm1;
 		fam_assert(!memmap_init(&mm1, size));
 		memmap_cleanup(&mm1);
@@ -185,7 +186,7 @@ Test(test_large_memmap_kval) {
 	int itt = 100;
 	Ptr ptrs[itt];
 	memmap_init(&mm1, size);
-	memmap_setijkl(0, 255, 255, 255, 3);
+	memmap_setijkl(0, 31, 511, 511, 7);
 	for (int i = 0; i < count; i++) {
 		for (int j = 0; j < itt; j++) {
 			ptrs[j] = memmap_allocate(&mm1);
@@ -208,7 +209,7 @@ Test(test_big_memmap) {
 	// int size = 8;
 	// unsigned long long count = 1024ULL * 1024ULL * 1024ULL * 2ULL;
 	int size = 128;
-	unsigned long long count = 10000;
+	unsigned long long count = 10ULL * 1000ULL * 1000ULL;
 	memmap_init(&mm1, size);
 	Ptr *ptrs = mmap_allocate(count * sizeof(Ptr));
 

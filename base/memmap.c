@@ -19,9 +19,8 @@
 #include <base/print_util.h>
 #include <base/util.h>
 
-#define MEMMAP_ENTRY_PER_LEVEL 256
-#define BITMAP_SIZE 32
-#define MEMMAP_SHIFT 8
+#define MEMMAP_ENTRY_PER_LEVEL 512
+#define BITMAP_SIZE 64
 
 static unsigned int memmap_id = 0;
 _Thread_local int last_i[MAX_MEMMAPS] = {};
@@ -51,16 +50,17 @@ typedef struct MemMapIndexCollection {
 
 Ptr memmap_index_to_ptr(unsigned int i, unsigned int j, unsigned int k,
 						unsigned int l, unsigned int x) {
-	return ((i & 0xFF) << 24) | ((j & 0xFF) << 16) | ((k & 0xFF) << 8) |
-		   ((l << 6) & 0xC0) | (x & 0x3F);
+	unsigned int ret = ((i & 0x1FF) << 27) | ((j & 0x1FF) << 18) |
+					   ((k & 0x1FF) << 9) | ((l << 6) & 0x1C0) | (x & 0x3F);
+	return ret;
 }
 
 MemMapIndexCollection memmap_ptr_to_index(Ptr ptr) {
 	MemMapIndexCollection ret = {
-		.i = (ptr >> 24) & 0xFF,
-		.j = (ptr >> 16) & 0xFF,
-		.k = (ptr >> 8) & 0xFF,
-		.l = ((ptr >> 6) & 0x3),
+		.i = (ptr >> 27) & 0x1FF,
+		.j = (ptr >> 18) & 0x1FF,
+		.k = (ptr >> 9) & 0x1FF,
+		.l = ((ptr >> 6) & 0x7),
 		.x = (ptr & 0x3F),
 	};
 	return ret;
@@ -144,6 +144,7 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 					  MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
 						  BITMAP_SIZE);
 		}
+
 		data4 = ALOAD(&impl->data[i][j][k]);
 		if (data4 == NULL) {
 			data4 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * impl->size *
@@ -174,7 +175,8 @@ void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
 	MemMapIndexCollection index = memmap_ptr_to_index(ptr);
 	byte *block = impl->data[index.i][index.j][index.k];
-	return (byte *)(block + (((index.l << 6) | index.x) * impl->size + 32));
+	return (byte *)(block +
+					(((index.l << 6) | index.x) * impl->size + BITMAP_SIZE));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
@@ -207,13 +209,13 @@ Ptr memmap_allocate(MemMap *mm) {
 			}
 			// l is 4 because 64 bits are used in the atomic load
 			// the other 4 combinations cover all 256 entries
-			if (++l >= 4) {
+			if (++l >= 8) {
 				l = 0;
 				if (++k >= MEMMAP_ENTRY_PER_LEVEL) {
 					k = 0;
 					if (++j >= MEMMAP_ENTRY_PER_LEVEL) {
 						j = 0;
-						if (++i >= MEMMAP_ENTRY_PER_LEVEL) {
+						if (++i >= 32) {  // reduced range
 							i = 0;
 						}
 						if (i == last_i[impl->memmap_id]) {
