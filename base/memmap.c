@@ -36,6 +36,7 @@ typedef struct MemMapImpl {
 	byte ****data;
 	unsigned int size;
 	unsigned int memmap_id;
+	byte padding[8];
 } MemMapImpl;
 
 void __attribute__((constructor)) __memmap_check_sizes() {
