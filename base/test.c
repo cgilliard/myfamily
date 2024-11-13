@@ -598,3 +598,31 @@ Test(test_slab_allocator_err_checks) {
 
 	slab_allocator_cleanup(&sa);
 }
+
+Test(test_slab_allocator_other_situations) {
+	set_debug_memmap_data(0);
+	SlabAllocator sa1;
+	fam_assert(slab_allocator_init(&sa1, 16, 100, 200));
+
+	set_debug_memmap_data(1);
+	fam_assert(slab_allocator_init(&sa1, 16, 100, 200));
+
+	fam_assert(!slab_allocator_init(&sa1, 16, 100, 200));
+	Ptr ptr = slab_allocator_allocate(&sa1);
+	set_debug_memmap_data(0);
+	fam_assert(!slab_get(&sa1, ptr));
+
+	set_debug_memmap_data(0);
+	fam_assert(!slab_allocator_allocate(&sa1));
+
+	slab_allocator_free(&sa1, ptr);
+	// diable panic
+	_debug_print_util_disable__ = true;
+	slab_allocator_free(&sa1, ptr);
+	_debug_print_util_disable__ = false;
+
+	set_debug_memmap_data(1);
+	fam_assert(!slab_allocator_allocate(&sa1));
+
+	slab_allocator_cleanup(&sa1);
+}

@@ -93,11 +93,13 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 
 	Ptr ptr = slab_allocator_grow(impl);
 	if (ptr == null) {
+		memmap_cleanup(&impl->mm);
 		return -1;
 	}
 
 	SlabList *sl = memmap_data(&impl->mm, ptr);
 	if (sl == NULL) {
+		memmap_cleanup(&impl->mm);
 		SetErr(IllegalState);
 		return -1;
 	}
@@ -155,6 +157,8 @@ Ptr slab_allocator_allocate(SlabAllocator *sa) {
 	ASUB(&impl->free_size, 1);
 	SlabList *sl = memmap_data(&impl->mm, ret);
 	if (sl == NULL) {
+		// note: this should not occur, but if it somehow does we have no way to
+		// free this pointer and it's a memory leak.
 		SetErr(IllegalState);
 		return null;
 	}
@@ -168,8 +172,10 @@ void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
 	SlabList *slptr = memmap_data(&impl->mm, ptr);
 	if (slptr == NULL) panic("cannot retrieve data for a freed ptr!");
 
-	if (!CAS(&slptr->next, &RESERVED_PTR, null))
+	if (!CAS(&slptr->next, &RESERVED_PTR, null)) {
 		panic("Double free attempt! ptr=%u", ptr);
+		return;
+	}
 	if (AADD(&impl->free_size, 1) >= impl->max_free_slabs) {
 		memmap_free(&impl->mm, ptr);
 		ASUB(&impl->total_slabs, 1);

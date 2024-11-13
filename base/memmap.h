@@ -43,6 +43,7 @@ void memmap_setijkl(int index, int i, int j, int k, int l);
 void mmemap_force_cleanup(MemMap *mm);
 extern bool _debug_capacity_exceeded;
 void set_debug_cas_fail_count(int value);
+void set_debug_memmap_data(int value);
 #endif	// TEST
 
 #endif	// _BASE_MEMMAP__

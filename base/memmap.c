@@ -25,6 +25,7 @@
 
 bool _debug_capacity_exceeded = false;
 static int _debug_cas_fail_count = -1;
+static int _debug_memmap_data = -1;
 
 static unsigned int memmap_id = 0;
 _Thread_local int last_i[MAX_MEMMAPS] = {};
@@ -202,6 +203,13 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 }
 
 void *memmap_data(const MemMap *mm, Ptr ptr) {
+	if (_debug_memmap_data >= 0) {
+		if (_debug_memmap_data == 0) {
+			_debug_memmap_data--;
+			return NULL;
+		}
+		_debug_memmap_data--;
+	}
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
 	MemMapIndexCollection index = memmap_ptr_to_index(ptr);
 	byte *block = impl->data[index.i][index.j][index.k];
@@ -366,5 +374,9 @@ void memmap_setijkl(int index, int i, int j, int k, int l) {
 
 void set_debug_cas_fail_count(int value) {
 	_debug_cas_fail_count = value;
+}
+
+void set_debug_memmap_data(int value) {
+	_debug_memmap_data = value;
 }
 #endif	// TEST
