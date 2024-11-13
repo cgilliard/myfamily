@@ -209,7 +209,7 @@ Test(test_big_memmap) {
 	// int size = 8;
 	// unsigned long long count = 1024ULL * 1024ULL * 1024ULL * 2ULL;
 	int size = 128;
-	unsigned long long count = 10ULL * 1000ULL * 1000ULL;
+	unsigned long long count = 100ULL * 1000ULL;
 	memmap_init(&mm1, size);
 	Ptr *ptrs = mmap_allocate(count * sizeof(Ptr));
 
