@@ -192,8 +192,6 @@ void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
 			if (!_debug_sa2 && CAS_SEQ(&sltail->next, &next, ptr)) {
 				CAS_SEQ(&impl->tail, &tail, ptr);
 				break;
-			} else {
-				CAS_SEQ(&impl->tail, &tail, next);
 			}
 		}
 		_debug_sa2 = false;
