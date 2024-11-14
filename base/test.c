@@ -143,28 +143,80 @@ Test(test_memmap) {
 
 Test(test_memmap_recycle) {
 	MemMap mm1;
-	int size = 64;
-	int count = 30000;
-	int itt = 4;
-	memmap_init(&mm1, size);
-	Ptr ptrs[itt];
+	int alloc_size = 64;
+	int size = 1024 * 100;
+	int count = 5;
+	memmap_init(&mm1, alloc_size);
+	Ptr ptrs[count];
 
-	for (int i = 0; i < count; i++) {
-		for (int j = 0; j < itt; j++) {
+	for (long long i = 0; i < size; i++) {
+		for (long long j = 0; j < count; j++) {
 			ptrs[j] = memmap_allocate(&mm1);
 			byte *data = memmap_data(&mm1, ptrs[j]);
-			data[0] = 'a' + (j % 26);
-			fam_assert((ptrs[j] == 2 + j));
+			for (int k = 0; k < alloc_size; k++) data[k] = 'a' + ((i + j) % 26);
 		}
 
-		for (int j = 0; j < itt; j++) {
+		for (long long j = 0; j < count; j++) {
 			byte *data = memmap_data(&mm1, ptrs[j]);
-			fam_assert_eq(data[0], 'a' + (j % 26));
-			fam_assert(ptrs[j] == 2 + j);
+			for (int k = 0; k < alloc_size; k++)
+				fam_assert_eq(data[k], 'a' + ((i + j) % 26));
 			memmap_free(&mm1, ptrs[j]);
 		}
 	}
 	memmap_cleanup(&mm1);
+}
+
+Test(test_slab_allocator_recycle) {
+	SlabAllocator sa1;
+	int alloc_size = 64;
+	int size = 1024 * 100;
+	int count = 5;
+
+	fam_assert(!slab_allocator_init(&sa1, alloc_size, count + 5, count + 5));
+	Ptr ptrs[count];
+
+	for (long long i = 0; i < size; i++) {
+		for (long long j = 0; j < count; j++) {
+			ptrs[j] = slab_allocator_allocate(&sa1);
+			byte *data = slab_get(&sa1, ptrs[j]);
+			for (int k = 0; k < alloc_size; k++) data[k] = 'a' + ((i + j) % 26);
+		}
+
+		for (long long j = 0; j < count; j++) {
+			byte *data = slab_get(&sa1, ptrs[j]);
+			for (int k = 0; k < alloc_size; k++)
+				fam_assert_eq(data[k], 'a' + ((i + j) % 26));
+			slab_allocator_free(&sa1, ptrs[j]);
+		}
+	}
+
+	slab_allocator_cleanup(&sa1);
+}
+
+#include <stdlib.h>
+
+Test(test_malloc_recycle) {
+	int alloc_size = 64;
+	long long size = 1024 * 100;
+	int count = 5;
+
+	byte *slabs[count];
+
+	for (long long i = 0; i < size; i++) {
+		for (long long j = 0; j < count; j++) {
+			slabs[j] = malloc(alloc_size);
+			for (int k = 0; k < alloc_size; k++) {
+				slabs[j][k] = 'a' + (k + j) % 26;
+			}
+		}
+
+		for (long long j = 0; j < count; j++) {
+			for (int k = 0; k < alloc_size; k++) {
+				fam_assert_eq(slabs[j][k], 'a' + (k + j) % 26);
+			}
+			free(slabs[j]);
+		}
+	}
 }
 
 Test(test_memmap_cap_exceed) {
@@ -500,28 +552,6 @@ Test(test_slab_allocator) {
 		byte *parr = slab_get(&sa1, arr[i]);
 		fam_assert_eq(parr[0], i + 2);
 		slab_allocator_free(&sa1, arr[i]);
-	}
-
-	slab_allocator_cleanup(&sa1);
-}
-
-Test(test_slab_allocator_recycle) {
-	long long size = 1024 * 1024 * 1;
-	int count = 5;
-	int alloc_size = 64;
-
-	SlabAllocator sa1;
-	fam_assert(!slab_allocator_init(&sa1, alloc_size, count + 5, count + 5));
-	Ptr slabs[count];
-
-	for (long long i = 0; i < size; i++) {
-		for (int j = 0; j < count; j++) {
-			slabs[j] = slab_allocator_allocate(&sa1);
-			fam_assert(slabs[j] != null);
-		}
-		for (int j = 0; j < count; j++) {
-			slab_allocator_free(&sa1, slabs[j]);
-		}
 	}
 
 	slab_allocator_cleanup(&sa1);

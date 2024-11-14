@@ -550,25 +550,41 @@ Test(test_orbtree_perf) {
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
-	// int size = 1000 * 1000 * 10;
-	int size = 1000;
-	Ptr *arr = mmap_allocate(size);
+	// int size = 10 * 1000;
+	int size = 100;
+	int count = 100;
 
+	int64 *keys = mmap_allocate(size * sizeof(int64));
 	OrbTree t;
 	slab_allocator_init(&sa, sizeof(MyLong), size + 10, size + 10);
-
 	orbtree_init(&t, &sa);
 
 	for (int64 i = 0; i < size; i++) {
-		int64 x = i;
-		cpsrng_rand_int64(&x);
-		Ptr ptr = slab_allocator_allocate(&sa);
-		MyLong *obj = (MyLong *)slab_get(&sa, ptr);
-		obj->x = x;
-		obj->y = i;
-		fam_assert(!orbtree_put(&t, ptr, long_offt, my_long_search));
+		keys[i] = 0;
+		cpsrng_rand_int64(&keys[i]);
 	}
 
+	for (int x = 0; x < count; x++) {
+		for (int64 i = 0; i < size; i++) {
+			Ptr ptr = slab_allocator_allocate(&sa);
+			MyLong *obj = (MyLong *)slab_get(&sa, ptr);
+			obj->x = keys[i];
+			obj->y = i;
+			fam_assert(!orbtree_put(&t, ptr, long_offt, my_long_search));
+		}
+
+		for (int64 i = 0; i < size; i++) {
+			MyLong obj = {.x = keys[i]};
+			Ptr ptr = orbtree_remove(&t, &obj, long_offt, my_long_search);
+			slab_allocator_free(&sa, ptr);
+		}
+	}
+
+	// assert that all slabs have been freed
+	int fs = slab_allocator_free_size(&sa);
+	int ts = slab_allocator_total_slabs(&sa);
+	fam_assert_eq(fs, ts);
+
 	slab_allocator_cleanup(&sa);
-	mmap_free(arr, size);
+	mmap_free(keys, size * sizeof(int64));
 }
