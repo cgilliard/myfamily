@@ -550,9 +550,9 @@ Test(test_orbtree_perf) {
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
-	int size = 1000 * 1000 * 10;
-	Ptr arr[size];
-	int vals[size];
+	// int size = 1000 * 1000 * 10;
+	int size = 1000;
+	Ptr *arr = mmap_allocate(size);
 
 	OrbTree t;
 	slab_allocator_init(&sa, sizeof(MyLong), size + 10, size + 10);
@@ -570,4 +570,5 @@ Test(test_orbtree_perf) {
 	}
 
 	slab_allocator_cleanup(&sa);
+	mmap_free(arr, size);
 }
