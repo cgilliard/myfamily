@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_err.h>
 #include <base/print_util.h>
 #include <crypto/aes.h>
 #include <crypto/cpsrng.h>
@@ -24,9 +25,13 @@ void cpsrng_reseed() {
 	byte key[32];
 	if (rand_bytes(key, 32)) {
 		panic("Could not generate entropy for AES key generation");
+		// for testing purposes
+		SetErr(IllegalState);
 	}
 	if (rand_bytes(iv, 16)) {
 		panic("Could not generate entropy for AES iv generation");
+		// for testing purposes
+		SetErr(IllegalState);
 	}
 
 	AES_init_ctx_iv(&aes_ctx, key, iv);
@@ -42,7 +47,7 @@ void __attribute__((constructor)) __init_cpsrng() {
 // flexible usage in a single thread, no locking is needed. In multi-threaded
 // environments, locking may be used.
 void cpsrng_rand_byte(byte *v) {
-	AES_CTR_xcrypt_buffer(&aes_ctx, v, sizeof(byte));
+	AES_CTR_xcrypt_buffer(&aes_ctx, (byte *)v, sizeof(byte));
 }
 
 // note: not thread safe as user must ensure thread safety. This allows for

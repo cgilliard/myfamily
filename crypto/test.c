@@ -72,3 +72,28 @@ Test(test_set_iv) {
 		fam_assert_eq(aes_ctx.Iv[i], iv2[i]);
 	}
 }
+
+Test(test_cpsrng) {
+	// seed values for test
+	byte iv[16] = {2};
+	byte key[32] = {1};
+	cpsrng_test_seed(iv, key);
+	byte b = 0;
+	cpsrng_rand_byte(&b);
+	fam_assert_eq(b, 239);
+
+	byte bytes[5] = {}, expected[5] = {83, 3, 132, 185, 144};
+	cpsrng_rand_bytes(bytes, 5);
+
+	for (int i = 0; i < 5; i++) fam_assert_eq(bytes[i], expected[i]);
+
+	_debug_print_util_disable__ = true;
+	_debug_getentropy_err = true;
+
+	fam_err = NoErrors;
+	cpsrng_reseed();
+	fam_assert_eq(fam_err, IllegalState);
+
+	_debug_getentropy_err = false;
+	_debug_print_util_disable__ = false;
+}

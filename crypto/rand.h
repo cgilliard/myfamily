@@ -22,4 +22,8 @@ int rand_int(int *v);
 int rand_int64(int64 *v);
 int rand_bytes(void *buf, int64 length);
 
+#ifdef TEST
+extern bool _debug_getentropy_err;
+#endif	// TEST
+
 #endif	// _CRYPTO_RAND__

@@ -16,18 +16,24 @@
 #include <crypto/rand.h>
 #include <sys/random.h>
 
+bool _debug_getentropy_err = false;
+
 int rand_byte(byte *v) {
+	if (_debug_getentropy_err) return -1;
 	return getentropy(v, sizeof(byte));
 }
 
 int rand_int(int *v) {
+	if (_debug_getentropy_err) return -1;
 	return getentropy(v, sizeof(int));
 }
 
 int rand_int64(int64 *v) {
+	if (_debug_getentropy_err) return -1;
 	return getentropy(v, sizeof(int64));
 }
 
 int rand_bytes(void *buf, int64 length) {
+	if (_debug_getentropy_err) return -1;
 	return getentropy(buf, length);
 }
