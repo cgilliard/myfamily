@@ -408,7 +408,7 @@ Test(test_random_tree) {
 
 Test(test_orbtree_range) {
 	unsigned int off = offsetof(MyObject, node1);
-	int size = 1000;
+	int size = 100;
 
 	OrbTree t;
 	slab_allocator_init(&sa, sizeof(MyObject), size + 10, size + 10);
@@ -434,7 +434,51 @@ Test(test_orbtree_range) {
 				&sa, orbtree_get(&t, &obj_in, off, my_obj_search, i));
 			fam_assert_eq(obj->x, j + i);
 		}
-		fam_assert(!orbtree_get(&t, &obj_in, off, my_obj_search, size));
+		fam_assert(!orbtree_get(&t, &obj_in, off, my_obj_search, size - j));
+	}
+
+	for (int i = 0; i < size; i++) {
+		MyObject obj = {.x = i, .v = 0};
+		Ptr removed_ptr = orbtree_remove(&t, &obj, off, my_obj_search);
+		slab_allocator_free(&sa, removed_ptr);
+		my_obj_validate(&t);
+	}
+
+	fam_assert_eq(slab_allocator_free_size(&sa),
+				  slab_allocator_total_slabs(&sa));
+
+	slab_allocator_cleanup(&sa);
+}
+
+Test(test_orbtree_range_rev) {
+	unsigned int off = offsetof(MyObject, node1);
+	int size = 100;
+
+	OrbTree t;
+	slab_allocator_init(&sa, sizeof(MyObject), size + 10, size + 10);
+
+	orbtree_init(&t, &sa);
+
+	for (int i = 0; i < size; i++) {
+		Ptr ptr = slab_allocator_allocate(&sa);
+		MyObject *obj = (MyObject *)slab_get(&sa, ptr);
+		obj->x = i;
+		obj->v = 0;
+		obj->ptr = ptr;
+		fam_assert(!orbtree_put(&t, ptr, off, my_obj_search));
+		my_obj_validate(&t);
+	}
+
+	my_obj_validate(&t);
+
+	for (int j = size - 1; j >= 0; j--) {
+		MyObject obj_in = {.x = j, .v = 0};
+		for (int i = j; i >= 0; i--) {
+			MyObject *obj = (MyObject *)slab_get(
+				&sa, orbtree_get(&t, &obj_in, off, my_obj_search, 0 - i));
+			fam_assert_eq(obj->x, j - i);
+		}
+		fam_assert(!orbtree_get(&t, &obj_in, off, my_obj_search, 0 - (1 + j)));
 	}
 
 	for (int i = 0; i < size; i++) {

@@ -652,16 +652,27 @@ bool orbtree_node_is_red(const OrbTreeNode *node) {
 
 // TODO: handle negative numbers (left)
 Ptr orbtree_adjust_offset(Ptr ret, int offset) {
+	bool left = offset < 0;
+	if (left) offset *= -1;
 	while (offset && ret) {
 		OrbTreeNodeImpl *cur = orbtree_node(ret);
-		unsigned int rh = RIGHT_HEIGHT(cur);
-		if (rh < offset) {
-			offset -= rh + 1;
+		unsigned int h;
+		if (left)
+			h = LEFT_HEIGHT(cur);
+		else
+			h = RIGHT_HEIGHT(cur);
+		if (h < offset) {
+			offset -= h + 1;
 			while (ret) {
 				OrbTreeNodeImpl *n = orbtree_node(ret);
 				if (n->parent) {
 					OrbTreeNodeImpl *parent = orbtree_node(n->parent);
-					if (parent->left == ret) {
+					Ptr p;
+					if (left)
+						p = parent->right;
+					else
+						p = parent->left;
+					if (p == ret) {
 						ret = n->parent;
 						break;
 					}
@@ -670,16 +681,28 @@ Ptr orbtree_adjust_offset(Ptr ret, int offset) {
 			}
 		} else {
 			offset -= 1;
-			ret = cur->right;
+			if (left)
+				ret = cur->left;
+			else
+				ret = cur->right;
 			cur = orbtree_node(ret);
-			while (cur->left) {
-				unsigned int lh = LEFT_HEIGHT(cur);
-				if (lh <= offset) {
-					offset -= lh;
+			while ((left && cur->right) || (!left && cur->left)) {
+				unsigned int h;
+				if (left)
+					h = RIGHT_HEIGHT(cur);
+				else
+					h = LEFT_HEIGHT(cur);
+				if (h <= offset) {
+					offset -= h;
 					break;
 				}
-				ret = cur->left;
-				cur = orbtree_node(cur->left);
+				if (left) {
+					ret = cur->right;
+					cur = orbtree_node(cur->right);
+				} else {
+					ret = cur->left;
+					cur = orbtree_node(cur->left);
+				}
 			}
 		}
 	}
