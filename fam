@@ -78,7 +78,7 @@ if [ "$1" = "clean" ]; then
 elif [ "$1" = "test" ] || [ "$1" = "coverage" ] || [ "$1" = "fasttest" ]; then
    if [ "$1" = "coverage" ]; then
       extra="-g -O0 -DTEST --coverage";
-   elif [ "$1" == "fasttest" ]; then
+   elif [ "$1" = "fasttest" ]; then
       extra="-O3 -flto -DTEST";
    else
       extra="-g -O0 -DTEST ${asan}";
