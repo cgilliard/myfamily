@@ -14,6 +14,7 @@
 
 #include <base/test.h>
 #include <core/lib.h>
+#include <crypto/lib.h>
 #include <stddef.h>
 
 Suite(core);
@@ -293,5 +294,104 @@ Test(test_orbtree) {
 	slab_allocator_free(&sa, ptr2);
 	slab_allocator_free(&sa, ptr3);
 
+	slab_allocator_cleanup(&sa);
+}
+
+Test(test_random_tree) {
+	unsigned int off = offsetof(MyObject, node1);
+
+	// seed rng for reproducibility
+	byte key[32] = {6};
+	byte iv[16] = {};
+	cpsrng_test_seed(iv, key);
+
+	int size = 1000;
+	Ptr arr[size];
+	int vals[size];
+
+	OrbTree t;
+	slab_allocator_init(&sa, sizeof(MyObject), size + 10, size + 10);
+
+	orbtree_init(&t, &sa);
+
+	for (int i = 0; i < size; i++) {
+		int x = 0;
+		cpsrng_rand_int(&x);
+		vals[i] = x;
+		Ptr ptr = slab_allocator_allocate(&sa);
+		MyObject *obj = (MyObject *)slab_get(&sa, ptr);
+		obj->x = x;
+		obj->v = 0;
+		obj->ptr = ptr;
+		fam_assert(!orbtree_put(&t, ptr, off, my_obj_search));
+		arr[i] = ptr;
+		my_obj_validate(&t);
+	}
+	my_obj_validate(&t);
+
+	for (int i = 0; i < size; i++) {
+		MyObject obj = {.x = vals[i], 0};
+		MyObject *obj_out = (MyObject *)slab_get(
+			&sa, orbtree_get(&t, &obj, off, my_obj_search, 0));
+		fam_assert_eq(obj_out->ptr, arr[i]);
+	}
+
+	// try a node not in the tree
+	MyObject obj = {.x = -1, .v = 0};
+	Ptr obj_out = orbtree_get(&t, &obj, off, my_obj_search, 0);
+	fam_assert_eq(obj_out, null);
+
+	my_obj_validate(&t);
+
+	Ptr ptr;
+
+	// do transplants
+	ptr = slab_allocator_allocate(&sa);
+	MyObject *replace1 = (MyObject *)slab_get(&sa, ptr);
+	replace1->x = vals[3];
+	replace1->v = 1;
+	Ptr rep_ptr = orbtree_put(&t, ptr, off, my_obj_search);
+	fam_assert_eq(rep_ptr, arr[3]);
+	arr[3] = ptr;
+	slab_allocator_free(&sa, rep_ptr);
+
+	ptr = slab_allocator_allocate(&sa);
+	MyObject *replace2 = (MyObject *)slab_get(&sa, ptr);
+	replace2->x = vals[7];
+	replace2->v = 1;
+	rep_ptr = orbtree_put(&t, ptr, off, my_obj_search);
+	fam_assert_eq(rep_ptr, arr[7]);
+	arr[7] = ptr;
+	slab_allocator_free(&sa, rep_ptr);
+
+	my_obj_validate(&t);
+
+	MyObject obj_updated = {.x = vals[3], .v = 0};
+	MyObject *obj_out_updated = (MyObject *)slab_get(
+		&sa, orbtree_get(&t, &obj_updated, off, my_obj_search, 0));
+	fam_assert_eq(obj_out_updated->v, 1);
+
+	MyObject obj_updated2 = {.x = vals[4], .v = 0};
+	MyObject *obj_out_updated2 = (MyObject *)slab_get(
+		&sa, orbtree_get(&t, &obj_updated2, off, my_obj_search, 0));
+	fam_assert_eq(obj_out_updated2->v, 0);
+
+	MyObject obj_updated3 = {.x = vals[7], .v = 0};
+	MyObject *obj_out_updated3 = (MyObject *)slab_get(
+		&sa, orbtree_get(&t, &obj_updated3, off, my_obj_search, 0));
+	fam_assert_eq(obj_out_updated3->v, 1);
+
+	for (int i = 0; i < size; i++) {
+		MyObject obj = {.x = vals[i]};
+		// OrbTreeNodeWrapper obj = wrap_obj(vals[i], 0);
+		Ptr removed_ptr = orbtree_remove(&t, &obj, off, my_obj_search);
+		fam_assert_eq(removed_ptr, arr[i]);
+		slab_allocator_free(&sa, removed_ptr);
+		my_obj_validate(&t);
+	}
+
+	// assert that all slabs are freed
+	fam_assert_eq(slab_allocator_free_size(&sa),
+				  slab_allocator_total_slabs(&sa));
 	slab_allocator_cleanup(&sa);
 }

@@ -12,5 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <crypto/cpsrng.h>
-#include <crypto/rand.h>
+#ifndef _CRYPTO_PSRNG__
+#define _CRYPTO_PSRNG__
+
+#include <base/types.h>
+
+void cpsrng_reseed();
+void cpsrng_rand_byte(byte *v);
+void cpsrng_rand_int64(int64 *v);
+void cpsrng_rand_int(int *v);
+void cpsrng_rand_bytes(void *v, unsigned long long size);
+
+#ifdef TEST
+void cpsrng_test_seed(byte iv[16], byte key[32]);
+#endif	// TEST
+
+#endif	// _CRYPTO_PSRNG__
