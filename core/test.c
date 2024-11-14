@@ -493,3 +493,81 @@ Test(test_orbtree_range_rev) {
 
 	slab_allocator_cleanup(&sa);
 }
+
+typedef struct MyLong {
+	int64 x;
+	int64 y;
+	OrbTreeNode node;
+} MyLong;
+
+static int long_offt = offsetof(MyLong, node);
+
+int my_long_search(const OrbTreeNode *root, const OrbTreeNode *value,
+				   OrbTreeNodePair *retval) {
+	retval->parent = null;
+	retval->is_right = true;
+	const OrbTreeNode *cur = root;
+	loop {
+		int64 x1 = ((MyLong *)((byte *)cur - long_offt))->x;
+		int64 x2 = ((MyLong *)((byte *)value - long_offt))->x;
+
+		retval->self = orbtree_node_ptr(cur, retval->is_right);
+
+		if (x1 == x2) {
+			break;
+		} else if (x1 < x2) {
+			MyLong *right = orbtree_node_right(cur);
+			if (right == NULL) {
+				retval->parent = retval->self;
+				retval->self = null;
+				retval->is_right = true;
+				break;
+			}
+			Ptr rptr = orbtree_node_ptr(&right->node, true);
+			retval->parent = orbtree_node_ptr(cur, retval->is_right);
+			retval->is_right = true;
+			cur = (const OrbTreeNode *)(slab_get(&sa, rptr) + long_offt);
+		} else {
+			MyLong *left = orbtree_node_left(cur);
+			if (left == NULL) {
+				retval->parent = retval->self;
+				retval->self = null;
+				retval->is_right = false;
+				break;
+			}
+			Ptr lptr = orbtree_node_ptr(&left->node, false);
+			retval->parent = orbtree_node_ptr(cur, retval->is_right);
+			retval->is_right = false;
+			cur = (const OrbTreeNode *)(slab_get(&sa, lptr) + long_offt);
+		}
+	}
+	return 0;
+}
+
+Test(test_orbtree_perf) {
+	// seed rng for reproducibility
+	byte key[32] = {7};
+	byte iv[16] = {};
+	cpsrng_test_seed(iv, key);
+
+	int size = 1000 * 1000 * 10;
+	Ptr arr[size];
+	int vals[size];
+
+	OrbTree t;
+	slab_allocator_init(&sa, sizeof(MyLong), size + 10, size + 10);
+
+	orbtree_init(&t, &sa);
+
+	for (int64 i = 0; i < size; i++) {
+		int64 x = i;
+		cpsrng_rand_int64(&x);
+		Ptr ptr = slab_allocator_allocate(&sa);
+		MyLong *obj = (MyLong *)slab_get(&sa, ptr);
+		obj->x = x;
+		obj->y = i;
+		fam_assert(!orbtree_put(&t, ptr, long_offt, my_long_search));
+	}
+
+	slab_allocator_cleanup(&sa);
+}
