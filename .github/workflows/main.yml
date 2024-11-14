@@ -22,20 +22,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Check uname
+      - name: Check linux version
         run: uname -a
       
-      - name: Test Linux Build
+      - name: linux build
         run: |
            ./fam clean; ./fam
-           # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
-      - name: Run Linux Tests (gcc)
+      - name: Run linux tests (gcc)
         run: |
           ./fam clean; ./fam test --with-cc=gcc -s
-      - name: Run Linux Tests (clang)
+      - name: Run linux tests (clang)
         run: |
           ./fam clean; ./fam test --with-cc=clang -s
-      - name: Build Docs
+      - name: Calculate code coverage
         run: |
           echo "evt=$GITHUB_EVENT_NAME";
           git clone https://anything:${{ secrets.MyFamilyPat }}@github.com/cgilliard/myfamily.git _coverage
@@ -58,16 +57,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Check macOS Version
+      - name: Check macos version
         run: sw_vers
       
-      - name: Test MacOS Build
+      - name: macos build
         run: |
           ./fam clean; ./fam
-          # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
-      - name: Run MacOS Tests (gcc)
+      - name: Run macos tests (gcc)
         run: |
           ./fam clean; ./fam test --with-cc=gcc -s
-      - name: Run MacOS Tests (clang)
+      - name: Run macos tests (clang)
         run: |
           ./fam clean; ./fam test --with-cc=clang -s

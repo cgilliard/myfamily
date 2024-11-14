@@ -12,7 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_ORBTREE__
-#define _CORE_ORBTREE__
+#ifndef _BASE_ORBTREE__
+#define _BASE_ORBTREE__
 
-#endif	// _CORE_ORBTREE__
+#include <base/slabs.h>
+#include <base/types.h>
+
+#define ORB_TREE_NODE_IMPL_SIZE 20
+typedef struct OrbTreeNode {
+	byte impl[ORB_TREE_NODE_IMPL_SIZE];
+} OrbTreeNode;
+
+void *orbtree_node_right(const OrbTreeNode *);
+void *orbtree_node_left(const OrbTreeNode *);
+Ptr orbtree_node_ptr(const OrbTreeNode *, bool is_right);
+
+typedef struct OrbTreeNodePair {
+	Ptr parent;
+	Ptr self;
+	bool is_right;
+} OrbTreeNodePair;
+
+typedef struct OrbTreeNodeSearchWrapper {
+	void *ptr;
+	unsigned int offsetof;
+} OrbTreeNodeSearchWrapper;
+
+typedef struct OrbTreeNodeWrapper {
+	Ptr ptr;
+	unsigned int offsetof;
+} OrbTreeNodeWrapper;
+
+#define ORB_TREE_IMPL_SIZE 24
+typedef struct OrbTree {
+	byte impl[ORB_TREE_IMPL_SIZE];
+} OrbTree;
+
+typedef int (*OrbTreeSearch)(const OrbTreeNode *base, const OrbTreeNode *value,
+							 OrbTreeNodePair *retval);
+
+int orbtree_init(OrbTree *tree, const SlabAllocator *sa);
+Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeSearchWrapper *value,
+				OrbTreeSearch search, int offset);
+Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
+				const OrbTreeSearch search);
+Ptr orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
+				   const OrbTreeSearch search);
+
+#ifdef TEST
+Ptr orbtree_root(const OrbTree *tree);
+void *orbtree_node_parent(const OrbTreeNode *node);
+bool orbtree_node_is_red(const OrbTreeNode *node);
+unsigned int orbtree_node_right_subtree_height(const OrbTreeNode *node);
+unsigned int orbtree_node_left_subtree_height(const OrbTreeNode *node);
+#endif	// TEST
+
+#endif	// _BASE_ORBTREE__
