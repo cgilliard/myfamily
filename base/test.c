@@ -34,6 +34,7 @@ Test(test_colors) {
 }
 
 Test(test_fam_err) {
+	fam_err = NoErrors;
 	fam_assert_eq(fam_err, NoErrors);
 	SetErr(IllegalArgument);
 	fam_assert_eq(fam_err, IllegalArgument);
