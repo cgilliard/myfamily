@@ -18,6 +18,10 @@
 #include <base/print_util.h>
 #include <base/slabs.h>
 
+bool _debug_sa1 = false;
+bool _debug_sa2 = false;
+bool _debug_sa3 = false;
+
 static Ptr RESERVED_PTR = 1;
 
 typedef struct SlabList {
@@ -143,25 +147,18 @@ Ptr slab_allocator_allocate(SlabAllocator *sa) {
 		next = sl->next;
 		if (head == impl->head) {
 			if (head == tail) {
-				if (next == null) {
-					return slab_allocator_grow(impl);
-				}
-				CAS_SEQ(&impl->tail, &tail, next);
+				return slab_allocator_grow(impl);
 			} else {
 				ret = head;
-				if (CAS_SEQ(&impl->head, &head, next)) break;
+				if (!_debug_sa1 && CAS_SEQ(&impl->head, &head, next)) break;
+				_debug_sa1 = false;
 			}
 		}
 	}
 
 	ASUB(&impl->free_size, 1);
 	SlabList *sl = memmap_data(&impl->mm, ret);
-	if (sl == NULL) {
-		// note: this should not occur, but if it somehow does we have no way to
-		// free this pointer and it's a memory leak.
-		SetErr(IllegalState);
-		return null;
-	}
+	if (sl == NULL) panic("Illegal state: newly allocated slab has no data!");
 	sl->next = ptr_reserved;
 	return ret;
 }
@@ -171,8 +168,9 @@ void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
 
 	SlabList *slptr = memmap_data(&impl->mm, ptr);
 	if (slptr == NULL) panic("cannot retrieve data for a freed ptr!");
-
 	if (!CAS(&slptr->next, &RESERVED_PTR, null)) {
+		// we have to fix RESERVED_PTR here. (mostly for tests since we panic)
+		RESERVED_PTR = 1;
 		panic("Double free attempt! ptr=%u", ptr);
 		return;
 	}
@@ -191,15 +189,14 @@ void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
 		if (sltail == NULL) panic("cannot retrieve data for tail!");
 		next = sltail->next;
 		if (tail == impl->tail) {
-			if (next == null) {
-				if (CAS_SEQ(&sltail->next, &next, ptr)) {
-					CAS_SEQ(&impl->tail, &tail, ptr);
-					break;
-				}
+			if (!_debug_sa2 && CAS_SEQ(&sltail->next, &next, ptr)) {
+				CAS_SEQ(&impl->tail, &tail, ptr);
+				break;
 			} else {
 				CAS_SEQ(&impl->tail, &tail, next);
 			}
 		}
+		_debug_sa2 = false;
 	}
 }
 
@@ -213,4 +210,11 @@ unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 	return ALOAD(&impl->total_slabs);
 }
+void set_debug_sa1() {
+	_debug_sa1 = true;
+}
+void set_debug_sa2() {
+	_debug_sa2 = true;
+}
+
 #endif	// TEST

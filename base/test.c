@@ -600,6 +600,7 @@ Test(test_slab_allocator_err_checks) {
 }
 
 Test(test_slab_allocator_other_situations) {
+	Ptr ptr;
 	set_debug_memmap_data(0);
 	SlabAllocator sa1;
 	fam_assert(slab_allocator_init(&sa1, 16, 100, 200));
@@ -608,21 +609,27 @@ Test(test_slab_allocator_other_situations) {
 	fam_assert(slab_allocator_init(&sa1, 16, 100, 200));
 
 	fam_assert(!slab_allocator_init(&sa1, 16, 100, 200));
-	Ptr ptr = slab_allocator_allocate(&sa1);
+	ptr = slab_allocator_allocate(&sa1);
 	set_debug_memmap_data(0);
 	fam_assert(!slab_get(&sa1, ptr));
-
 	set_debug_memmap_data(0);
 	fam_assert(!slab_allocator_allocate(&sa1));
-
 	slab_allocator_free(&sa1, ptr);
 	// diable panic
 	_debug_print_util_disable__ = true;
 	slab_allocator_free(&sa1, ptr);
 	_debug_print_util_disable__ = false;
-
-	set_debug_memmap_data(1);
-	fam_assert(!slab_allocator_allocate(&sa1));
-
 	slab_allocator_cleanup(&sa1);
+
+	SlabAllocator sa2;
+	fam_assert(!slab_allocator_init(&sa2, 16, 100, 200));
+	ptr = slab_allocator_allocate(&sa2);
+	slab_allocator_free(&sa2, ptr);
+
+	set_debug_sa1();
+	fam_assert(ptr = slab_allocator_allocate(&sa2));
+	set_debug_sa2();
+	slab_allocator_free(&sa2, ptr);
+
+	slab_allocator_cleanup(&sa2);
 }

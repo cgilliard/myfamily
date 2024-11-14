@@ -38,6 +38,8 @@ void slab_allocator_free(SlabAllocator *sa, Ptr ptr);
 #ifdef TEST
 unsigned long long slab_allocator_free_size(SlabAllocator *sa);
 unsigned long long slab_allocator_total_slabs(SlabAllocator *sa);
+void set_debug_sa1();
+void set_debug_sa2();
 #endif	// TEST
 
 #endif	// _BASE_SLABS__
