@@ -45,3 +45,30 @@ Test(test_rand) {
 	fam_assert(!rand_bytes(buf2, count));
 	fam_assert(cstring_compare_n(buf1, buf2, count));
 }
+
+Test(test_set_iv) {
+	byte iv[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+	byte key[32] = {0,	1,	2,	3,	4,	5,	6,	7,	8,	9,	10,
+					11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+					22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+	if (rand_bytes(key, 32)) {
+		panic("Could not generate entropy for AES key generation");
+	}
+	if (rand_bytes(iv, 16)) {
+		panic("Could not generate entropy for AES iv generation");
+	}
+
+	struct AES_ctx aes_ctx;
+	AES_init_ctx_iv(&aes_ctx, key, iv);
+	for (int i = 0; i < 16; i++) {
+		fam_assert_eq(aes_ctx.Iv[i], iv[i]);
+	}
+	for (int i = 0; i < 32; i++) {
+		fam_assert_eq(aes_ctx.RoundKey[i], key[i]);
+	}
+	byte iv2[16] = {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+	AES_ctx_set_iv(&aes_ctx, iv2);
+	for (int i = 0; i < 16; i++) {
+		fam_assert_eq(aes_ctx.Iv[i], iv2[i]);
+	}
+}
