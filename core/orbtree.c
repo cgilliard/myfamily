@@ -694,12 +694,12 @@ int orbtree_init(OrbTree *tree, const SlabAllocator *sa) {
 	return 0;
 }
 
-Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeSearchWrapper *value,
+Ptr orbtree_get(const OrbTree *tree, const void *value, unsigned int offsetof,
 				OrbTreeSearch search, int offset) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	OrbTreeNode *target = (OrbTreeNode *)((byte *)value->ptr + value->offsetof);
+	OrbTreeNode *target = (OrbTreeNode *)((byte *)value + offsetof);
 	OrbTreeNodePair retval = {};
-	orbtree_set_tl_context(impl, value->offsetof);
+	orbtree_set_tl_context(impl, offsetof);
 	Ptr ret = null;
 
 	lockr(&impl->lock);
@@ -713,12 +713,13 @@ Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeSearchWrapper *value,
 	return ret;
 }
 
-Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
+Ptr orbtree_put(OrbTree *tree, Ptr ptr, unsigned int offsetof,
 				OrbTreeSearch search) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	orbtree_set_tl_context(impl, value->offsetof);
-	OrbTreeNode *target = (OrbTreeNode *)orbtree_node(value->ptr);
-	OrbTreeNodePair pair = {.parent = null, .self = value->ptr};
+	orbtree_set_tl_context(impl, offsetof);
+	void *value = slab_get(impl->sa, ptr);
+	OrbTreeNode *target = (OrbTreeNode *)((byte *)value + offsetof);
+	OrbTreeNodePair pair = {.parent = null, .self = ptr};
 
 	lockw(&impl->lock);
 	if (impl->root != null) {
@@ -726,22 +727,22 @@ Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
 		search(root, target, &pair);
 	}
 
-	Ptr ret = orbtree_insert(impl, &pair, value->ptr);
+	Ptr ret = orbtree_insert(impl, &pair, ptr);
 	if (ret == null) {
 		orbtree_update_heights(pair.parent, pair.is_right, true);
-		orbtree_put_fixup(value->ptr);
+		orbtree_put_fixup(ptr);
 	}
 	unlock(&impl->lock);
 
 	return ret;
 }
 
-Ptr orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
+Ptr orbtree_remove(OrbTree *tree, const void *value, unsigned int offsetof,
 				   OrbTreeSearch search) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	orbtree_set_tl_context(impl, value->offsetof);
-	OrbTreeNode *target = (OrbTreeNode *)orbtree_node(value->ptr);
-	OrbTreeNodePair pair = {.parent = null, .self = value->ptr};
+	orbtree_set_tl_context(impl, offsetof);
+	OrbTreeNode *target = (OrbTreeNode *)((byte *)value + offsetof);
+	OrbTreeNodePair pair = {.parent = null, .self = null};
 
 	lockw(&impl->lock);
 	if (impl->root != null) {

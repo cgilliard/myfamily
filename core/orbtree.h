@@ -52,11 +52,11 @@ typedef int (*OrbTreeSearch)(const OrbTreeNode *base, const OrbTreeNode *value,
 							 OrbTreeNodePair *retval);
 
 int orbtree_init(OrbTree *tree, const SlabAllocator *sa);
-Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeSearchWrapper *value,
+Ptr orbtree_get(const OrbTree *tree, const void *value, unsigned int offsetof,
 				OrbTreeSearch search, int offset);
-Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
+Ptr orbtree_put(OrbTree *tree, Ptr ptr, unsigned int offsetof,
 				const OrbTreeSearch search);
-Ptr orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
+Ptr orbtree_remove(OrbTree *tree, const void *value, unsigned int offsetof,
 				   const OrbTreeSearch search);
 
 #ifdef TEST
