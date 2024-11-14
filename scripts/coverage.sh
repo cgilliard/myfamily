@@ -43,7 +43,7 @@ echo "$BLUE--------------------------------"\
 "--------------------$RESET";
    cd $dir;
    for gcno in *.gcno; do
-      if [ -f ${gcno%.gcno}.gcda ] && [ "$gcno" != "test_impl.gcno" ]; then
+      if [ -f ${gcno%.gcno}.gcda ] && [ "$gcno" != "test_impl.gcno" ] && [ "$gcno" != "test.gcno" ]; then
          percent=`gcov $gcno | grep "^Lines" | head -1 | cut -f2 -d ' ' | cut -f2 -d ':' | cut -f1 -d '%' | tr -d \\n`;
          if [ "$percent" = "" ]; then
             percent=0.00;
