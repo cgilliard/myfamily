@@ -47,7 +47,7 @@ void lock_write(Lock *lock) {
 	do {
 		state = ALOAD(lock) & ~0x80000000ULL;
 		state_update = (state + 0x100000000ULL) | 0x80000000ULL;
-	} while (!CAS(lock, &state, state_update));
+	} while (!CAS_SEQ(lock, &state, state_update));
 
 	// second step, obtain total lock before proceeding
 	do {

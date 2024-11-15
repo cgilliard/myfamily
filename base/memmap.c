@@ -107,7 +107,7 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 #ifdef TEST
 		DEBUG_CAS_FAIL_COUNT
 #endif	// TEST
-	} while (force_continue_loop || !CAS(&impl->data, &nullvalue1, data1));
+	} while (force_continue_loop || !CAS_SEQ(&impl->data, &nullvalue1, data1));
 
 	// load second level
 	byte ***nullvalue2 = NULL;
@@ -133,7 +133,8 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 #ifdef TEST
 		DEBUG_CAS_FAIL_COUNT
 #endif	// TEST
-	} while (force_continue_loop || !CAS(&impl->data[i], &nullvalue2, data2));
+	} while (force_continue_loop ||
+			 !CAS_SEQ(&impl->data[i], &nullvalue2, data2));
 	// load third level
 	byte **nullvalue3 = NULL;
 	byte **data3;
@@ -160,7 +161,7 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 		DEBUG_CAS_FAIL_COUNT
 #endif	// TEST
 	} while (force_continue_loop ||
-			 !CAS(&impl->data[i][j], &nullvalue3, data3));
+			 !CAS_SEQ(&impl->data[i][j], &nullvalue3, data3));
 	// load fourth and final level
 	byte *nullvalue4 = NULL;
 	byte *data4;
@@ -194,7 +195,7 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 		DEBUG_CAS_FAIL_COUNT
 #endif	// TEST
 	} while (force_continue_loop ||
-			 !CAS(&impl->data[i][j][k], &nullvalue4, data4));
+			 !CAS_SEQ(&impl->data[i][j][k], &nullvalue4, data4));
 
 	// return the lth item at the begining of the data array (32 bytes reserved)
 	// l is between 0-3.
@@ -273,7 +274,7 @@ Ptr memmap_allocate(MemMap *mm) {
 		ret = memmap_index_to_ptr(i, j, k, l, x);
 		// set bit
 		desired = v | (0x1ULL << x);
-	} while (!CAS(current, &v, desired));
+	} while (!CAS_SEQ(current, &v, desired));
 
 	last_i[impl->memmap_id] = i;
 	last_j[impl->memmap_id] = j;
@@ -304,7 +305,7 @@ void memmap_free(MemMap *mm, Ptr ptr) {
 		vo = ALOAD((unsigned long long *)(v));
 		if ((vo & (0x1ULL << x)) == 0) panic("double free attempt!");
 		nv = vo & ~(0x1ULL << x);
-	} while (!CAS(&*v, &vo, nv));
+	} while (!CAS_SEQ(&*v, &vo, nv));
 
 	last_i[impl->memmap_id] = i;
 	last_j[impl->memmap_id] = j;

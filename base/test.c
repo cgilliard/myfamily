@@ -141,11 +141,12 @@ Test(test_memmap) {
 	memmap_cleanup(&mm1);
 }
 
+static int alloc_size = 64;
+static int size = 1024 * 10;
+static int count = 5;
+
 Test(test_memmap_recycle) {
 	MemMap mm1;
-	int alloc_size = 64;
-	int size = 1024 * 100;
-	int count = 5;
 	memmap_init(&mm1, alloc_size);
 	Ptr ptrs[count];
 
@@ -168,9 +169,6 @@ Test(test_memmap_recycle) {
 
 Test(test_slab_allocator_recycle) {
 	SlabAllocator sa1;
-	int alloc_size = 64;
-	int size = 1024 * 100;
-	int count = 5;
 
 	fam_assert(!slab_allocator_init(&sa1, alloc_size, count + 5, count + 5));
 	Ptr ptrs[count];
@@ -196,10 +194,6 @@ Test(test_slab_allocator_recycle) {
 #include <stdlib.h>
 
 Test(test_malloc_recycle) {
-	int alloc_size = 64;
-	long long size = 1024 * 100;
-	int count = 5;
-
 	byte *slabs[count];
 
 	for (long long i = 0; i < size; i++) {
