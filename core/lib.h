@@ -13,3 +13,4 @@
 // limitations under the License.
 
 #include <core/orbtree.h>
+#include <core/thread.h>
