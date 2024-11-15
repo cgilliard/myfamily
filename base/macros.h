@@ -35,20 +35,20 @@
 
 // CAS
 #define CAS(...)                                                      \
-	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELAXED, \
-								__ATOMIC_RELAXED)
+	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELEASE, \
+								__ATOMIC_RELEASE)
 #define CAS_SEQ(...)                                                  \
 	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_SEQ_CST, \
-								__ATOMIC_RELAXED)
+								__ATOMIC_SEQ_CST)
 #define CAS_ACQUIRE(...)                                              \
 	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_ACQUIRE, \
-								__ATOMIC_RELAXED)
+								__ATOMIC_ACQUIRE)
 #define CAS_RELEASE(...)                                              \
 	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELEASE, \
-								__ATOMIC_RELAXED)
-#define ALOAD(ptr) __atomic_load_n(ptr, __ATOMIC_RELAXED)
-#define ASTORE(ptr, value) __atomic_store_n(ptr, value, __ATOMIC_RELAXED)
-#define AADD(ptr, value) __atomic_fetch_add(ptr, value, __ATOMIC_RELAXED)
-#define ASUB(ptr, value) __atomic_fetch_sub(ptr, value, __ATOMIC_RELAXED)
+								__ATOMIC_RELEASE)
+#define ALOAD(ptr) __atomic_load_n(ptr, __ATOMIC_ACQUIRE)
+#define ASTORE(ptr, value) __atomic_store_n(ptr, value, __ATOMIC_RELEASE)
+#define AADD(ptr, value) __atomic_fetch_add(ptr, value, __ATOMIC_SEQ_CST)
+#define ASUB(ptr, value) __atomic_fetch_sub(ptr, value, __ATOMIC_SEQ_CST)
 
 #endif	// _BASE_MACROS__
