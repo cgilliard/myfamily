@@ -15,46 +15,35 @@
 #ifndef _BASE_ORBTREE__
 #define _BASE_ORBTREE__
 
-#include <base/slabs.h>
 #include <base/types.h>
 
-#define ORB_TREE_NODE_IMPL_SIZE 20
+#define INIT_ORBTREE \
+	{}
+#define PARENT(node) \
+	((OrbTreeNode *)((unsigned long long)node->parent_color & ~0x1))
+
 typedef struct OrbTreeNode {
-	byte impl[ORB_TREE_NODE_IMPL_SIZE];
+	struct OrbTreeNode *parent_color;
+	struct OrbTreeNode *right;
+	struct OrbTreeNode *left;
 } OrbTreeNode;
 
-void *orbtree_node_right(const OrbTreeNode *);
-void *orbtree_node_left(const OrbTreeNode *);
-Ptr orbtree_node_ptr(const OrbTreeNode *, bool is_right);
-
 typedef struct OrbTreeNodePair {
-	Ptr parent;
-	Ptr self;
+	OrbTreeNode *parent;
+	OrbTreeNode *self;
 	bool is_right;
 } OrbTreeNodePair;
 
-#define ORB_TREE_IMPL_SIZE 24
 typedef struct OrbTree {
-	byte impl[ORB_TREE_IMPL_SIZE];
+	OrbTreeNode *root;
 } OrbTree;
 
-typedef int (*OrbTreeSearch)(const OrbTreeNode *base, const OrbTreeNode *value,
+typedef int (*OrbTreeSearch)(OrbTreeNode *base, const OrbTreeNode *value,
 							 OrbTreeNodePair *retval);
 
-int orbtree_init(OrbTree *tree, const SlabAllocator *sa);
-Ptr orbtree_get(const OrbTree *tree, const void *value, unsigned int offsetof,
-				OrbTreeSearch search, int offset);
-Ptr orbtree_put(OrbTree *tree, Ptr ptr, unsigned int offsetof,
-				const OrbTreeSearch search);
-Ptr orbtree_remove(OrbTree *tree, const void *value, unsigned int offsetof,
-				   const OrbTreeSearch search);
-
-#ifdef TEST
-Ptr orbtree_root(const OrbTree *tree);
-void *orbtree_node_parent(const OrbTreeNode *node);
-bool orbtree_node_is_red(const OrbTreeNode *node);
-unsigned int orbtree_node_right_subtree_height(const OrbTreeNode *node);
-unsigned int orbtree_node_left_subtree_height(const OrbTreeNode *node);
-#endif	// TEST
+OrbTreeNode *orbtree_put(OrbTree *tree, OrbTreeNode *value,
+						 const OrbTreeSearch search);
+OrbTreeNode *orbtree_remove(OrbTree *tree, OrbTreeNode *value,
+							const OrbTreeSearch search);
 
 #endif	// _BASE_ORBTREE__

@@ -63,7 +63,7 @@ esac
 done
 extra="${extra} ${asan}";
 
-cc_flags='-Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -I..';
+cc_flags='-Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -Wno-address-of-packed-member -I..';
 
 if ${cc} -dM -E - < /dev/null | grep -q '__clang__'; then
     # If Clang is detected

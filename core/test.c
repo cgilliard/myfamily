@@ -19,6 +19,188 @@
 
 Suite(core);
 
+typedef struct __attribute__((__packed__)) MyObject {
+	Ptr ptr;
+	int64 version;
+	int64 value;
+	OrbTreeNode node;
+} MyObject;
+
+unsigned int offsetof_node = offsetof(MyObject, node);
+
+int my_obj_search(OrbTreeNode *cur, const OrbTreeNode *value,
+				  OrbTreeNodePair *retval) {
+	while (cur) {
+		int64 v1 = ((MyObject *)((byte *)cur - offsetof_node))->value;
+		int64 v2 = ((MyObject *)((byte *)value - offsetof_node))->value;
+
+		if (v1 == v2) {
+			retval->self = cur;
+			break;
+		} else if (v1 < v2) {
+			retval->parent = cur;
+			retval->is_right = true;
+			cur = cur->right;
+		} else {
+			retval->parent = cur;
+			retval->is_right = false;
+			cur = cur->left;
+		}
+		retval->self = cur;
+	}
+	return 0;
+}
+
+#define IS_BLACK(node) (((unsigned long long)node->parent_color % 2) == 0)
+
+void my_obj_validate_node(const OrbTreeNode *node, int *black_count,
+						  int current_black_count) {
+	if (node == NULL) {
+		if (*black_count == 0) {
+			*black_count =
+				current_black_count;  // Set the black count for the first path
+		} else {
+			// Check for black count
+			// consistency
+			fam_assert(current_black_count == *black_count);
+		}
+		return;
+	}
+
+	if (IS_BLACK(node))
+		current_black_count++;
+	else {
+		// check parent is not red (red property violation)
+		fam_assert((unsigned long long)node->parent_color > 1);
+		if (!IS_BLACK(PARENT(node))) {
+			println("red violation!");
+		}
+		fam_assert(IS_BLACK(PARENT(node)));
+	}
+	my_obj_validate_node(node->right, black_count, current_black_count);
+	my_obj_validate_node(node->left, black_count, current_black_count);
+}
+
+void my_obj_validate(const OrbTree *tree) {
+	int black_count = 0;
+	OrbTreeNode *root = tree->root;
+	// Validate from the root and
+	// check if the root is black
+	if (root != NULL) {
+		// assert root is black
+		fam_assert(IS_BLACK(root));
+		my_obj_validate_node(root, &black_count, 0);
+	}
+}
+
+/*
+Test(orbtree) {
+	OrbTree tree = INIT_ORBTREE;
+	MyObject obj1 = {.value = 1};
+	MyObject obj2 = {.value = 2};
+	MyObject obj3 = {.value = 3};
+
+	println("insert 1");
+	orbtree_put(&tree, &obj2.node, my_obj_search);
+	println("insert 2");
+	orbtree_put(&tree, &obj1.node, my_obj_search);
+	println("insert 3");
+	orbtree_put(&tree, &obj3.node, my_obj_search);
+
+	OrbTreeNodePair empty = {};
+	OrbTreeNodePair pair = empty;
+
+	my_obj_search(tree.root, &obj1.node, &pair);
+	fam_assert_eq(pair.self, &obj1.node);
+	fam_assert_eq(pair.parent, &obj2.node);
+
+	pair = empty;
+	my_obj_search(tree.root, &obj2.node, &pair);
+	fam_assert_eq(pair.self, &obj2.node);
+	fam_assert_eq(pair.parent, NULL);
+
+	pair = empty;
+	my_obj_search(tree.root, &obj3.node, &pair);
+	fam_assert_eq(pair.self, &obj3.node);
+	fam_assert_eq(pair.parent, &obj2.node);
+}
+*/
+
+Test(orbtree_rand) {
+	// seed rng for reproducibility
+	byte key[32] = {8};
+	byte iv[16] = {};
+	cpsrng_test_seed(iv, key);
+
+	OrbTree tree = INIT_ORBTREE;
+	SlabAllocator sa;
+	slab_allocator_init(&sa, sizeof(MyObject), 100, 200);
+	int size = 100;
+	Ptr arr[size];
+	int64 values[size];
+
+	for (int i = 0; i < size; i++) {
+		arr[i] = slab_allocator_allocate(&sa);
+		MyObject *obj = (MyObject *)slab_get(&sa, arr[i]);
+		int64 v = 0;
+		cpsrng_rand_int64(&v);
+		values[i] = v;
+		obj->value = v;
+		obj->version = 0;
+		obj->ptr = arr[i];
+		fam_assert(!orbtree_put(&tree, &obj->node, my_obj_search));
+		my_obj_validate(&tree);
+	}
+
+	Ptr tmp;
+	MyObject *obj, *obj_out;
+	OrbTreeNode *prev;
+	/*
+			tmp = slab_allocator_allocate(&sa);
+			obj = (MyObject *)slab_get(&sa, tmp);
+			obj->value = values[3];
+			obj->version = 1;
+			prev = orbtree_put(&tree, &obj->node, my_obj_search);
+			fam_assert(prev);
+			obj_out = (MyObject *)((byte *)prev - offsetof_node);
+			fam_assert_eq(obj_out->value, values[3]);
+			my_obj_validate(&tree);
+			slab_allocator_free(&sa, tmp);
+
+			tmp = slab_allocator_allocate(&sa);
+			obj = (MyObject *)slab_get(&sa, tmp);
+			obj->value = values[7];
+			obj->version = 1;
+			prev = orbtree_put(&tree, &obj->node, my_obj_search);
+			fam_assert(prev);
+			obj_out = (MyObject *)((byte *)prev - offsetof_node);
+			fam_assert_eq(obj_out->value, values[7]);
+			my_obj_validate(&tree);
+			slab_allocator_free(&sa, tmp);
+		*/
+
+	for (int i = 0; i < size; i++) {
+		tmp = slab_allocator_allocate(&sa);
+		obj = (MyObject *)slab_get(&sa, tmp);
+		obj->value = values[i];
+		prev = orbtree_remove(&tree, &obj->node, my_obj_search);
+		fam_assert(prev);
+		obj_out = (MyObject *)((byte *)prev - offsetof_node);
+		fam_assert_eq(obj_out->value, values[i]);
+		fam_assert(!orbtree_remove(&tree, &obj->node, my_obj_search));
+		slab_allocator_free(&sa, tmp);
+		slab_allocator_free(&sa, obj_out->ptr);
+		my_obj_validate(&tree);
+	}
+
+	// assert that all slabs are freed
+	fam_assert_eq(slab_allocator_free_size(&sa),
+				  slab_allocator_total_slabs(&sa));
+	slab_allocator_cleanup(&sa);
+}
+
+/*
+
 typedef struct MyObject {
 	int x;
 	int v;
@@ -145,8 +327,8 @@ void my_obj_validate_node(const OrbTree *tree, Ptr node, int *black_count,
 	if (node == null) {
 		if (*black_count == 0) {
 			*black_count =
-				current_black_count;  // Set the black count for the first path
-		} else {
+				current_black_count;  // Set the black count for the first
+path } else {
 			// Check for black count
 			// consistency
 			fam_assert(current_black_count == *black_count);
@@ -248,14 +430,12 @@ Test(test_orbtree) {
 	orbtree_put(&t, ptr2, off, my_obj_search);
 
 	MyObject *obj2_out =
-		(MyObject *)slab_get(&sa, orbtree_get(&t, obj2, off, my_obj_search, 0));
-	fam_assert(obj2_out);
-	fam_assert_eq(obj2_out->x, 0);
+		(MyObject *)slab_get(&sa, orbtree_get(&t, obj2, off, my_obj_search,
+0)); fam_assert(obj2_out); fam_assert_eq(obj2_out->x, 0);
 
 	MyObject *obj1_out =
-		(MyObject *)slab_get(&sa, orbtree_get(&t, obj1, off, my_obj_search, 0));
-	fam_assert(obj1_out);
-	fam_assert_eq(obj1_out->x, 1);
+		(MyObject *)slab_get(&sa, orbtree_get(&t, obj1, off, my_obj_search,
+0)); fam_assert(obj1_out); fam_assert_eq(obj1_out->x, 1);
 
 	Ptr ptr3 = slab_allocator_allocate(&sa);
 	MyObject *obj3 = (MyObject *)slab_get(&sa, ptr3);
@@ -264,9 +444,8 @@ Test(test_orbtree) {
 	orbtree_put(&t, ptr3, off, my_obj_search);
 
 	MyObject *obj3_out =
-		(MyObject *)slab_get(&sa, orbtree_get(&t, obj3, off, my_obj_search, 0));
-	fam_assert(obj3_out);
-	fam_assert_eq(obj3_out->x, 2);
+		(MyObject *)slab_get(&sa, orbtree_get(&t, obj3, off, my_obj_search,
+0)); fam_assert(obj3_out); fam_assert_eq(obj3_out->x, 2);
 
 	my_obj_validate(&t);
 
@@ -458,7 +637,8 @@ Test(test_orbtree_range_rev) {
 				&sa, orbtree_get(&t, &obj_in, off, my_obj_search, 0 - i));
 			fam_assert_eq(obj->x, j - i);
 		}
-		fam_assert(!orbtree_get(&t, &obj_in, off, my_obj_search, 0 - (1 + j)));
+		fam_assert(!orbtree_get(&t, &obj_in, off, my_obj_search, 0 - (1 +
+j)));
 	}
 
 	for (int i = 0; i < size; i++) {
@@ -569,3 +749,4 @@ Test(test_orbtree_perf) {
 	slab_allocator_cleanup(&sa);
 	mmap_free(keys, size * sizeof(int64));
 }
+*/

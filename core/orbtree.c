@@ -12,768 +12,316 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/lock.h>
-#include <base/macro_util.h>
 #include <base/print_util.h>
-#include <base/slabs.h>
+#include <base/util.h>
 #include <core/orbtree.h>
 
-typedef struct OrbTreeNodeImpl {
-	Ptr parent;
-	Ptr right;
-	Ptr left;
-	unsigned int right_subtree_height : 31;
-	unsigned int color : 1;
-	unsigned int left_subtree_height;
-} OrbTreeNodeImpl;
-
-typedef struct OrbTreeImpl {
-	const SlabAllocator *sa;
-	Ptr root;
-	Lock lock;
-} OrbTreeImpl;
-
-typedef struct OrbTreeCtx {
-	const SlabAllocator *sa;
-	OrbTreeImpl *tree;
-	unsigned int offset;
-} OrbTreeCtx;
-
-_Thread_local OrbTreeCtx orbtree_tl_ctx = {};
-
-void __attribute__((constructor)) __orbtree_check_sizes() {
-	if (sizeof(OrbTreeNodeImpl) != sizeof(OrbTreeNode))
-		panic("sizeof(OrbTreeNodeImpl) (%i) != sizeof(OrbTreeNode) (%i)",
-			  sizeof(OrbTreeNodeImpl), sizeof(OrbTreeNode));
-	if (sizeof(OrbTreeImpl) != sizeof(OrbTree))
-		panic("sizeof(OrbTreeImpl) (%i) != sizeof(OrbTree) (%i)",
-			  sizeof(OrbTreeImpl), sizeof(OrbTree));
-}
-
-void *orbtree_value(Ptr ptr) {
-	return slab_get(orbtree_tl_ctx.sa, ptr);
-}
-
-OrbTreeNodeImpl *orbtree_node(Ptr ptr) {
-	byte *slab = slab_get(orbtree_tl_ctx.sa, ptr);
-	return (slab == NULL) ? NULL
-						  : (OrbTreeNodeImpl *)(slab + orbtree_tl_ctx.offset);
-}
-
-#define IS_RED(k)                                   \
-	({                                              \
-		OrbTreeNodeImpl *_impl__ = orbtree_node(k); \
-		int _ret__;                                 \
-		if (_impl__ == NULL)                        \
-			_ret__ = 0;                             \
-		else                                        \
-			_ret__ = _impl__->color;                \
-		_ret__;                                     \
+#define RED 1
+#define BLACK 0
+#define SET_NODE(node, color, parent, rightv, leftv)             \
+	({                                                           \
+		node->parent_color =                                     \
+			(OrbTreeNode *)((unsigned long long)parent | color); \
+		node->right = rightv;                                    \
+		node->left = leftv;                                      \
 	})
-#define IS_BLACK(k) !IS_RED(k)
-#define SET_BLACK(k)                                \
-	({                                              \
-		OrbTreeNodeImpl *_impl__ = orbtree_node(k); \
-		_impl__->color = 0;                         \
-	})
-#define SET_RED(k)                                  \
-	({                                              \
-		OrbTreeNodeImpl *_impl__ = orbtree_node(k); \
-		_impl__->color = 1;                         \
-	})
-#define RIGHT_HEIGHT(n) (n->right_subtree_height)
-#define LEFT_HEIGHT(n) (n->left_subtree_height)
-#define SET_RIGHT_HEIGHT(n, v) (n->right_subtree_height = v)
-#define SET_LEFT_HEIGHT(n, v) (n->left_subtree_height = v)
+#define IS_RED(node) (node && ((unsigned long long)node->parent_color & 0x1))
+#define IS_BLACK(node) !IS_RED(node)
+#define SET_BLACK(node)   \
+	(node->parent_color = \
+		 (OrbTreeNode *)((unsigned long long)node->parent_color & ~RED))
+#define SET_RED(node)     \
+	(node->parent_color = \
+		 (OrbTreeNode *)((unsigned long long)node->parent_color | RED))
+#define SET_RIGHT(node, rightv) node->right = rightv
+#define SET_LEFT(node, leftv) node->left = leftv
+#define SET_PARENT(node, parentv)                      \
+	(node->parent_color =                              \
+		 (OrbTreeNode *)((unsigned long long)parentv + \
+						 ((unsigned long long)node->parent_color & 0x1)))
+#define RIGHT(node) node->right
+#define LEFT(node) node->left
+#define SET_ROOT(tree, node) tree->root = node
+#define ROOT(tree) (tree->root)
+#define IS_ROOT(tree, value) (tree->root == value)
 
-void *orbtree_node_right(const OrbTreeNode *node) {
-	Ptr ptr = ((const OrbTreeNodeImpl *)node)->right;
-	return (ptr == null) ? NULL : orbtree_value(ptr);
+void orbtree_rotate_right(OrbTree *tree, OrbTreeNode *x) {
+	OrbTreeNode *y = LEFT(x);
+	SET_LEFT(x, RIGHT(y));
+	if (RIGHT(y)) SET_PARENT(RIGHT(y), x);
+	SET_PARENT(y, PARENT(x));
+	if (!PARENT(x))
+		SET_ROOT(tree, y);
+	else if (x == RIGHT(PARENT(x)))
+		SET_RIGHT(PARENT(x), y);
+	else
+		SET_LEFT(PARENT(x), y);
+	SET_RIGHT(y, x);
+	SET_PARENT(x, y);
 }
 
-void *orbtree_node_left(const OrbTreeNode *node) {
-	Ptr ptr = ((const OrbTreeNodeImpl *)node)->left;
-	return (ptr == null) ? NULL : orbtree_value(ptr);
+void orbtree_rotate_left(OrbTree *tree, OrbTreeNode *x) {
+	OrbTreeNode *y = RIGHT(x);
+	SET_RIGHT(x, LEFT(y));
+	if (LEFT(y)) SET_PARENT(LEFT(y), x);
+	SET_PARENT(y, PARENT(x));
+	if (!PARENT(x))
+		SET_ROOT(tree, y);
+	else if (x == LEFT(PARENT(x)))
+		SET_LEFT(PARENT(x), y);
+	else
+		SET_RIGHT(PARENT(x), y);
+	SET_LEFT(y, x);
+	SET_PARENT(x, y);
 }
 
-Ptr orbtree_node_ptr(const OrbTreeNode *node, bool is_right) {
-	if (node == NULL) return null;
-	const OrbTreeNodeImpl *impl = (const OrbTreeNodeImpl *)node;
-	if (impl->parent == null) {
-		return orbtree_tl_ctx.tree->root;
-	} else {
-		OrbTreeNodeImpl *node = (OrbTreeNodeImpl *)orbtree_node(impl->parent);
-		return is_right ? node->right : node->left;
+void orbtree_insert_fixup(OrbTree *tree, OrbTreeNode *k) {
+	OrbTreeNode *parent, *gparent, *uncle;
+	while (!IS_ROOT(tree, k) && IS_RED(PARENT(k))) {
+		parent = PARENT(k);
+		gparent = PARENT(parent);
+		if (parent == LEFT(gparent)) {
+			uncle = RIGHT(gparent);
+			if (IS_RED(uncle)) {
+				SET_BLACK(parent);
+				SET_BLACK(uncle);
+				SET_RED(gparent);
+				k = gparent;
+			} else {
+				if (k == RIGHT(parent)) {
+					k = PARENT(k);
+					orbtree_rotate_left(tree, k);
+				}
+				parent = PARENT(k);
+				gparent = PARENT(parent);
+				SET_BLACK(parent);
+				SET_RED(gparent);
+				orbtree_rotate_right(tree, gparent);
+			}
+		} else {
+			uncle = LEFT(gparent);
+			if (IS_RED(uncle)) {
+				SET_BLACK(parent);
+				SET_BLACK(uncle);
+				SET_RED(gparent);
+				k = gparent;
+			} else {
+				if (k == LEFT(parent)) {
+					k = PARENT(k);
+					orbtree_rotate_right(tree, k);
+				}
+				parent = PARENT(k);
+				gparent = PARENT(parent);
+				SET_BLACK(parent);
+				SET_RED(gparent);
+				orbtree_rotate_left(tree, gparent);
+			}
+		}
 	}
+	SET_BLACK(ROOT(tree));
 }
 
-void orbtree_set_tl_context(OrbTreeImpl *impl, unsigned int offset) {
-	orbtree_tl_ctx.sa = impl->sa;
-	orbtree_tl_ctx.tree = impl;
-	orbtree_tl_ctx.offset = offset;
-}
-
-void orbtree_init_node(OrbTreeNodeImpl *node, bool color, Ptr parent) {
-	node->right = null;
-	node->left = null;
-	node->parent = parent;
-	node->color = color;
-	node->right_subtree_height = 0;
-	node->left_subtree_height = 0;
-}
-
-void orbtree_update_heights(Ptr node, bool is_right, bool insert) {
-	OrbTreeNodeImpl *last = orbtree_node(node);
-	if (last == NULL) return;
-	if (insert) {
+void orbtree_insert_transplant(OrbTreeNode *prev, OrbTreeNode *next,
+							   bool is_right) {
+	copy_bytes((byte *)next, (byte *)prev, sizeof(OrbTreeNode));
+	OrbTreeNode *parent = PARENT(next);
+	if (parent != NULL) {
 		if (is_right)
-			last->right_subtree_height++;
-
+			parent->right = next;
 		else
-			last->left_subtree_height++;
+			parent->left = next;
 	}
-	OrbTreeNodeImpl *parent;
-	while (last->parent != null) {
-		parent = orbtree_node(last->parent);
-		if (orbtree_node(parent->right) == last) {
-			unsigned int h = 1 + RIGHT_HEIGHT(last) + LEFT_HEIGHT(last);
-			SET_RIGHT_HEIGHT(parent, h);
+	if (next->left) SET_PARENT(next->left, next);
+	if (next->right) SET_PARENT(next->right, next);
+}
+
+OrbTreeNode *orbtree_insert(OrbTree *tree, OrbTreeNodePair *pair,
+							OrbTreeNode *value) {
+	OrbTreeNode *ret = NULL;
+	if (pair->self) {
+		orbtree_insert_transplant(pair->self, value, pair->is_right);
+		ret = pair->self;
+	} else {
+		if (pair->parent == NULL) {
+			SET_ROOT(tree, value);
+			tree->root->parent_color = 0;
+			tree->root->right = tree->root->left = NULL;
 		} else {
-			unsigned int h = 1 + RIGHT_HEIGHT(last) + LEFT_HEIGHT(last);
-			SET_LEFT_HEIGHT(parent, h);
-		}
-		last = parent;
-	}
-}
-
-void orbtree_rotate_right(Ptr x_ptr) {
-	OrbTreeNodeImpl *x = orbtree_node(x_ptr);
-	Ptr y_ptr = x->left;
-	OrbTreeNodeImpl *y = orbtree_node(y_ptr);
-
-	unsigned int y_right_height = RIGHT_HEIGHT(y);
-
-	// Move subtree
-	x->left = y->right;
-	SET_LEFT_HEIGHT(x, y_right_height);
-
-	if (y->right != null) {
-		OrbTreeNodeImpl *yright = orbtree_node(y->right);
-		yright->parent = x_ptr;
-	}
-
-	// Update y's parent to x's parent
-	y->parent = x->parent;
-
-	// If x was the root, now y becomes the root
-	OrbTreeNodeImpl *xparent = orbtree_node(x->parent);
-	if (x->parent == null) {
-		orbtree_tl_ctx.tree->root = y_ptr;
-	} else if (x_ptr == xparent->right) {
-		xparent->right = y_ptr;
-	} else {
-		xparent->left = y_ptr;
-	}
-
-	// Place x as y's left child
-	y->right = x_ptr;
-	unsigned int h = 1 + RIGHT_HEIGHT(x) + LEFT_HEIGHT(x);
-	SET_RIGHT_HEIGHT(y, h);
-	x->parent = y_ptr;
-}
-
-void orbtree_rotate_left(Ptr x_ptr) {
-	OrbTreeNodeImpl *x = orbtree_node(x_ptr);
-	Ptr y_ptr = x->right;
-	OrbTreeNodeImpl *y = orbtree_node(y_ptr);
-
-	unsigned int y_left_height = LEFT_HEIGHT(y);
-
-	// Move subtree
-	x->right = y->left;
-	SET_RIGHT_HEIGHT(x, y_left_height);
-
-	if (y->left != null) {
-		OrbTreeNodeImpl *yleft = orbtree_node(y->left);
-		yleft->parent = x_ptr;
-	}
-
-	// Update y's parent to x's parent
-	y->parent = x->parent;
-
-	// If x was the root, now y becomes the root
-	OrbTreeNodeImpl *xparent = orbtree_node(x->parent);
-	if (x->parent == null) {
-		orbtree_tl_ctx.tree->root = y_ptr;
-	} else if (x_ptr == xparent->left) {
-		xparent->left = y_ptr;
-	} else {
-		xparent->right = y_ptr;
-	}
-
-	// Place x as y's left child
-	y->left = x_ptr;
-	unsigned int h = 1 + RIGHT_HEIGHT(x) + LEFT_HEIGHT(x);
-	SET_LEFT_HEIGHT(y, h);
-	x->parent = y_ptr;
-}
-
-int orbtree_put_fixup(Ptr k_ptr) {
-	OrbTreeNodeImpl *k = orbtree_node(k_ptr);
-	while (k_ptr != orbtree_tl_ctx.tree->root && IS_RED(k->parent)) {
-		k = orbtree_node(k_ptr);
-		OrbTreeNodeImpl *parent = orbtree_node(k->parent);
-		OrbTreeNodeImpl *gparent = orbtree_node(parent->parent);
-
-		if (k->parent == gparent->left) {
-			// Case 1: Uncle is on the right
-			OrbTreeNodeImpl *u = orbtree_node(gparent->right);
-			Ptr u_ptr = gparent->right;
-			if (IS_RED(u_ptr)) {
-				// Case 1a: Uncle is red
-				// Recolor the parent and uncle to black
-				SET_BLACK(k->parent);
-				SET_BLACK(u_ptr);
-				// Recolor the grandparent to red
-				SET_RED(parent->parent);
-
-				// Move up the tree
-				k_ptr = parent->parent;
-				k = orbtree_node(k_ptr);
-			} else {
-				// Case 1b: Uncle is black
-				if (k_ptr == parent->right) {
-					// Case 1b1: Node is a right child
-					// Rotate left to make the node the left child
-					k_ptr = k->parent;
-					k = orbtree_node(k_ptr);
-					orbtree_rotate_left(k_ptr);
-				}
-				// Recolor and rotate
-				OrbTreeNodeImpl *kparent = orbtree_node(k->parent);
-				SET_BLACK(k->parent);
-				SET_RED(kparent->parent);
-
-				orbtree_rotate_right(kparent->parent);
-			}
-		} else {
-			// Case 2: Uncle is on the left
-			OrbTreeNodeImpl *u = orbtree_node(gparent->left);
-			Ptr u_ptr = gparent->left;
-			if (IS_RED(u_ptr)) {
-				// Case 2a: Uncle is red
-				// Recolor the parent and uncle to black
-				SET_BLACK(k->parent);
-				SET_BLACK(u_ptr);
-				// Recolor the grandparent to red
-				SET_RED(parent->parent);
-
-				// Move up the tree
-				k_ptr = parent->parent;
-				k = orbtree_node(k_ptr);
-			} else {
-				// Case 2b: Uncle is black
-				if (k_ptr == parent->left) {
-					// Case 2b1: Node is a left child
-					// Rotate right to make the node the right child
-					k_ptr = k->parent;
-					k = orbtree_node(k_ptr);
-					orbtree_rotate_right(k_ptr);
-				}
-				// Recolor and rotate
-				SET_BLACK(k->parent);
-				OrbTreeNodeImpl *kparent = orbtree_node(k->parent);
-				SET_RED(kparent->parent);
-				orbtree_rotate_left(kparent->parent);
-			}
-		}
-	}
-	// Ensure the root is always black
-	SET_BLACK(orbtree_tl_ctx.tree->root);
-	return 0;
-}
-
-void orbtree_insert_transplant(OrbTreeImpl *impl, const OrbTreeNodeImpl *prev,
-							   OrbTreeNodeImpl *next, Ptr ptr, bool is_right) {
-	next->parent = prev->parent;
-	next->right = prev->right;
-	next->left = prev->left;
-	next->right_subtree_height = prev->right_subtree_height;
-	next->left_subtree_height = prev->left_subtree_height;
-	next->color = prev->color;
-
-	if (next->parent != null) {
-		OrbTreeNodeImpl *parent = orbtree_node(next->parent);
-		if (is_right) {
-			parent->right = ptr;
-		} else
-			parent->left = ptr;
-	}
-	if (next->left != null) {
-		OrbTreeNodeImpl *left = orbtree_node(next->left);
-		left->parent = ptr;
-	}
-	if (next->right != null) {
-		OrbTreeNodeImpl *right = orbtree_node(next->right);
-		right->parent = ptr;
-	}
-}
-
-Ptr orbtree_insert(OrbTreeImpl *impl, OrbTreeNodePair *pair, Ptr ptr) {
-	if (pair->parent == null) {
-		impl->root = pair->self;
-		OrbTreeNodeImpl *self = (OrbTreeNodeImpl *)orbtree_node(pair->self);
-		orbtree_init_node(self, false, null);
-	} else {
-		OrbTreeNodeImpl *self = (OrbTreeNodeImpl *)orbtree_node(pair->self);
-		if (self == NULL) {
-			OrbTreeNodeImpl *parent =
-				(OrbTreeNodeImpl *)orbtree_node(pair->parent);
+			SET_NODE(value, RED, pair->parent, NULL, NULL);
 			if (pair->is_right)
-				parent->right = ptr;
+				SET_RIGHT(pair->parent, value);
 			else
-				parent->left = ptr;
-			self = (OrbTreeNodeImpl *)orbtree_node(ptr);
-			orbtree_init_node(self, true, pair->parent);
-		} else {
-			OrbTreeNodeImpl *next = orbtree_value(ptr) + orbtree_tl_ctx.offset;
-			Ptr ret =
-				orbtree_node_ptr((const OrbTreeNode *)self, pair->is_right);
-			orbtree_insert_transplant(impl, self, next, ptr, pair->is_right);
-			return ret;
+				SET_LEFT(pair->parent, value);
 		}
 	}
-	return null;
+	return ret;
 }
 
-void orbtree_remove_transplant(Ptr dst, Ptr src) {
-	OrbTreeNodeImpl *dst_node = orbtree_node(dst);
-	OrbTreeNodeImpl *dst_parent = orbtree_node(dst_node->parent);
-
-	if (dst_node->parent == null)
-		orbtree_tl_ctx.tree->root = src;
-	else if (dst == dst_parent->left) {
-		dst_parent->left = src;
-		if (src == null) SET_LEFT_HEIGHT(dst_parent, 0);
-
-	} else {
-		dst_parent->right = src;
-		if (src == null) SET_RIGHT_HEIGHT(dst_parent, 0);
-	}
-	if (src != null) {
-		OrbTreeNodeImpl *src_node = orbtree_node(src);
-		src_node->parent = dst_node->parent;
-
-		OrbTreeNodeImpl *src_node_p = orbtree_node(src_node->parent);
-		if (src_node_p) {
-			unsigned int h = 1 + RIGHT_HEIGHT(src_node) + LEFT_HEIGHT(src_node);
-			if (src_node_p->right == src)
-				SET_RIGHT_HEIGHT(src_node_p, h);
-			else
-				SET_LEFT_HEIGHT(src_node_p, h);
-		}
-	}
-
-	orbtree_update_heights(dst_node->parent, false, false);
+OrbTreeNode *orbtree_find_successor(OrbTreeNode *x) {
+	x = RIGHT(x);
+	while (x && LEFT(x)) x = LEFT(x);
+	return x;
 }
 
-Ptr orbtree_find_successor(Ptr x_ptr) {
-	OrbTreeNodeImpl *x = orbtree_node(x_ptr);
-	Ptr successor_ptr = x->right;
-	OrbTreeNodeImpl *successor = orbtree_node(x->right);
-	while (successor && successor->left != null) {
-		successor_ptr = successor->left;
-		successor = orbtree_node(successor->left);
-	}
-	return successor_ptr;
+void orbtree_remove_transplant(OrbTree *tree, OrbTreeNode *dst,
+							   OrbTreeNode *src) {
+	if (PARENT(dst) == NULL)
+		SET_ROOT(tree, src);
+	else if (dst == LEFT(PARENT(dst)))
+		SET_LEFT(PARENT(dst), src);
+	else
+		SET_RIGHT(PARENT(dst), src);
+	if (src) SET_PARENT(src, PARENT(dst));
 }
 
-// set child's color to parent's
-void orbtree_set_color_based_on_parent(Ptr child, Ptr parent) {
-	if (child != null) {
-		if (IS_RED(parent)) {
+void orbtree_set_color(OrbTreeNode *child, OrbTreeNode *parent) {
+	if (child) {
+		if (IS_RED(parent))
 			SET_RED(child);
-		} else {
+		else
 			SET_BLACK(child);
-		}
 	}
 }
 
-void orbtree_remove_fixup(Ptr p_ptr, Ptr w_ptr, Ptr x_ptr) {
-	while (x_ptr != orbtree_tl_ctx.tree->root && IS_BLACK(x_ptr)) {
-		OrbTreeNodeImpl *parent_node = orbtree_node(p_ptr);
-		OrbTreeNodeImpl *w_node = orbtree_node(w_ptr);
-		OrbTreeNodeImpl *x_node = orbtree_node(x_ptr);
-		if (w_ptr == parent_node->right) {
-			// Case 1: Sibling is
-			// red
-			if (IS_RED(w_ptr)) {
-				SET_BLACK(w_ptr);
-				SET_RED(p_ptr);
-				orbtree_rotate_left(p_ptr);
-				w_ptr = parent_node->right;
-				w_node = orbtree_node(w_ptr);
+void orbtree_remove_fixup(OrbTree *tree, OrbTreeNode *p, OrbTreeNode *w,
+						  OrbTreeNode *x) {
+	while (!IS_ROOT(tree, x) && IS_BLACK(x)) {
+		if (w == RIGHT(p)) {
+			if (IS_RED(w)) {
+				SET_BLACK(w);
+				SET_RED(p);
+				orbtree_rotate_left(tree, p);
+				w = RIGHT(p);
 			}
 
-			// Case 2: Sibling's
-			// children are both
-			// black
-			if (IS_BLACK(w_node->left) && IS_BLACK(w_node->right)) {
-				SET_RED(w_ptr);
-				x_ptr = p_ptr;
-				x_node = orbtree_node(x_ptr);
-				p_ptr = parent_node->parent;
-				parent_node = orbtree_node(p_ptr);
-				OrbTreeNodeImpl *x_parent = orbtree_node(x_node->parent);
-				if (x_parent == NULL) {
-					w_ptr = null;
-					w_node = NULL;
-				} else if (x_ptr == x_parent->left) {
-					w_ptr = x_parent->right;
-					w_node = orbtree_node(w_ptr);
-				} else {
-					w_ptr = x_parent->left;
-					w_node = orbtree_node(w_ptr);
-				}
+			if (IS_BLACK(LEFT(w)) && IS_BLACK(RIGHT(w))) {
+				SET_RED(w);
+				x = p;
+				p = PARENT(p);
+				if (p == NULL)
+					w = NULL;
+				else if (x == LEFT(p))
+					w = RIGHT(p);
+				else
+					w = LEFT(p);
 			} else {
-				// Case 3: Sibling's
-				// right child is
-				// black, left child
-				// is red
-				if (IS_BLACK(w_node->right)) {
-					SET_BLACK(w_node->left);
-					SET_RED(w_ptr);
-					orbtree_rotate_right(w_ptr);
-					w_ptr = parent_node->right;
-					w_node = orbtree_node(w_ptr);
+				if (IS_BLACK(RIGHT(w))) {
+					SET_BLACK(LEFT(w));
+					SET_RED(w);
+					orbtree_rotate_right(tree, w);
+					w = RIGHT(p);
 				}
-
-				// Case 4: Sibling's
-				// right child is
-				// red
-				orbtree_set_color_based_on_parent(w_ptr, p_ptr);
-				SET_BLACK(p_ptr);
-				SET_BLACK(w_node->right);
-				orbtree_rotate_left(p_ptr);
-				x_ptr = orbtree_tl_ctx.tree->root;
-				x_node = orbtree_node(x_ptr);
+				orbtree_set_color(w, p);
+				SET_BLACK(p);
+				SET_BLACK(RIGHT(w));
+				orbtree_rotate_left(tree, p);
+				x = ROOT(tree);
 			}
 		} else {
-			// Case 1: Sibling is
-			// red
-			if (IS_RED(w_ptr)) {
-				SET_BLACK(w_ptr);
-				SET_RED(p_ptr);
-				orbtree_rotate_right(p_ptr);
-				w_ptr = parent_node->left;
-				w_node = orbtree_node(w_ptr);
+			if (IS_RED(w)) {
+				SET_BLACK(w);
+				SET_RED(p);
+				orbtree_rotate_right(tree, p);
+				w = LEFT(p);
 			}
-
-			// Case 2: Sibling's
-			// children are both
-			// black
-			if (IS_BLACK(w_node->right) && IS_BLACK(w_node->left)) {
-				SET_RED(w_ptr);
-				x_ptr = p_ptr;
-				x_node = orbtree_node(x_ptr);
-				p_ptr = parent_node->parent;
-				parent_node = orbtree_node(p_ptr);
-				OrbTreeNodeImpl *x_parent = orbtree_node(x_node->parent);
-				if (x_parent == NULL) {
-					w_ptr = null;
-					w_node = NULL;
-				} else if (x_ptr == x_parent->left) {
-					w_ptr = x_parent->right;
-					w_node = orbtree_node(w_ptr);
-				} else {
-					w_ptr = x_parent->left;
-					w_node = orbtree_node(w_ptr);
-				}
+			if (IS_BLACK(RIGHT(w)) && IS_BLACK(LEFT(w))) {
+				SET_RED(w);
+				x = p;
+				p = PARENT(p);
+				if (p == NULL)
+					w = NULL;
+				else if (x == LEFT(p))
+					w = RIGHT(p);
+				else
+					w = LEFT(p);
 			} else {
-				// Case 3: Sibling's
-				// right child is
-				// black, left child
-				// is red
-				if (IS_BLACK(w_node->left)) {
-					SET_BLACK(w_node->right);
-					SET_RED(w_ptr);
-					orbtree_rotate_left(w_ptr);
-					w_ptr = parent_node->left;
-					w_node = orbtree_node(w_ptr);
+				if (IS_BLACK(LEFT(w))) {
+					SET_BLACK(RIGHT(w));
+					SET_RED(w);
+					orbtree_rotate_left(tree, w);
+					w = LEFT(p);
 				}
-
-				// Case 4: Sibling's
-				// right child is
-				// red
-				orbtree_set_color_based_on_parent(w_ptr, p_ptr);
-				SET_BLACK(p_ptr);
-				SET_BLACK(w_node->left);
-				orbtree_rotate_right(p_ptr);
-				x_ptr = orbtree_tl_ctx.tree->root;
-				x_node = orbtree_node(x_ptr);
+				orbtree_set_color(w, p);
+				SET_BLACK(p);
+				SET_BLACK(LEFT(w));
+				orbtree_rotate_right(tree, p);
+				x = ROOT(tree);
 			}
 		}
 	}
 
-	// Ensure x is black at the end
-	// of fixup
-	SET_BLACK(x_ptr);
+	SET_BLACK(x);
 }
 
-void orbtree_remove_impl(Ptr ptr, bool is_right) {
-	bool do_fixup = IS_BLACK(ptr);
-	OrbTreeNodeImpl *node_to_delete = orbtree_node(ptr);
+void orbtree_remove_impl(OrbTree *tree, OrbTreeNodePair *pair,
+						 OrbTreeNode *value) {
+	OrbTreeNode *node_to_delete = pair->self;
+	bool do_fixup = IS_BLACK(node_to_delete);
 
-	Ptr x_ptr = null, w_ptr = null, p_ptr = null;
-	OrbTreeNodeImpl *x = NULL, *w = NULL, *p = NULL;
+	OrbTreeNode *x = NULL, *w = NULL, *p = NULL;
 
-	if (node_to_delete->left == null) {
-		x_ptr = node_to_delete->right;
-		x = orbtree_node(x_ptr);
-		orbtree_remove_transplant(ptr, node_to_delete->right);
-		OrbTreeNodeImpl *node_to_delete_parent =
-			orbtree_node(node_to_delete->parent);
-		if (node_to_delete->parent != null) {
-			if (node_to_delete_parent->left == null) {
-				w_ptr = node_to_delete_parent->right;
-				w = orbtree_node(w_ptr);
-			} else if (node_to_delete_parent) {
-				w_ptr = node_to_delete_parent->left;
-				w = orbtree_node(w_ptr);
-			}
+	if (LEFT(node_to_delete) == NULL) {
+		x = RIGHT(node_to_delete);
+		orbtree_remove_transplant(tree, node_to_delete, RIGHT(node_to_delete));
+		p = PARENT(node_to_delete);
+		if (p) {
+			if (p->left == NULL)
+				w = RIGHT(p);
+			else if (p)
+				w = LEFT(p);
 		}
-		if (x_ptr != null) {
-			x = orbtree_node(x_ptr);
-			p_ptr = x->parent;
-			p = orbtree_node(p_ptr);
-		} else if (w_ptr != null) {
-			p_ptr = w->parent;
-			p = orbtree_node(p_ptr);
-		}
-	} else if (node_to_delete->right == null) {
-		x_ptr = node_to_delete->left;
-		x = orbtree_node(x_ptr);
-		orbtree_remove_transplant(ptr, node_to_delete->left);
-		OrbTreeNodeImpl *node_to_delete_parent =
-			orbtree_node(node_to_delete->parent);
-		if (node_to_delete_parent) {
-			w_ptr = node_to_delete_parent->left;
-			w = orbtree_node(w_ptr);
-		}
-		p_ptr = x->parent;
-		p = orbtree_node(p_ptr);
+	} else if (RIGHT(node_to_delete) == NULL) {
+		x = LEFT(node_to_delete);
+		orbtree_remove_transplant(tree, node_to_delete, LEFT(node_to_delete));
+		p = PARENT(node_to_delete);
+		if (p) w = LEFT(p);
 	} else {
-		Ptr successor_ptr = orbtree_find_successor(ptr);
-		OrbTreeNodeImpl *successor = orbtree_node(successor_ptr);
-		do_fixup = IS_BLACK(successor_ptr);
-
-		x_ptr = successor->right;
-		OrbTreeNodeImpl *successor_parent = orbtree_node(successor->parent);
-		w_ptr = successor_parent->right;
-		x = orbtree_node(x_ptr);
-		w = orbtree_node(w_ptr);
-
-		if (w == NULL) {
-			p_ptr = null;
-			p = NULL;
-		} else if (w->parent == ptr) {
-			w_ptr = node_to_delete->left;
-			w = orbtree_node(w_ptr);
-			p_ptr = successor_ptr;
-			p = successor;
-		} else {
-			p_ptr = w->parent;
-			p = orbtree_node(p_ptr);
-		}
-
-		if (successor->parent != ptr) {
-			orbtree_remove_transplant(successor_ptr, successor->right);
-			successor->right = node_to_delete->right;
-			SET_RIGHT_HEIGHT(successor, 0);
-			OrbTreeNodeImpl *successor_right = orbtree_node(successor->right);
-			if (successor_right) {
-				unsigned int h = 1 + RIGHT_HEIGHT(successor_right) +
-								 LEFT_HEIGHT(successor_right);
-				SET_RIGHT_HEIGHT(successor, h);
-				successor_right->parent = successor_ptr;
+		OrbTreeNode *successor = orbtree_find_successor(node_to_delete);
+		do_fixup = IS_BLACK(successor);
+		x = RIGHT(successor);
+		w = RIGHT(PARENT(successor));
+		if (w) {
+			if (PARENT(w) == node_to_delete) {
+				w = LEFT(node_to_delete);
+				p = successor;
+			} else {
+				p = PARENT(w);
 			}
 		}
 
-		orbtree_remove_transplant(ptr, successor_ptr);
-		successor->left = node_to_delete->left;
-
-		OrbTreeNodeImpl *successor_left = orbtree_node(successor->left);
-		SET_LEFT_HEIGHT(successor, 0);
-		if (node_to_delete->left != null) {
-			OrbTreeNodeImpl *ntdl = orbtree_node(node_to_delete->left);
-			unsigned int h = 1 + LEFT_HEIGHT(ntdl) + RIGHT_HEIGHT(ntdl);
-			SET_LEFT_HEIGHT(successor, h);
+		if (PARENT(successor) != node_to_delete) {
+			orbtree_remove_transplant(tree, successor, RIGHT(successor));
+			SET_RIGHT(successor, RIGHT(node_to_delete));
+			if (RIGHT(successor)) SET_PARENT(RIGHT(successor), successor);
 		}
-		successor_left->parent = successor_ptr;
-		orbtree_set_color_based_on_parent(successor_ptr, ptr);
 
-		orbtree_update_heights(successor_ptr, false, false);
+		orbtree_remove_transplant(tree, node_to_delete, successor);
+		SET_LEFT(successor, LEFT(node_to_delete));
+
+		SET_PARENT(LEFT(successor), successor);
+		orbtree_set_color(successor, node_to_delete);
 	}
 
 	if (do_fixup) {
-		if (w_ptr != null && p_ptr != null) {
-			orbtree_remove_fixup(p_ptr, w_ptr, x_ptr);
-		} else {
-			if (orbtree_tl_ctx.tree->root) SET_BLACK(orbtree_tl_ctx.tree->root);
-		}
+		if (w && p)
+			orbtree_remove_fixup(tree, p, w, x);
+		else if (ROOT(tree))
+			SET_BLACK(ROOT(tree));
 	}
 }
 
-Ptr orbtree_root(const OrbTree *tree) {
-	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	return impl->root;
-}
-
-void *orbtree_node_parent(const OrbTreeNode *node) {
-	const OrbTreeNodeImpl *impl = (const OrbTreeNodeImpl *)node;
-	if (impl->parent == null) return NULL;
-	return orbtree_value(impl->parent);
-}
-
-unsigned int orbtree_node_right_subtree_height(const OrbTreeNode *node) {
-	if (node == NULL) return 0;
-	return RIGHT_HEIGHT(((OrbTreeNodeImpl *)node));
-}
-
-unsigned int orbtree_node_left_subtree_height(const OrbTreeNode *node) {
-	if (node == NULL) return 0;
-	return LEFT_HEIGHT(((OrbTreeNodeImpl *)node));
-}
-
-bool orbtree_node_is_red(const OrbTreeNode *node) {
-	const OrbTreeNodeImpl *impl = (const OrbTreeNodeImpl *)node;
-	return impl->color;
-}
-
-// TODO: handle negative numbers (left)
-Ptr orbtree_adjust_offset(Ptr ret, int offset) {
-	bool left = offset < 0;
-	if (left) offset *= -1;
-	while (offset && ret) {
-		OrbTreeNodeImpl *cur = orbtree_node(ret);
-		unsigned int h;
-		if (left)
-			h = LEFT_HEIGHT(cur);
-		else
-			h = RIGHT_HEIGHT(cur);
-		if (h < offset) {
-			offset -= h + 1;
-			while (ret) {
-				OrbTreeNodeImpl *n = orbtree_node(ret);
-				if (n->parent) {
-					OrbTreeNodeImpl *parent = orbtree_node(n->parent);
-					Ptr p;
-					if (left)
-						p = parent->right;
-					else
-						p = parent->left;
-					if (p == ret) {
-						ret = n->parent;
-						break;
-					}
-				}
-				ret = n->parent;
-			}
-		} else {
-			offset -= 1;
-			if (left)
-				ret = cur->left;
-			else
-				ret = cur->right;
-			cur = orbtree_node(ret);
-			while ((left && cur->right) || (!left && cur->left)) {
-				unsigned int h;
-				if (left)
-					h = RIGHT_HEIGHT(cur);
-				else
-					h = LEFT_HEIGHT(cur);
-				if (h <= offset) {
-					offset -= h;
-					break;
-				}
-				if (left) {
-					ret = cur->right;
-					cur = orbtree_node(cur->right);
-				} else {
-					ret = cur->left;
-					cur = orbtree_node(cur->left);
-				}
-			}
-		}
-	}
+OrbTreeNode *orbtree_put(OrbTree *tree, OrbTreeNode *value,
+						 const OrbTreeSearch search) {
+	OrbTreeNodePair pair = {};
+	if (search(ROOT(tree), value, &pair)) return NULL;
+	OrbTreeNode *ret = orbtree_insert(tree, &pair, value);
+	if (!ret) orbtree_insert_fixup(tree, value);
 	return ret;
 }
-
-int orbtree_init(OrbTree *tree, const SlabAllocator *sa) {
-	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	impl->sa = sa;
-	impl->root = null;
-	impl->lock = INIT_LOCK;
-	return 0;
-}
-
-Ptr orbtree_get(const OrbTree *tree, const void *value, unsigned int offsetof,
-				OrbTreeSearch search, int offset) {
-	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	OrbTreeNode *target = (OrbTreeNode *)((byte *)value + offsetof);
-	OrbTreeNodePair retval = {};
-	orbtree_set_tl_context(impl, offsetof);
-	Ptr ret = null;
-
-	lockr(&impl->lock);
-	if (impl->root != null) {
-		OrbTreeNode *root = (OrbTreeNode *)orbtree_node(impl->root);
-		search(root, target, &retval);
-		ret = orbtree_adjust_offset(retval.self, offset);
-	}
-	unlock(&impl->lock);
-
-	return ret;
-}
-
-Ptr orbtree_put(OrbTree *tree, Ptr ptr, unsigned int offsetof,
-				OrbTreeSearch search) {
-	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	orbtree_set_tl_context(impl, offsetof);
-	void *value = slab_get(impl->sa, ptr);
-	OrbTreeNode *target = (OrbTreeNode *)((byte *)value + offsetof);
-	OrbTreeNodePair pair = {.parent = null, .self = ptr};
-
-	lockw(&impl->lock);
-	if (impl->root != null) {
-		OrbTreeNode *root = (OrbTreeNode *)orbtree_node(impl->root);
-		search(root, target, &pair);
-	}
-
-	Ptr ret = orbtree_insert(impl, &pair, ptr);
-	if (ret == null) {
-		orbtree_update_heights(pair.parent, pair.is_right, true);
-		orbtree_put_fixup(ptr);
-	}
-	unlock(&impl->lock);
-
-	return ret;
-}
-
-Ptr orbtree_remove(OrbTree *tree, const void *value, unsigned int offsetof,
-				   OrbTreeSearch search) {
-	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	orbtree_set_tl_context(impl, offsetof);
-	OrbTreeNode *target = (OrbTreeNode *)((byte *)value + offsetof);
-	OrbTreeNodePair pair = {.parent = null, .self = null};
-
-	lockw(&impl->lock);
-	if (impl->root != null) {
-		OrbTreeNode *root = (OrbTreeNode *)orbtree_node(impl->root);
-		search(root, target, &pair);
-	}
-	if (pair.self != null) orbtree_remove_impl(pair.self, pair.is_right);
-	unlock(&impl->lock);
-
+OrbTreeNode *orbtree_remove(OrbTree *tree, OrbTreeNode *value,
+							const OrbTreeSearch search) {
+	OrbTreeNodePair pair = {};
+	if (search(ROOT(tree), value, &pair)) return NULL;
+	if (pair.self) orbtree_remove_impl(tree, &pair, value);
 	return pair.self;
 }
