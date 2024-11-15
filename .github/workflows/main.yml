@@ -30,10 +30,10 @@ jobs:
            ./fam clean; ./fam
       - name: Run linux tests (gcc)
         run: |
-          ./fam clean; ./fam test --with-cc=gcc -s
+          ./fam clean; ./fam test --with-asan --with-cc=gcc -s
       - name: Run linux tests (clang)
         run: |
-          ./fam clean; ./fam test --with-cc=clang -s
+          ./fam clean; ./fam test --with-asan --with-cc=clang -s
       - name: Calculate code coverage
         run: |
           echo "evt=$GITHUB_EVENT_NAME";
@@ -65,7 +65,7 @@ jobs:
           ./fam clean; ./fam
       - name: Run macos tests (gcc)
         run: |
-          ./fam clean; ./fam test --with-cc=gcc -s
+          ./fam clean; ./fam test --with-asan --with-cc=gcc -s
       - name: Run macos tests (clang)
         run: |
-          ./fam clean; ./fam test --with-cc=clang -s
+          ./fam clean; ./fam test --with-asan --with-cc=clang -s

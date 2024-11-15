@@ -33,16 +33,6 @@ typedef struct OrbTreeNodePair {
 	bool is_right;
 } OrbTreeNodePair;
 
-typedef struct OrbTreeNodeSearchWrapper {
-	void *ptr;
-	unsigned int offsetof;
-} OrbTreeNodeSearchWrapper;
-
-typedef struct OrbTreeNodeWrapper {
-	Ptr ptr;
-	unsigned int offsetof;
-} OrbTreeNodeWrapper;
-
 #define ORB_TREE_IMPL_SIZE 24
 typedef struct OrbTree {
 	byte impl[ORB_TREE_IMPL_SIZE];

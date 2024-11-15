@@ -29,26 +29,6 @@ typedef struct MyObject {
 
 SlabAllocator sa;
 
-MyObject *create_my_object(int value, int value2) {
-	Ptr ptr = slab_allocator_allocate(&sa);
-	MyObject *ret = (MyObject *)slab_get(&sa, ptr);
-	ret->ptr = ptr;
-	ret->x = value;
-	ret->v = value2;
-	return ret;
-}
-
-OrbTreeNodeSearchWrapper wrapper_for(MyObject *obj) {
-	OrbTreeNodeSearchWrapper ret = {.ptr = obj,
-									.offsetof = offsetof(MyObject, node1)};
-	return ret;
-}
-
-OrbTreeNodeSearchWrapper wrap_obj(int value, int value2) {
-	MyObject *obj = create_my_object(value, value2);
-	return wrapper_for(obj);
-}
-
 int my_obj_search(const OrbTreeNode *root, const OrbTreeNode *value,
 				  OrbTreeNodePair *retval) {
 	retval->parent = null;
@@ -494,7 +474,8 @@ Test(test_orbtree_range_rev) {
 	slab_allocator_cleanup(&sa);
 }
 
-typedef struct MyLong {
+typedef struct __attribute__((packed)) MyLong {
+	int pad;
 	int64 x;
 	int64 y;
 	OrbTreeNode node;
