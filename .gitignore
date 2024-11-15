@@ -8,6 +8,7 @@
 **/*.tmp
 **/*.fam
 **/.bin
+/etc/java/*.class
 /bin/*
 /doc/*
 /main/resources.h
