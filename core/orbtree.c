@@ -127,12 +127,12 @@ void orbtree_insert_transplant(OrbTreeNode *prev, OrbTreeNode *next,
 	OrbTreeNode *parent = PARENT(next);
 	if (parent != NULL) {
 		if (is_right)
-			parent->right = next;
+			SET_RIGHT(parent, next);
 		else
-			parent->left = next;
+			SET_LEFT(parent, next);
 	}
-	if (next->left) SET_PARENT(next->left, next);
-	if (next->right) SET_PARENT(next->right, next);
+	if (LEFT(next)) SET_PARENT(LEFT(next), next);
+	if (RIGHT(next)) SET_PARENT(RIGHT(next), next);
 }
 
 OrbTreeNode *orbtree_insert(OrbTree *tree, OrbTreeNodePair *pair,

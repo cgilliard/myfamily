@@ -155,29 +155,30 @@ Test(orbtree_rand) {
 	Ptr tmp;
 	MyObject *obj, *obj_out;
 	OrbTreeNode *prev;
-	/*
-			tmp = slab_allocator_allocate(&sa);
-			obj = (MyObject *)slab_get(&sa, tmp);
-			obj->value = values[3];
-			obj->version = 1;
-			prev = orbtree_put(&tree, &obj->node, my_obj_search);
-			fam_assert(prev);
-			obj_out = (MyObject *)((byte *)prev - offsetof_node);
-			fam_assert_eq(obj_out->value, values[3]);
-			my_obj_validate(&tree);
-			slab_allocator_free(&sa, tmp);
 
-			tmp = slab_allocator_allocate(&sa);
-			obj = (MyObject *)slab_get(&sa, tmp);
-			obj->value = values[7];
-			obj->version = 1;
-			prev = orbtree_put(&tree, &obj->node, my_obj_search);
-			fam_assert(prev);
-			obj_out = (MyObject *)((byte *)prev - offsetof_node);
-			fam_assert_eq(obj_out->value, values[7]);
-			my_obj_validate(&tree);
-			slab_allocator_free(&sa, tmp);
-		*/
+	tmp = slab_allocator_allocate(&sa);
+	obj = (MyObject *)slab_get(&sa, tmp);
+	obj->value = values[3];
+	obj->version = 1;
+	obj->ptr = tmp;
+	prev = orbtree_put(&tree, &obj->node, my_obj_search);
+	fam_assert(prev);
+	obj_out = (MyObject *)((byte *)prev - offsetof_node);
+	fam_assert_eq(obj_out->value, values[3]);
+	my_obj_validate(&tree);
+	slab_allocator_free(&sa, obj_out->ptr);
+
+	tmp = slab_allocator_allocate(&sa);
+	obj = (MyObject *)slab_get(&sa, tmp);
+	obj->value = values[7];
+	obj->version = 1;
+	obj->ptr = tmp;
+	prev = orbtree_put(&tree, &obj->node, my_obj_search);
+	fam_assert(prev);
+	obj_out = (MyObject *)((byte *)prev - offsetof_node);
+	fam_assert_eq(obj_out->value, values[7]);
+	my_obj_validate(&tree);
+	slab_allocator_free(&sa, obj_out->ptr);
 
 	for (int i = 0; i < size; i++) {
 		tmp = slab_allocator_allocate(&sa);
