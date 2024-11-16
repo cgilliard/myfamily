@@ -17,6 +17,9 @@
 
 #include <base/types.h>
 
+// offsetof
+#define offsetof(x, y) __builtin_offsetof(x, y)
+
 // Lock macros
 #define lock() (lock_create())
 #define lockr(l) lock_read(l)

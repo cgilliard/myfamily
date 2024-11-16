@@ -15,7 +15,6 @@
 #include <base/test.h>
 #include <core/lib.h>
 #include <crypto/lib.h>
-#include <stddef.h>
 
 Suite(core);
 
