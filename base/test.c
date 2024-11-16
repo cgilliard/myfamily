@@ -143,25 +143,24 @@ Test(test_memmap) {
 
 static int alloc_size = 64;
 static int size = 1024 * 10;
-static int count = 5;
+static int count = 50;
 
 Test(test_memmap_recycle) {
 	MemMap mm1;
 	memmap_init(&mm1, alloc_size);
-	Ptr ptrs[count];
+	Slab slabs[count];
 
 	for (long long i = 0; i < size; i++) {
 		for (long long j = 0; j < count; j++) {
-			ptrs[j] = memmap_allocate(&mm1);
-			byte *data = memmap_data(&mm1, ptrs[j]);
-			for (int k = 0; k < alloc_size; k++) data[k] = 'a' + ((i + j) % 26);
+			slabs[j] = memmap_allocate_slab(&mm1);
+			for (int k = 0; k < alloc_size; k++)
+				((byte *)slabs[j].data)[k] = 'a' + ((i + j) % 26);
 		}
 
 		for (long long j = 0; j < count; j++) {
-			byte *data = memmap_data(&mm1, ptrs[j]);
 			for (int k = 0; k < alloc_size; k++)
-				fam_assert_eq(data[k], 'a' + ((i + j) % 26));
-			memmap_free(&mm1, ptrs[j]);
+				fam_assert_eq(((byte *)slabs[j].data)[k], 'a' + ((i + j) % 26));
+			memmap_free(&mm1, slabs[j].ptr);
 		}
 	}
 	memmap_cleanup(&mm1);
@@ -254,7 +253,7 @@ Test(test_big_memmap) {
 	memmap_reset();
 	MemMap mm1;
 	// int size = 8;
-	// unsigned long long count = 1024ULL * 1024ULL * 1024ULL * 2ULL;
+	// unsigned long long count = (1024ULL * 1024ULL * 1024ULL * 4ULL) - 2;
 	int size = 128;
 	unsigned long long count = 100ULL * 1000ULL;
 	memmap_init(&mm1, size);
@@ -297,8 +296,6 @@ Test(test_memmap_cas_fail) {
 	unsigned long long count = 1ULL;
 	memmap_init(&mm1, size);
 
-	set_debug_cas_fail_count(0);
-
 	Ptr *ptrs = mmap_allocate(count * sizeof(Ptr));
 	for (unsigned long long i = 0; i < count; i++) {
 		ptrs[i] = memmap_allocate(&mm1);
@@ -320,7 +317,6 @@ Test(test_memmap_cas_fail) {
 	memmap_cleanup(&mm1);
 
 	memmap_init(&mm1, size);
-	set_debug_cas_fail_count(1);
 
 	for (unsigned long long i = 0; i < count; i++) {
 		ptrs[i] = memmap_allocate(&mm1);
@@ -341,7 +337,6 @@ Test(test_memmap_cas_fail) {
 	memmap_cleanup(&mm1);
 
 	memmap_init(&mm1, size);
-	set_debug_cas_fail_count(2);
 
 	for (unsigned long long i = 0; i < count; i++) {
 		ptrs[i] = memmap_allocate(&mm1);
@@ -362,7 +357,6 @@ Test(test_memmap_cas_fail) {
 	memmap_cleanup(&mm1);
 
 	memmap_init(&mm1, size);
-	set_debug_cas_fail_count(3);
 
 	for (unsigned long long i = 0; i < count; i++) {
 		ptrs[i] = memmap_allocate(&mm1);

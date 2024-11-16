@@ -23,16 +23,6 @@
 #define BITMAP_SIZE 64
 #define IMAX 32
 
-bool _debug_capacity_exceeded = false;
-static int _debug_cas_fail_count = -1;
-static int _debug_memmap_data = -1;
-
-static unsigned int memmap_id = 0;
-_Thread_local int last_i[MAX_MEMMAPS] = {};
-_Thread_local int last_j[MAX_MEMMAPS] = {};
-_Thread_local int last_k[MAX_MEMMAPS] = {};
-_Thread_local int last_l[MAX_MEMMAPS] = {};
-
 typedef struct MemMapImpl {
 	byte ****data;
 	unsigned int size;
@@ -41,12 +31,6 @@ typedef struct MemMapImpl {
 	byte padding[8];
 } MemMapImpl;
 
-void __attribute__((constructor)) __memmap_check_sizes() {
-	if (sizeof(MemMapImpl) != sizeof(MemMap))
-		panic("sizeof(MemMapImpl) (%i) != sizeof(MemMap) (%i)",
-			  sizeof(MemMapImpl), sizeof(MemMap));
-}
-
 typedef struct MemMapIndexCollection {
 	unsigned int i;
 	unsigned int j;
@@ -54,6 +38,11 @@ typedef struct MemMapIndexCollection {
 	unsigned int l;
 	unsigned int x;
 } MemMapIndexCollection;
+
+static unsigned int memmap_id = 0;
+static _Thread_local MemMapIndexCollection last[MAX_MEMMAPS] = {};
+bool _debug_capacity_exceeded = false;
+static int _debug_memmap_data = -1;
 
 Ptr memmap_index_to_ptr(unsigned int i, unsigned int j, unsigned int k,
 						unsigned int l, unsigned int x) {
@@ -124,6 +113,25 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 	return ret;
 }
 
+void __attribute__((constructor)) __memmap_check_sizes() {
+	if (sizeof(MemMapImpl) != sizeof(MemMap))
+		panic("sizeof(MemMapImpl) (%i) != sizeof(MemMap) (%i)",
+			  sizeof(MemMapImpl), sizeof(MemMap));
+}
+
+int memmap_init(MemMap *mm, unsigned int size) {
+	MemMapImpl *impl = (MemMapImpl *)mm;
+	impl->size = size;
+	impl->data = NULL;
+	impl->lock = INIT_LOCK;
+	impl->memmap_id = AADD(&memmap_id, 1);
+	if (impl->memmap_id > MAX_MEMMAPS) {
+		SetErr(CapacityExceeded);
+		return -1;
+	}
+	return 0;
+}
+
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	if (_debug_memmap_data >= 0) {
 		if (_debug_memmap_data == 0) {
@@ -138,38 +146,29 @@ void *memmap_data(const MemMap *mm, Ptr ptr) {
 	return (byte *)(block +
 					(((index.l << 6) | index.x) * impl->size + BITMAP_SIZE));
 }
-int memmap_init(MemMap *mm, unsigned int size) {
-	MemMapImpl *impl = (MemMapImpl *)mm;
-	impl->size = size;
-	impl->data = NULL;
-	impl->lock = INIT_LOCK;
-	impl->memmap_id = AADD(&memmap_id, 1);
-	if (impl->memmap_id > MAX_MEMMAPS) {
-		SetErr(CapacityExceeded);
-		return -1;
-	}
-	return 0;
-}
 
 Ptr memmap_allocate(MemMap *mm) {
-	Ptr ret = null;
+	Slab s = memmap_allocate_slab(mm);
+	return s.ptr;
+}
+Slab memmap_allocate_slab(MemMap *mm) {
+	Slab ret = {};
 	MemMapImpl *impl = (MemMapImpl *)mm;
-	int i = last_i[impl->memmap_id], j = last_j[impl->memmap_id],
-		k = last_k[impl->memmap_id], l = last_l[impl->memmap_id];
+	int i = last[impl->memmap_id].i, j = last[impl->memmap_id].j,
+		k = last[impl->memmap_id].k, l = last[impl->memmap_id].l;
 	unsigned long long *current, desired, v;
+	int x;
 
 	do {
 		loop {
 			// load section of bitmap
 			current = memmap_itt_for(impl, i, j, k, l);
 
-			if (current == NULL) return null;
+			if (current == NULL) return ret;
 			v = ALOAD(current);
 			if (v != ((unsigned long long)0) - 1) {
 				break;
 			}
-			// l is 4 because 64 bits are used in the atomic load
-			// the other 4 combinations cover all 256 entries
 			if (_debug_capacity_exceeded || ++l >= 8) {
 				l = 0;
 				if (_debug_capacity_exceeded || ++k >= MEMMAP_ENTRY_PER_LEVEL) {
@@ -181,9 +180,9 @@ Ptr memmap_allocate(MemMap *mm) {
 							i = 0;
 						}
 						if (_debug_capacity_exceeded ||
-							i == last_i[impl->memmap_id]) {
+							i == last[impl->memmap_id].i) {
 							SetErr(CapacityExceeded);
-							return null;
+							return ret;
 						}
 					}
 				}
@@ -191,17 +190,19 @@ Ptr memmap_allocate(MemMap *mm) {
 		}
 
 		// find open bit
-		int x;
 		for (x = 0; (v & (0x1ULL << x)) != 0; x++);
-		ret = memmap_index_to_ptr(i, j, k, l, x);
 		// set bit
 		desired = v | (0x1ULL << x);
 	} while (!CAS_SEQ(current, &v, desired));
 
-	last_i[impl->memmap_id] = i;
-	last_j[impl->memmap_id] = j;
-	last_k[impl->memmap_id] = k;
-	last_l[impl->memmap_id] = l;
+	ret.ptr = memmap_index_to_ptr(i, j, k, l, x);
+	ret.data = (byte *)impl->data[i][j][k] +
+			   (((l << 6) | x) * impl->size + BITMAP_SIZE);
+
+	last[impl->memmap_id].i = i;
+	last[impl->memmap_id].j = j;
+	last[impl->memmap_id].k = k;
+	last[impl->memmap_id].l = l;
 
 	return ret;
 }
@@ -229,12 +230,11 @@ void memmap_free(MemMap *mm, Ptr ptr) {
 		nv = vo & ~(0x1ULL << x);
 	} while (!CAS_SEQ(&*v, &vo, nv));
 
-	last_i[impl->memmap_id] = i;
-	last_j[impl->memmap_id] = j;
-	last_k[impl->memmap_id] = k;
-	last_l[impl->memmap_id] = 0;
+	last[impl->memmap_id].i = i;
+	last[impl->memmap_id].j = j;
+	last[impl->memmap_id].k = k;
+	last[impl->memmap_id].l = 0;
 }
-
 void memmap_cleanup(MemMap *mm) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	if (impl->data == NULL) return;
@@ -281,24 +281,17 @@ void mmemap_force_cleanup(MemMap *mm) {
 	}
 	mmap_free(impl->data, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 }
-
 void memmap_reset() {
 	ASTORE(&memmap_id, 0);
 	for (int i = 0; i < MAX_MEMMAPS; i++)
-		last_i[i] = last_j[i] = last_k[i] = last_l[i] = 0;
+		last[i].i = last[i].j = last[i].k = last[i].l = 0;
 }
-
 void memmap_setijkl(int index, int i, int j, int k, int l) {
-	last_i[index] = i;
-	last_j[index] = j;
-	last_k[index] = k;
-	last_l[index] = l;
+	last[index].i = i;
+	last[index].j = j;
+	last[index].k = k;
+	last[index].l = l;
 }
-
-void set_debug_cas_fail_count(int value) {
-	_debug_cas_fail_count = value;
-}
-
 void set_debug_memmap_data(int value) {
 	_debug_memmap_data = value;
 }

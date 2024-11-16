@@ -31,9 +31,15 @@ typedef struct MemMap {
 	byte impl[MM_IMPL_SIZE];
 } MemMap;
 
+typedef struct Slab {
+	Ptr ptr;
+	void *data;
+} Slab;
+
 void *memmap_data(const MemMap *mm, Ptr ptr);
 int memmap_init(MemMap *mm, unsigned int size);
 Ptr memmap_allocate(MemMap *mm);
+Slab memmap_allocate_slab(MemMap *mm);
 void memmap_free(MemMap *mm, Ptr ptr);
 void memmap_cleanup(MemMap *mm);
 
@@ -42,7 +48,6 @@ void memmap_reset();
 void memmap_setijkl(int index, int i, int j, int k, int l);
 void mmemap_force_cleanup(MemMap *mm);
 extern bool _debug_capacity_exceeded;
-void set_debug_cas_fail_count(int value);
 void set_debug_memmap_data(int value);
 #endif	// TEST
 
