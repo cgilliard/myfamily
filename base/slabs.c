@@ -39,6 +39,7 @@ typedef struct SlabAllocatorImpl {
 	unsigned int total_slabs;
 	Ptr head;
 	Ptr tail;
+	byte padding[4];
 } SlabAllocatorImpl;
 
 void __attribute__((constructor)) __slabs_check_sizes() {

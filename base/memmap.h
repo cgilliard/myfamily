@@ -26,7 +26,7 @@ typedef unsigned int Ptr;
 // this value will not be allocated
 #define ptr_reserved ((Ptr)1)
 
-#define MM_IMPL_SIZE 24
+#define MM_IMPL_SIZE 32
 typedef struct MemMap {
 	byte impl[MM_IMPL_SIZE];
 } MemMap;

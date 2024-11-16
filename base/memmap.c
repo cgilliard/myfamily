@@ -38,6 +38,7 @@ typedef struct MemMapImpl {
 	unsigned int size;
 	unsigned int memmap_id;
 	Lock lock;
+	byte padding[8];
 } MemMapImpl;
 
 void __attribute__((constructor)) __memmap_check_sizes() {
@@ -71,15 +72,6 @@ MemMapIndexCollection memmap_ptr_to_index(Ptr ptr) {
 	};
 	return ret;
 }
-
-#define DEBUG_CAS_FAIL_COUNT              \
-	if (_debug_cas_fail_count >= 0) {     \
-		if (_debug_cas_fail_count == 0) { \
-			force_continue_loop = true;   \
-		}                                 \
-		_debug_cas_fail_count--;          \
-	} else                                \
-		force_continue_loop = false;
 
 unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 								   int l) {

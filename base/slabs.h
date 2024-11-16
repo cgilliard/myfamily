@@ -20,7 +20,7 @@
 #include <base/types.h>
 
 // Slab Allocator
-#define SA_IMPL_SIZE 52
+#define SA_IMPL_SIZE 64
 typedef struct SlabAllocator {
 	byte impl[SA_IMPL_SIZE];
 } SlabAllocator;
