@@ -19,8 +19,6 @@
 
 #define INIT_ORBTREE \
 	{}
-#define PARENT(node) \
-	((OrbTreeNode *)((unsigned long long)node->parent_color & ~0x1))
 
 typedef struct OrbTreeNode {
 	struct OrbTreeNode *parent_color;

@@ -52,6 +52,8 @@ int my_obj_search(OrbTreeNode *cur, const OrbTreeNode *value,
 }
 
 #define IS_BLACK(node) (((unsigned long long)node->parent_color % 2) == 0)
+#define PARENT(node) \
+	((OrbTreeNode *)((unsigned long long)node->parent_color & ~0x1))
 
 void my_obj_validate_node(const OrbTreeNode *node, int *black_count,
 						  int current_black_count) {

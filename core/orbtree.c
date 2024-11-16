@@ -39,6 +39,8 @@
 	(node->parent_color =                              \
 		 (OrbTreeNode *)((unsigned long long)parentv + \
 						 ((unsigned long long)node->parent_color & 0x1)))
+#define PARENT(node) \
+	((OrbTreeNode *)((unsigned long long)node->parent_color & ~0x1))
 #define RIGHT(node) node->right
 #define LEFT(node) node->left
 #define SET_ROOT(tree, node) tree->root = node
