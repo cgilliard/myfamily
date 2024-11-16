@@ -658,9 +658,10 @@ j)));
 
 	slab_allocator_cleanup(&sa);
 }
+*/
 
-typedef struct __attribute__((packed)) MyLong {
-	int pad;
+typedef struct MyLong {
+	Ptr ptr;
 	int64 x;
 	int64 y;
 	OrbTreeNode node;
@@ -668,44 +669,25 @@ typedef struct __attribute__((packed)) MyLong {
 
 static int long_offt = offsetof(MyLong, node);
 
-int my_long_search(const OrbTreeNode *root, const OrbTreeNode *value,
+int my_long_search(OrbTreeNode *cur, const OrbTreeNode *value,
 				   OrbTreeNodePair *retval) {
-	retval->parent = null;
-	retval->is_right = true;
-	const OrbTreeNode *cur = root;
-	loop {
-		int64 x1 = ((MyLong *)((byte *)cur - long_offt))->x;
-		int64 x2 = ((MyLong *)((byte *)value - long_offt))->x;
+	while (cur) {
+		int64 v1 = ((MyLong *)((byte *)cur - long_offt))->x;
+		int64 v2 = ((MyLong *)((byte *)value - long_offt))->x;
 
-		retval->self = orbtree_node_ptr(cur, retval->is_right);
-
-		if (x1 == x2) {
+		if (v1 == v2) {
+			retval->self = cur;
 			break;
-		} else if (x1 < x2) {
-			MyLong *right = orbtree_node_right(cur);
-			if (right == NULL) {
-				retval->parent = retval->self;
-				retval->self = null;
-				retval->is_right = true;
-				break;
-			}
-			Ptr rptr = orbtree_node_ptr(&right->node, true);
-			retval->parent = orbtree_node_ptr(cur, retval->is_right);
+		} else if (v1 < v2) {
+			retval->parent = cur;
 			retval->is_right = true;
-			cur = (const OrbTreeNode *)(slab_get(&sa, rptr) + long_offt);
+			cur = cur->right;
 		} else {
-			MyLong *left = orbtree_node_left(cur);
-			if (left == NULL) {
-				retval->parent = retval->self;
-				retval->self = null;
-				retval->is_right = false;
-				break;
-			}
-			Ptr lptr = orbtree_node_ptr(&left->node, false);
-			retval->parent = orbtree_node_ptr(cur, retval->is_right);
+			retval->parent = cur;
 			retval->is_right = false;
-			cur = (const OrbTreeNode *)(slab_get(&sa, lptr) + long_offt);
+			cur = cur->left;
 		}
+		retval->self = cur;
 	}
 	return 0;
 }
@@ -718,12 +700,11 @@ Test(test_orbtree_perf) {
 
 	// int size = 10 * 1000;
 	int size = 100;
-	int count = 100;
+	int count = 1000;
 
 	int64 *keys = mmap_allocate(size * sizeof(int64));
-	OrbTree t;
+	OrbTree t = INIT_ORBTREE;
 	slab_allocator_init(&sa, sizeof(MyLong), size + 10, size + 10);
-	orbtree_init(&t, &sa);
 
 	for (int64 i = 0; i < size; i++) {
 		keys[i] = 0;
@@ -734,15 +715,17 @@ Test(test_orbtree_perf) {
 		for (int64 i = 0; i < size; i++) {
 			Ptr ptr = slab_allocator_allocate(&sa);
 			MyLong *obj = (MyLong *)slab_get(&sa, ptr);
+			obj->ptr = ptr;
 			obj->x = keys[i];
 			obj->y = i;
-			fam_assert(!orbtree_put(&t, ptr, long_offt, my_long_search));
+			fam_assert(!orbtree_put(&t, &obj->node, my_long_search));
 		}
 
 		for (int64 i = 0; i < size; i++) {
 			MyLong obj = {.x = keys[i]};
-			Ptr ptr = orbtree_remove(&t, &obj, long_offt, my_long_search);
-			slab_allocator_free(&sa, ptr);
+			OrbTreeNode *node = orbtree_remove(&t, &obj.node, my_long_search);
+			MyLong *ref = (MyLong *)((byte *)node - long_offt);
+			slab_allocator_free(&sa, ref->ptr);
 		}
 	}
 
@@ -754,4 +737,3 @@ Test(test_orbtree_perf) {
 	slab_allocator_cleanup(&sa);
 	mmap_free(keys, size * sizeof(int64));
 }
-*/
