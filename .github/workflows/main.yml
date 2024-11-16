@@ -65,7 +65,7 @@ jobs:
           ./fam clean; ./fam
       - name: Run macos tests (gcc)
         run: |
-          ./fam clean; ./fam test --with-asan --with-cc=gcc -s
+          ./fam clean; ./fam test --with-cc=gcc -s
       - name: Run macos tests (clang)
         run: |
           ./fam clean; ./fam test --with-asan --with-cc=clang -s
