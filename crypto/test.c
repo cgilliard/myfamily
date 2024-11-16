@@ -87,6 +87,10 @@ Test(test_cpsrng) {
 
 	for (int i = 0; i < 5; i++) fam_assert_eq(bytes[i], expected[i]);
 
+	int x = 0;
+	cpsrng_rand_int(&x);
+	fam_assert_eq(x, 1211643910);
+
 	_debug_print_util_disable__ = true;
 	_debug_getentropy_err = true;
 

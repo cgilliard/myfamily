@@ -26,6 +26,7 @@ static Ptr RESERVED_PTR = 1;
 
 typedef struct SlabList {
 	Ptr next;
+	byte padding[4];
 	byte data[];
 } SlabList;
 
@@ -66,7 +67,7 @@ Ptr slab_allocator_grow(SlabAllocatorImpl *impl) {
 		SetErr(CapacityExceeded);
 		return null;
 	}
-	Ptr ret = memmap_allocate(&impl->mm);
+	Ptr ret = memmap_allocate(&(impl->mm));
 	if (ret == null) return null;
 	SlabList *sl = memmap_data(&impl->mm, ret);
 	if (sl == NULL) {
@@ -87,8 +88,7 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 		return -1;
 	}
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
-
-	if (memmap_init(&impl->mm, slab_size + sizeof(SlabList))) return -1;
+	if (memmap_init(&(impl->mm), slab_size + sizeof(SlabList))) return -1;
 	ASTORE(&impl->free_size, 1);
 	ASTORE(&impl->total_slabs, 0);
 	impl->slab_size = slab_size;

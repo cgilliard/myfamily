@@ -19,11 +19,11 @@
 
 Suite(core);
 
-typedef struct __attribute__((__packed__)) MyObject {
-	Ptr ptr;
+typedef struct MyObject {
 	int64 version;
 	int64 value;
 	OrbTreeNode node;
+	Ptr ptr;
 } MyObject;
 
 unsigned int offsetof_node = offsetof(MyObject, node);
@@ -126,18 +126,19 @@ Test(orbtree) {
 }
 */
 
+SlabAllocator sa;
+
 Test(orbtree_rand) {
 	// seed rng for reproducibility
-	byte key[32] = {8};
+	byte key[32] = {9};
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
 	OrbTree tree = INIT_ORBTREE;
-	SlabAllocator sa;
-	slab_allocator_init(&sa, sizeof(MyObject), 100, 200);
-	int size = 100;
-	Ptr arr[size];
-	int64 values[size];
+	int size = 1000;
+	slab_allocator_init(&sa, sizeof(MyObject), size + 10, size + 10);
+	Ptr *arr = mmap_allocate(sizeof(Ptr) * size);
+	int64 *values = mmap_allocate(sizeof(int64) * size);
 
 	for (int i = 0; i < size; i++) {
 		arr[i] = slab_allocator_allocate(&sa);
@@ -198,6 +199,9 @@ Test(orbtree_rand) {
 	fam_assert_eq(slab_allocator_free_size(&sa),
 				  slab_allocator_total_slabs(&sa));
 	slab_allocator_cleanup(&sa);
+
+	mmap_free(arr, sizeof(Ptr) * size);
+	mmap_free(values, sizeof(int64) * size);
 }
 
 /*

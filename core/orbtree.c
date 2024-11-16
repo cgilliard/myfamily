@@ -303,10 +303,7 @@ void orbtree_remove_impl(OrbTree *tree, OrbTreeNodePair *pair,
 	}
 
 	if (do_fixup) {
-		if (w && p)
-			orbtree_remove_fixup(tree, p, w, x);
-		else if (ROOT(tree))
-			SET_BLACK(ROOT(tree));
+		if (w && p) orbtree_remove_fixup(tree, p, w, x);
 	}
 }
 

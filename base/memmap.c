@@ -37,7 +37,7 @@ typedef struct MemMapImpl {
 	byte ****data;
 	unsigned int size;
 	unsigned int memmap_id;
-	byte padding[8];
+	Lock lock;
 } MemMapImpl;
 
 void __attribute__((constructor)) __memmap_check_sizes() {
@@ -83,122 +83,51 @@ MemMapIndexCollection memmap_ptr_to_index(Ptr ptr) {
 
 unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 								   int l) {
-	bool mmapped = false;
-	byte ****nullvalue1 = NULL;
-	byte ****data1 = NULL;
-	bool force_continue_loop = false;
-	// load data
-	do {
-		if (mmapped) {
-			mmap_free(data1, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+	lockw(&impl->lock);
+	if (impl->data == NULL) {
+		impl->data = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+		if (!impl->data) {
+			SetErr(AllocErr);
+			unlock(&impl->lock);
+			return NULL;
 		}
-		data1 = ALOAD(&impl->data);
-		if (data1 == NULL) {
-			data1 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
-			if (data1 == NULL) {
-				SetErr(AllocErr);
-				return NULL;
-			}
-			mmapped = true;
-			set_bytes((byte *)data1, '\0',
-					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
-		} else
-			break;
-#ifdef TEST
-		DEBUG_CAS_FAIL_COUNT
-#endif	// TEST
-	} while (force_continue_loop || !CAS_SEQ(&impl->data, &nullvalue1, data1));
-
-	// load second level
-	byte ***nullvalue2 = NULL;
-	byte ***data2;
-	mmapped = false;
-	force_continue_loop = false;
-	do {
-		if (mmapped) {
-			mmap_free(data2, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+		set_bytes((byte *)impl->data, '\0',
+				  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+	}
+	if (impl->data[i] == NULL) {
+		impl->data[i] = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+		if (!impl->data[i]) {
+			SetErr(AllocErr);
+			unlock(&impl->lock);
+			return NULL;
 		}
-		data2 = ALOAD(&impl->data[i]);
-		if (data2 == NULL) {
-			data2 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
-			if (data2 == NULL) {
-				SetErr(AllocErr);
-				return NULL;
-			}
-			mmapped = true;
-			set_bytes((byte *)data2, '\0',
-					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
-		} else
-			break;
-#ifdef TEST
-		DEBUG_CAS_FAIL_COUNT
-#endif	// TEST
-	} while (force_continue_loop ||
-			 !CAS_SEQ(&impl->data[i], &nullvalue2, data2));
-	// load third level
-	byte **nullvalue3 = NULL;
-	byte **data3;
-	mmapped = false;
-	force_continue_loop = false;
-	do {
-		if (mmapped) {
-			mmap_free(data3, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+		set_bytes((byte *)impl->data[i], '\0',
+				  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+	}
+	if (impl->data[i][j] == NULL) {
+		impl->data[i][j] =
+			mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+		if (!impl->data[i][j]) {
+			SetErr(AllocErr);
+			unlock(&impl->lock);
+			return NULL;
 		}
-
-		data3 = ALOAD(&impl->data[i][j]);
-		if (data3 == NULL) {
-			data3 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
-			if (data3 == NULL) {
-				SetErr(AllocErr);
-				return NULL;
-			}
-			mmapped = true;
-			set_bytes((byte *)data3, '\0',
-					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
-		} else
-			break;
-#ifdef TEST
-		DEBUG_CAS_FAIL_COUNT
-#endif	// TEST
-	} while (force_continue_loop ||
-			 !CAS_SEQ(&impl->data[i][j], &nullvalue3, data3));
-	// load fourth and final level
-	byte *nullvalue4 = NULL;
-	byte *data4;
-	mmapped = false;
-	force_continue_loop = false;
-	// add 32 bytes for the bitmap
-	do {
-		if (mmapped) {
-			mmap_free(data4,
-					  MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
-						  BITMAP_SIZE);
+		set_bytes((byte *)impl->data[i][j], '\0',
+				  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+	}
+	if (impl->data[i][j][k] == NULL) {
+		impl->data[i][j][k] = mmap_allocate(
+			MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) + BITMAP_SIZE);
+		if (!impl->data[i][j][k]) {
+			SetErr(AllocErr);
+			unlock(&impl->lock);
+			return NULL;
 		}
+		set_bytes((byte *)impl->data[i][j][k], '\0', BITMAP_SIZE);
+		if (i == 0 && j == 0 && k == 0) impl->data[i][j][k][0] = 0x3;
+	}
+	unlock(&impl->lock);
 
-		data4 = ALOAD(&impl->data[i][j][k]);
-		if (data4 == NULL) {
-			data4 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * impl->size *
-									  sizeof(byte) +
-								  BITMAP_SIZE);
-			if (data4 == NULL) {
-				SetErr(AllocErr);
-				return NULL;
-			}
-			mmapped = true;
-			set_bytes((byte *)data4, '\0', BITMAP_SIZE);
-			// set Ptr=0 to allocated so we never return null / also reserve the
-			// first value for other purposes
-			if (i == 0 && j == 0 && k == 0) data4[0] = 0x3;
-		} else
-			break;
-#ifdef TEST
-		DEBUG_CAS_FAIL_COUNT
-#endif	// TEST
-	} while (force_continue_loop ||
-			 !CAS_SEQ(&impl->data[i][j][k], &nullvalue4, data4));
-
-	// return the lth item at the begining of the data array (32 bytes reserved)
-	// l is between 0-3.
 	unsigned long long *ret = ((unsigned long long *)impl->data[i][j][k]) + l;
 	return ret;
 }
@@ -221,6 +150,7 @@ int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	impl->size = size;
 	impl->data = NULL;
+	impl->lock = INIT_LOCK;
 	impl->memmap_id = AADD(&memmap_id, 1);
 	if (impl->memmap_id > MAX_MEMMAPS) {
 		SetErr(CapacityExceeded);
