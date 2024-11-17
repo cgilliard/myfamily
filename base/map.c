@@ -20,6 +20,7 @@
 #include <base/util.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <pwd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
