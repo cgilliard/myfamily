@@ -18,6 +18,7 @@
 #include <base/lock.h>
 #include <base/macro_util.h>
 #include <base/macros.h>
+#include <base/map.h>
 #include <base/memmap.h>
 #include <base/mmap.h>
 #include <base/print_util.h>

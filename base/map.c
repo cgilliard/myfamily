@@ -18,12 +18,12 @@
 #include <base/map.h>
 #include <base/print_util.h>
 #include <base/util.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <pwd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
-int errno;
 uid_t getuid(void);
 char *strerror(int e);
 int close(int fd);
