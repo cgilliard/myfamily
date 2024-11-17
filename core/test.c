@@ -279,3 +279,21 @@ Test(test_orbtree_perf) {
 	slab_allocator_cleanup(&sa);
 	mmap_free(keys, size * sizeof(int64));
 }
+
+Test(bplus) {
+	char file1[cstring_len(test_dir) + 10];
+	int test_dir_len = cstring_len(test_dir);
+	copy_bytes(file1, test_dir, test_dir_len);
+	copy_bytes(file1 + test_dir_len, "/test.dat", 9);
+	file1[test_dir_len + 9] = 0;
+
+	BPlus b1;
+	fam_assert(!bplus_open(&b1, file1));
+	fam_assert_eq(bplus_block_count(&b1), 0);
+
+	bplus_close(&b1);
+
+	fam_assert(!bplus_open(&b1, file1));
+
+	bplus_close(&b1);
+}

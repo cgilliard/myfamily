@@ -15,11 +15,13 @@
 #include <base/test.h>
 #include <dlfcn.h>
 #include <execinfo.h>
+#include <ftw.h>
 #include <inttypes.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
 
 #define MAX_BACKTRACE_ENTRIES 128
@@ -32,6 +34,19 @@ static int test_itt;
 int fail_count = 0;
 static byte target_test[MAX_TEST_NAME + 1];
 extern char **environ;
+
+int unlink_cb(const char *fpath, const struct stat *sb, int typeflag,
+			  struct FTW *ftwbuf) {
+	int rv = remove(fpath);
+
+	if (rv) perror(fpath);
+
+	return rv;
+}
+
+int rmrf(char *path) {
+	return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
+}
 
 static void __attribute__((constructor)) get_target_test() {
 	target_test[0] = 0;
@@ -61,7 +76,15 @@ bool execute_tests(byte *name) {
 				!cstring_compare(target_test, test_names[i])) {
 				test_exe_count++;
 				int64 start_alloc = _allocation_sum;
-				test_arr[i]("test_dir", "resources_dir");
+				int test_name_len = cstring_len(test_names[i]);
+				char test_dir[test_name_len + 100];
+				copy_bytes(test_dir, "./.", 3);
+				copy_bytes(test_dir + 3, test_names[i], test_name_len);
+				copy_bytes(test_dir + 3 + test_name_len, ".fam", 4);
+				test_dir[4 + 3 + test_name_len] = 0;
+				rmrf(test_dir);
+				mkdir(test_dir, 0700);
+				test_arr[i](test_dir, "resources");
 				if (_allocation_sum != start_alloc)
 					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
 							BRIGHT_RED, RESET, _allocation_sum - start_alloc);
@@ -72,6 +95,16 @@ bool execute_tests(byte *name) {
 					test_names[i], RESET);
 			fail_count++;
 		}
+	}
+
+	for (int i = 0; i < test_count; i++) {
+		int test_name_len = cstring_len(test_names[i]);
+		char test_dir[test_name_len + 100];
+		copy_bytes(test_dir, "./.", 3);
+		copy_bytes(test_dir + 3, test_names[i], test_name_len);
+		copy_bytes(test_dir + 3 + test_name_len, ".fam", 4);
+		test_dir[4 + 3 + test_name_len] = 0;
+		rmrf(test_dir);
 	}
 
 	clock_gettime(CLOCK_MONOTONIC, &end);

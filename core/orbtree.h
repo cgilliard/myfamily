@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_ORBTREE__
-#define _BASE_ORBTREE__
+#ifndef _CORE_ORBTREE__
+#define _CORE_ORBTREE__
 
 #include <base/types.h>
 
-#define INIT_ORBTREE \
-	{}
+#define INIT_ORBTREE             \
+	({                           \
+		OrbTree _ret__ = {NULL}; \
+		_ret__;                  \
+	})
 
 typedef struct OrbTreeNode {
 	struct OrbTreeNode *parent_color;
@@ -44,4 +47,4 @@ OrbTreeNode *orbtree_put(OrbTree *tree, OrbTreeNode *value,
 OrbTreeNode *orbtree_remove(OrbTree *tree, OrbTreeNode *value,
 							const OrbTreeSearch search);
 
-#endif	// _BASE_ORBTREE__
+#endif	// _CORE_ORBTREE__

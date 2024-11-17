@@ -43,6 +43,8 @@
 	FileNotFound, \
 	NotADirectory, \
 	UnsupportedOperation, \
+	UnsupportedVersion, \
+	FileCorrupted, \
 	IllegalState, \
 	TooBig, \
 	ResourceNotAvailable, \

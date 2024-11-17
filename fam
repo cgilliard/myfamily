@@ -63,7 +63,7 @@ esac
 done
 extra="${extra} ${asan}";
 
-cc_flags='-Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -Wno-address-of-packed-member -I..';
+cc_flags='-Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -I..';
 
 if ${cc} -dM -E - < /dev/null | grep -q '__clang__'; then
     # If Clang is detected
@@ -161,5 +161,5 @@ elif [ -z "$1" ] || [ "${1#-}" != "$1" ] || [ "$1" = "all" ]; then
       ${cc} ${cc_flags} ${extra} ${special} -o bin/fam */*.o
    fi
 else
-   echo "Unknown command: '$1' Usage: fam [test | all] [options]";
+   echo "Unknown command: '$1' Usage: fam [test | fasttest | all | clean | coverage] [options]";
 fi

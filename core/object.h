@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_OBJECT__
-#define _BASE_OBJECT__
+#ifndef _CORE_OBJECT__
+#define _CORE_OBJECT__
 
 #include <base/types.h>
 
@@ -65,4 +65,4 @@ Object object_ref(const Object src);
 Object object_weak(const Object src);
 Object object_upgrade(const Object src);
 
-#endif	// _BASE_OBJECT__
+#endif	// _CORE_OBJECT__
