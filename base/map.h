@@ -23,7 +23,7 @@ int getpagesize();
 byte *map(unsigned long long pages);
 byte *fmap(unsigned long long pages, unsigned long long offset);
 void unmap(byte *addr, unsigned long long pages);
-void zsync(byte *, unsigned long long pages);
+void zsync(byte *addr, unsigned long long pages);
 
 #ifdef TEST
 void fmap_init_path(const char *fpath);
