@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef __linux__
+#define _XOPEN_SOURCE 500
+#endif	// __linux__
 #include <base/test.h>
 #include <dlfcn.h>
 #include <execinfo.h>
