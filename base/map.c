@@ -95,7 +95,7 @@ void unmap(byte *addr, unsigned long long pages) {
 		panic("munmap error: %s", strerror(errno));
 }
 
-void save(byte *addr, unsigned long long pages) {
+void zsync(byte *addr, unsigned long long pages) {
 	if (msync(addr, pages * PAGE_SIZE, MS_SYNC))
 		panic("msync error: %s", strerror(errno));
 }
