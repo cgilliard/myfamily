@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_LOCK__
-#define _BASE_LOCK__
+#ifndef _BASE_MAP__
+#define _BASE_MAP__
 
-#define INIT_LOCK (0)
+#include <base/types.h>
 
-typedef unsigned long long Lock;
+int getpagesize();
+#define PAGE_SIZE (getpagesize())
 
-Lock lock_create();
-void lock_read(Lock *lock);
-void lock_write(Lock *lock);
-void lock_unlock(Lock *lock);
+byte *map(unsigned long long pages);
+byte *fmap(unsigned long long pages, unsigned long long offset);
+void unmap(byte *addr, unsigned long long pages);
+void save(byte *, unsigned long long pages);
 
-void lock_guard_cleanup(Lock *lg);
+#ifdef TEST
+void fmap_init_path(const char *fpath);
+void fmap_close();
+#endif	// TEST
 
-#define LockGuard \
-	Lock __attribute__((warn_unused_result, cleanup(lock_guard_cleanup)))
-
-LockGuard lock_guard_read(Lock l);
-LockGuard lock_guard_write(Lock l);
-
-#endif	// _BASE_LOCK__
+#endif	// _BASE_MAP__

@@ -15,9 +15,11 @@
 #ifdef __linux__
 #define _XOPEN_SOURCE 500
 #endif	// __linux__
+#include <base/map.h>
 #include <base/test.h>
 #include <dlfcn.h>
 #include <execinfo.h>
+#include <fcntl.h>
 #include <ftw.h>
 #include <inttypes.h>
 #include <setjmp.h>
@@ -26,6 +28,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
 
 #define MAX_BACKTRACE_ENTRIES 128
 
@@ -37,6 +40,7 @@ static int test_itt;
 int fail_count = 0;
 static byte target_test[MAX_TEST_NAME + 1];
 extern char **environ;
+extern int _gfd;
 
 int unlink_cb(const char *fpath, const struct stat *sb, int typeflag,
 			  struct FTW *ftwbuf) {
@@ -87,7 +91,13 @@ bool execute_tests(byte *name) {
 				test_dir[4 + 3 + test_name_len] = 0;
 				rmrf(test_dir);
 				mkdir(test_dir, 0700);
+				char gfile[test_name_len + 100];
+				copy_bytes(gfile, test_dir, test_name_len + 4 + 3);
+				copy_bytes(gfile + test_name_len + 4 + 3, "/.fam.dat", 9);
+				gfile[test_name_len + 4 + 3 + 9] = 0;
+				fmap_init_path(gfile);
 				test_arr[i](test_dir);
+				fmap_close();
 				if (_allocation_sum != start_alloc)
 					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
 							BRIGHT_RED, RESET, _allocation_sum - start_alloc);
