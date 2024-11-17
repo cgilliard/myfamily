@@ -19,7 +19,7 @@
 
 extern int test_count;
 extern int fail_count;
-typedef void (*test_fn_ptr)(const byte *, const byte *);
+typedef void (*test_fn_ptr)(const byte *);
 extern test_fn_ptr test_arr[MAX_TESTS + 1];
 extern byte test_names[MAX_TESTS][MAX_TEST_NAME + 1];
 
@@ -59,17 +59,17 @@ void fail_assert();
 		return 0;                                                              \
 	}
 
-#define Test(name)                                                        \
-	void _tfwork_##name(const byte *test_dir, const byte *resources_dir); \
-	static void __attribute__((constructor)) init_##name() {              \
-		if (test_count > MAX_TESTS)                                       \
-			panic("Too many tests (MAX=%i)", MAX_TESTS);                  \
-		int name_len = cstring_len(#name);                                \
-		if (name_len > MAX_TEST_NAME)                                     \
-			panic("test name: '%s' too long!", #name);                    \
-		test_arr[test_count] = &_tfwork_##name;                           \
-		copy_bytes(test_names[test_count], #name, name_len);              \
-		test_names[test_count][name_len] = 0;                             \
-		test_count++;                                                     \
-	}                                                                     \
-	void _tfwork_##name(const byte *test_dir, const byte *resources_dir)
+#define Test(name)                                           \
+	void _tfwork_##name(const byte *test_dir);               \
+	static void __attribute__((constructor)) init_##name() { \
+		if (test_count > MAX_TESTS)                          \
+			panic("Too many tests (MAX=%i)", MAX_TESTS);     \
+		int name_len = cstring_len(#name);                   \
+		if (name_len > MAX_TEST_NAME)                        \
+			panic("test name: '%s' too long!", #name);       \
+		test_arr[test_count] = &_tfwork_##name;              \
+		copy_bytes(test_names[test_count], #name, name_len); \
+		test_names[test_count][name_len] = 0;                \
+		test_count++;                                        \
+	}                                                        \
+	void _tfwork_##name(const byte *test_dir)

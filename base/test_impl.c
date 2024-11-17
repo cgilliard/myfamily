@@ -87,7 +87,7 @@ bool execute_tests(byte *name) {
 				test_dir[4 + 3 + test_name_len] = 0;
 				rmrf(test_dir);
 				mkdir(test_dir, 0700);
-				test_arr[i](test_dir, "resources");
+				test_arr[i](test_dir);
 				if (_allocation_sum != start_alloc)
 					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
 							BRIGHT_RED, RESET, _allocation_sum - start_alloc);

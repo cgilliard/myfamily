@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_err.h>
 #include <base/mmap.h>
 #include <base/print_util.h>
 #include <base/types.h>
+#include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 int64 _allocation_sum = 0;
 static int mmap_fail = -1;
-
-size_t getpagesize();
 
 void *mmap_allocate(unsigned long long size) {
 	if (mmap_fail >= 0) {
@@ -49,6 +51,40 @@ unsigned long long mmap_aligned_size(unsigned long long size) {
 	return (size + (page_size - 1)) & ~(page_size - 1);
 }
 
+int mmap_open(const char *path) {
+	int fd = open(path, O_RDWR);
+	if (fd == -1) {
+		fd = open(path, O_CREAT | O_RDWR, 0600);
+		if (fd == -1) SetErr(FileNotFound);
+	}
+	return fd;
+}
+
+byte *mmap_map(int fd, unsigned long long block_offset,
+			   unsigned long long block_length) {
+	return mmap(NULL, block_length * PAGE_SIZE, PROT_READ | PROT_WRITE,
+				MAP_SHARED, fd, block_offset * PAGE_SIZE);
+}
+int mmap_unmap(byte *ptr, unsigned long long block_length) {
+	return munmap(ptr, block_length * PAGE_SIZE);
+}
+int mmap_truncate(int fd, unsigned long long blocks) {
+	return ftruncate(fd, blocks * PAGE_SIZE);
+}
+int mmap_unlink(const char *path) {
+	return unlink(path);
+}
+unsigned long long mmap_blocks(int fd) {
+	struct stat st;
+	fstat(fd, &st);
+	return st.st_size / PAGE_SIZE;
+}
+int mmap_close(int fd) {
+	return close(fd);
+}
+
+#ifdef TEST
 void set_mmap_fail(int count) {
 	mmap_fail = count;
 }
+#endif	// TEST

@@ -17,8 +17,19 @@
 
 #include <base/types.h>
 
+int getpagesize();
+#define PAGE_SIZE (getpagesize())
+
 unsigned long long mmap_aligned_size(unsigned long long size);
 void *mmap_allocate(unsigned long long size);
+int mmap_open(const char *path);
+byte *mmap_map(int fd, unsigned long long block_offset,
+			   unsigned long long block_length);
+int mmap_unmap(byte *ptr, unsigned long long block_length);
+int mmap_truncate(int fd, unsigned long long blocks);
+int mmap_unlink(const char *path);
+unsigned long long mmap_blocks(int fd);
+int mmap_close(int fd);
 void mmap_free(void *, unsigned long long size);
 
 #ifdef TEST

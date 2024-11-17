@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <base/test.h>
+#include <errno.h>
+#include <stdio.h>
 
 Suite(base);
 
@@ -91,6 +93,33 @@ Test(test_mmap) {
 	for (int i = 0; i < 100; i++) fam_assert_eq(test[i], i);
 
 	mmap_free(test, sizeof(int *) * 100);
+
+	char file1[cstring_len(test_dir) + 10];
+	int test_dir_len = cstring_len(test_dir);
+	copy_bytes(file1, test_dir, test_dir_len);
+	copy_bytes(file1 + test_dir_len, "/test.dat", 9);
+	file1[test_dir_len + 9] = 0;
+
+	int fd = mmap_open(file1);
+	fam_assert(fd > 0);
+	fam_assert_eq(mmap_blocks(fd), 0);
+	fam_assert(!mmap_truncate(fd, 10));
+	fam_assert_eq(mmap_blocks(fd), 10);
+	fam_assert(!mmap_close(fd));
+	fam_assert(!mmap_unlink(file1));
+	fd = mmap_open(file1);
+	fam_assert_eq(mmap_blocks(fd), 0);
+	fam_assert(!mmap_truncate(fd, 10));
+	fam_assert_eq(mmap_blocks(fd), 10);
+
+	byte *data = mmap_map(fd, 4, 2);
+	for (int i = 0; i < PAGE_SIZE; i++) data[i] = (i % 26) + 'a';
+	byte *data2 = mmap_map(fd, 4, 2);
+	for (int i = 0; i < PAGE_SIZE; i++) fam_assert_eq(data[i], data2[i]);
+
+	fam_assert(!mmap_unmap(data, 2));
+	fam_assert(!mmap_unmap(data2, 2));
+	fam_assert(!mmap_close(fd));
 }
 
 Test(test_misc) {
