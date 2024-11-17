@@ -24,6 +24,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
+uid_t getuid(void);
 char *strerror(int e);
 int close(int fd);
 int ftruncate(int fd, off_t size);
