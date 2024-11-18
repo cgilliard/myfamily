@@ -82,7 +82,7 @@ bool execute_tests(byte *name) {
 			if (target_test[0] == 0 ||
 				!cstring_compare(target_test, test_names[i])) {
 				test_exe_count++;
-				// int64 start_alloc = _allocation_sum;
+				int64 start_alloc = _alloc_sum;
 				int test_name_len = cstring_len(test_names[i]);
 				char test_dir[test_name_len + 100];
 				copy_bytes(test_dir, "./.", 3);
@@ -98,10 +98,11 @@ bool execute_tests(byte *name) {
 				fmap_init_path(gfile);
 				test_arr[i](test_dir);
 				fmap_close();
-				// if (_allocation_sum != start_alloc)
-				// println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
-				// BRIGHT_RED, RESET, _allocation_sum - start_alloc);
-				// fam_assert_eq(_allocation_sum, start_alloc);
+
+				if (_alloc_sum != start_alloc)
+					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
+							BRIGHT_RED, RESET, _alloc_sum - start_alloc);
+				fam_assert_eq(_alloc_sum, start_alloc);
 			}
 		} else {
 			println("%sFAIL:%s test '%s%s%s' failed!", BRIGHT_RED, RESET, GREEN,

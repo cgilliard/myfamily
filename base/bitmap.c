@@ -54,9 +54,10 @@ void __attribute__((constructor)) __check_bitmap_sizes() {
 int64 bitmap_try_allocate(BitMapImpl *impl) {
 	bool has_looped = false;
 	unsigned long long itt = bitmap_last_index[impl->bitmap_index];
+	unsigned long long cur_blocks = ALOAD(&impl->cur_blocks);
 	loop {
-		if (itt >= (impl->cur_blocks * PAGE_SIZE) / 8) {
-			if (impl->cur_blocks == impl->max_blocks) {
+		if (itt >= (cur_blocks * PAGE_SIZE) / 8) {
+			if (cur_blocks == impl->max_blocks) {
 				// try one more loop
 				if (!has_looped) {
 					has_looped = true;
@@ -80,7 +81,7 @@ int64 bitmap_try_allocate(BitMapImpl *impl) {
 			x = __builtin_ctzl(~(initial));
 			updated = initial | (0x1ULL << x);
 
-		} while (!CAS_SEQ(DATA(impl, itt), &initial, updated));
+		} while (!CAS_RELEASE(DATA(impl, itt), &initial, updated));
 
 		if (found) {
 			bitmap_last_index[impl->bitmap_index] = itt;
@@ -94,13 +95,19 @@ int64 bitmap_try_allocate(BitMapImpl *impl) {
 }
 
 int bitmap_try_resize(BitMapImpl *impl) {
-	if (impl->cur_blocks == impl->max_blocks) return -1;
+	unsigned long long cur_blocks = ALOAD(&impl->cur_blocks);
+	if (cur_blocks == impl->max_blocks) return -1;
 
 	lockr(&impl->lock);
-	unsigned long long next = (impl->cur_blocks + 0) * (PAGE_SIZE / 8);
+	unsigned long long next = (cur_blocks) * (PAGE_SIZE / 8);
 	unsigned long long i = next >> IOFF;
 	unsigned long long j = (next >> JOFF) & MASK;
 	unsigned long long k = (next >> KOFF) & MASK;
+
+	if (i >= PAGE_SIZE / sizeof(unsigned long long ****)) {
+		unlock(&impl->lock);
+		return -1;
+	}
 
 	if (impl->data == NULL) {
 		unlock(&impl->lock);
@@ -155,7 +162,7 @@ int bitmap_try_resize(BitMapImpl *impl) {
 				return -1;
 			}
 		}
-		impl->cur_blocks++;
+		AADD(&impl->cur_blocks, 1);
 		unlock(&impl->lock);
 		lockr(&impl->lock);
 	}
@@ -167,7 +174,7 @@ int bitmap_try_resize(BitMapImpl *impl) {
 
 int bitmap_init(BitMap *m, unsigned long long max_blocks) {
 	BitMapImpl *impl = (BitMapImpl *)m;
-	impl->cur_blocks = 0;
+	ASTORE(&impl->cur_blocks, 0);
 	impl->max_blocks = max_blocks;
 	impl->lock = INIT_LOCK;
 	impl->bitmap_index = AADD(&bitmap_index, 1);
@@ -200,8 +207,26 @@ void bitmap_free(BitMap *m, unsigned long long index) {
 	do {
 		initial = ALOAD(DATA(impl, index));
 		updated = initial & ~(0x1ULL << bit);
-	} while (!CAS_SEQ(DATA(impl, index), &initial, updated));
+	} while (!CAS_RELEASE(DATA(impl, index), &initial, updated));
 
 	if (index < bitmap_last_index[impl->bitmap_index])
 		bitmap_last_index[impl->bitmap_index] = index;
+}
+
+void bitmap_cleanup(BitMap *m) {
+	BitMapImpl *impl = (BitMapImpl *)m;
+
+	if (impl->data) {
+		for (int i = 0; i < PAGE_SIZE / sizeof(byte *) && impl->data[i]; i++) {
+			for (int j = 0; j < PAGE_SIZE / sizeof(byte *) && impl->data[i][j];
+				 j++) {
+				for (int k = 0;
+					 k < PAGE_SIZE / sizeof(byte *) && impl->data[i][j][k]; k++)
+					unmap((byte *)impl->data[i][j][k], 1);
+				unmap((byte *)impl->data[i][j], 1);
+			}
+			unmap((byte *)impl->data[i], 1);
+		}
+		unmap((byte *)impl->data, 1);
+	}
 }

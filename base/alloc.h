@@ -12,19 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_BITMAP__
-#define _BASE_BITMAP__
+#ifndef _BASE_ALLOC__
+#define _BASE_ALLOC__
 
 #include <base/types.h>
 
-#define BITMAP_IMPL_SIZE 48
-typedef struct BitMap {
-	byte impl[BITMAP_IMPL_SIZE];
-} BitMap;
+typedef unsigned int Ptr;
 
-int bitmap_init(BitMap *m, unsigned long long max_blocks);
-int64 bitmap_allocate(BitMap *m);
-void bitmap_free(BitMap *m, unsigned long long index);
-void bitmap_cleanup(BitMap *m);
+#define ALLOC_IMPL_SIZE 80
+typedef struct Alloc {
+	byte impl[ALLOC_IMPL_SIZE];
+} Alloc;
 
-#endif	// _BASE_BITMAP__
+typedef struct Slab {
+	Ptr ptr;
+	byte *data;
+} Slab;
+
+int alloc_init(Alloc *a, unsigned int size, unsigned int max_slabs);
+Slab alloc(Alloc *a);
+void release(Alloc *a, Ptr ptr);
+void alloc_cleanup(Alloc *a);
+
+#endif	// _BASE_ALLOC__

@@ -28,6 +28,7 @@ void flush(byte *addr, unsigned long long pages);
 #ifdef TEST
 void fmap_init_path(const char *fpath);
 void fmap_close();
+extern unsigned long long _alloc_sum;
 #endif	// TEST
 
 #endif	// _BASE_MAP__

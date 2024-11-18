@@ -54,4 +54,59 @@ Test(bitmap) {
 	fam_assert_eq(bitmap_allocate(&b1), 200);
 	fam_assert_eq(bitmap_allocate(&b1), 300);
 	fam_assert_eq(bitmap_allocate(&b1), (2048 * 64) + 1);
+
+	bitmap_cleanup(&b1);
+}
+
+Test(alloc_max_slabs) {
+	Alloc a1;
+	int64 size = PAGE_SIZE * 8, len = 128;
+	fam_assert(!alloc_init(&a1, len, PAGE_SIZE * 8));
+
+	Slab *arr = (Slab *)map(1 + (sizeof(Slab) * size) / PAGE_SIZE);
+
+	for (int64 i = 0; i < size; i++) {
+		arr[i] = alloc(&a1);
+		fam_assert_eq(arr[i].ptr, i);
+		for (int j = 0; j < len; j++) {
+			arr[i].data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+	Slab inv = alloc(&a1);
+	fam_assert_eq(inv.ptr, 0);
+	fam_assert_eq(inv.data, NULL);
+
+	alloc_cleanup(&a1);
+	unmap((byte *)arr, 1 + (sizeof(Slab) * size) / PAGE_SIZE);
+}
+
+Test(alloc_big) {
+	Alloc a1;
+	// int64 size = (1024LL * 1024LL * 1024LL * 4LL), len = 8;
+	int64 size = 1000 * 100, len = 128;
+
+	fam_assert(!alloc_init(&a1, len, UINT32_MAX));
+
+	Slab *arr = (Slab *)map(1 + (sizeof(Slab) * size) / PAGE_SIZE);
+
+	for (int64 i = 0; i < size; i++) {
+		arr[i] = alloc(&a1);
+		fam_assert_eq(arr[i].ptr, i);
+		for (int j = 0; j < len; j++) {
+			arr[i].data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	// Slab inv = alloc(&a1);
+	// fam_assert_eq(inv.ptr, 0);
+
+	for (int64 i = 0; i < size; i++) {
+		for (int j = 0; j < len; j++) {
+			fam_assert_eq(arr[i].data[j], ((i + j) % 26) + 'a');
+		}
+		release(&a1, arr[i].ptr);
+	}
+
+	alloc_cleanup(&a1);
+	unmap((byte *)arr, 1 + (sizeof(Slab) * size) / PAGE_SIZE);
 }
