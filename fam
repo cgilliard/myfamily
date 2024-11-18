@@ -1,69 +1,20 @@
 #!/bin/sh
 
 . ./scripts/env.sh
+. ./scripts/color.sh
 
-if [ "$NO_COLOR" = "" ]; then
-   GREEN="\033[32m";
-   CYAN="\033[36m";
-   YELLOW="\033[33m";
-   BRIGHT_RED="\033[91m";
-   RESET="\033[0m";
-   BLUE="\033[34m";
-else
-   GREEN="";
-   CYAN="";
-   YELLOW="";
-   BRIGHT_RED="";
-   RESET="";
-   BLUE="";
-fi
-
-update_docs=0;
-cc=cc
-extra='-O3 -flto';
-s=0;
-do_final=1;
-asan='';
-filter='';
-target='';
-for var in "$@"
-do
-case "$var" in --with-cc=*)
-        cc=${var#*=};
-	;;
-esac
-case "$var" in --with-extra=*)
-	extra=${var#*=};
-	;;
-esac
-case "$var" in -s)
-        s=1;
-        ;;
-esac
-case "$var" in --update-docs)
-        update_docs=1;
-        ;;
-esac
-case "$var" in --skip-final)
-	do_final=0;
-	;;
-esac
-case "$var" in --with-asan)
-	asan='-fsanitize=undefined -fsanitize=address';
-	;;
-esac
-case "$var" in --filter=*)
-	filter=${var#*=};
-	;;
-esac
-case "$var" in --target=*)
-	target=${var#*=};
-	;;
-esac
-done
-extra="${extra} ${asan}";
-
+extra="-O3 -flto"
 cc_flags='-Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -I..';
+cc=cc
+update_docs=0
+skip_final=0
+with_asan=0
+s=0
+filter=
+target=
+test=0
+all=0
+. ./scripts/parse_params.sh
 
 if ${cc} -dM -E - < /dev/null | grep -q '__clang__'; then
     # If Clang is detected
@@ -73,93 +24,94 @@ else
     special="-Werror=discarded-qualifiers"
 fi
 
-if [ "$1" = "clean" ]; then
-   rm -rf */*.o */*.gcda */*.gcov */*.gcno */.bin/* main/resources.h
-elif [ "$1" = "test" ] || [ "$1" = "coverage" ] || [ "$1" = "fasttest" ]; then
-   if [ "$1" = "coverage" ]; then
-      extra="-g -O0 -DTEST --coverage";
-   elif [ "$1" = "fasttest" ]; then
-      extra="-O3 -flto -DTEST";
-   else
-      extra="-g -O0 -DTEST ${asan}";
-   fi
-   if [ $s = 1 ]; then
-      ./fam --with-cc=$cc --with-extra="$extra" -s --skip-final || exit 1;
-   else
-      ./fam --with-cc=$cc --with-extra="$extra" --skip-final || exit 1;
-   fi
-   echo "[===================================================================================================================]";
-   if [ "$filter" != "" ]; then
-      export TEST_FILTER=$filter;
-   else
-      unset TEST_FILTER;
-   fi
-   cd base;
-   ${cc} ${cc_flags} ${extra} ${special} -c test_impl.c || exit 1;
-   cd ..;
-   for dir in $subdirs; do
-      if [ "$target" != "$dir" ] && [ "$target" != "" ]; then
-          continue;
-      fi
-      cd ${dir};
-      if [ -f "test.c" ]; then
-         mkdir -p ./.bin
-         eval "deps=\$deps_${dir}"
-         ${cc} ${cc_flags} ${extra} ${special} test.c -o ./.bin/test ${deps} || exit 1;
-         ./.bin/test || exit 1;
-      fi
-      cd ..;
-   done
-   echo "All tests passed!";
-   if [ "$1" = "coverage" ]; then
-      if [ $update_docs = 1 ]; then
-         ./scripts/coverage.sh --update-docs
-      else
-         ./scripts/coverage.sh
-      fi
-   fi
-elif [ -z "$1" ] || [ "${1#-}" != "$1" ] || [ "$1" = "all" ]; then
-   if [ ! -e main/resources.h ]; then
-      ${cc} -o bin/xxdir etc/xxdir.c
-      ./bin/xxdir etc/resources main/resources.h fam
-   fi
-   for dir in $subdirs
-   do
-      cd ${dir}
-         for file in *.c
-         do
-            newer_header=0;
-            for header in *.h; do
-               if [ ${header} -nt ${file%.c}.o ]; then
-                  newer_header=1;
-               fi
-            done
-            if [ ! -e ${file%.c}.o ] || [ ${file} -nt ${file%.c}.o ] || [ $newer_header = 1 ]; then
-               if [ ${file} != "test.c" ] && [ ${file} != "test_impl.c" ]; then
-                  if [ $s = 0 ]; then
-                     echo "${GREEN}C compile command$RESET: ${CYAN}${cc}${RESET}\n\
+if [ "$test" = 1 ] || [ "$coverage" = 1 ] || [ "$fasttest" = 1 ]; then
+	if [ "$coverage" = 1 ]; then
+		extra="-g -O0 -DTEST --coverage";
+	elif [ "$fasttest" = 1 ]; then
+		extra="-O3 -flto -DTEST";
+	else
+                extra="-O0 -g -DTEST";
+	fi
+	if [ $s = 1 ]; then
+		./fam --with-cc=$cc --with-extra="$extra" -s --skip-final || exit 1;
+	else
+		./fam --with-cc=$cc --with-extra="$extra" --skip-final || exit 1;
+	fi
+	echo "[${BLUE}===================================================================================================================${RESET}]";
+	if [ "$filter" != "" ]; then
+		export TEST_FILTER=$filter;
+	else
+		unset TEST_FILTER;
+	fi
+	cd base;
+	${cc} ${cc_flags} ${extra} ${special} -c test_impl.c || exit 1;
+	cd ..;
+	for dir in $subdirs; do
+		if [ "$target" != "$dir" ] && [ "$target" != "" ]; then
+			continue;
+		fi
+		cd ${dir};
+ 		echo "[${BLUE}====${RESET}] Running ${GREEN}$dir${RESET} test suite...";
+		if [ -f "test.c" ]; then
+			mkdir -p ./.bin
+			eval "deps=\$deps_${dir}"
+			${cc} ${cc_flags} ${extra} ${special} test.c -o ./.bin/test ${deps} || exit 1;
+			./.bin/test || exit 1;
+		fi
+		cd ..;
+	done
+
+	echo "${GREEN}All tests passed!${RESET}";
+	if [ "$1" = "coverage" ]; then
+		if [ $update_docs = 1 ]; then
+			./scripts/coverage.sh --update-docs
+		else
+			./scripts/coverage.sh
+		fi
+	fi
+elif [ "$all" = 1 ]; then
+	for dir in $subdirs
+	do
+		cd ${dir}
+			if [ "$s" != "1" ]; then
+				echo "Building ${dir}...";
+			fi
+			for file in *.c
+			do
+				newer_header=0;
+				for header in *.h; do
+					if [ ${header} -nt ${file%.c}.o ]; then
+						newer_header=1;
+					fi
+				done
+				if [ ! -e ${file%.c}.o ] || [ ${file} -nt ${file%.c}.o ] || [ $newer_header = 1 ]; then
+					if [ ${file} != "test.c" ] && [ ${file} != "test_impl.c" ]; then
+						if [ "$s" = "0" ]; then
+							echo "${GREEN}C compile command$RESET: ${CYAN}${cc}${RESET}\n\
 	${cc_flags}\n\
 	${extra}\n\
 	${special}\n\
 	-o ${file%.c}.o\n\
 	${YELLOW}-c ${file}$RESET"
-                  fi
-                  ${cc} ${cc_flags} ${extra} ${special} -o ${file%.c}.o -c ${file} || exit 1;
-               fi
-            fi
-         done
-      cd ..
-   done
-   if [ $do_final = 1 ]; then
-      if [ $s = 0 ]; then
-         echo "${GREEN}C compile command$RESET: ${CYAN}${cc}$RESET\n\
+						fi
+						${cc} ${cc_flags} ${extra} ${special} -o ${file%.c}.o -c ${file} || exit 1;
+					fi
+				fi
+			done
+		cd ..
+	done
+	if [ "$skip_final" = "0" ]; then
+		if [ $s = 0 ]; then
+			echo "${GREEN}C compile command$RESET: ${CYAN}${cc}$RESET\n\
 	${cc_flags}\n\
 	${extra}\n\
 	${special}\n\
 	-o ${YELLOW}bin/fam$RESET */*.o";
-      fi
-      ${cc} ${cc_flags} ${extra} ${special} -o bin/fam */*.o
-   fi
+		fi
+		${cc} ${cc_flags} ${extra} ${special} -o bin/fam */*.o
+	fi
 else
-   echo "Unknown command: '$1' Usage: fam [test | fasttest | all | clean | coverage] [options]";
+	rm -rf */*.o */*.gcda */*.gcov */*.gcno */.bin/* main/resources.h bin/*
 fi
+
+

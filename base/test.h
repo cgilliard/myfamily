@@ -48,15 +48,13 @@ void fail_assert();
 		fail_assert();                             \
 	}
 
-#define Suite(name)                                                            \
-	int main() {                                                               \
-		println("[%s====%s] Running %s%s%s test suite...", BLUE, RESET, GREEN, \
-				#name, RESET);                                                 \
-		bool success = execute_tests(#name);                                   \
-		if (!success) {                                                        \
-			return -1;                                                         \
-		}                                                                      \
-		return 0;                                                              \
+#define Suite(name)                          \
+	int main() {                             \
+		bool success = execute_tests(#name); \
+		if (!success) {                      \
+			return -1;                       \
+		}                                    \
+		return 0;                            \
 	}
 
 #define Test(name)                                           \

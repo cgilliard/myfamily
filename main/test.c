@@ -16,5 +16,5 @@
 
 Suite(main);
 
-Test(test_main) {
+Test(main) {
 }
