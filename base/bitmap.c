@@ -18,6 +18,7 @@
 #include <base/macros.h>
 #include <base/map.h>
 #include <base/print_util.h>
+#include <base/util.h>
 
 #define MAX_BITMAPS 1024
 
@@ -39,16 +40,49 @@ void __attribute__((constructor)) __check_bitmap_sizes() {
 			  sizeof(BitMapImpl), sizeof(BitMap));
 }
 
+#define SHIFT_PER_LEVEL (__builtin_ctz(PAGE_SIZE) - 3)
+#define MASK ((1U << (SHIFT_PER_LEVEL)) - 1)
+#define KOFF (SHIFT_PER_LEVEL)
+#define JOFF (2 * SHIFT_PER_LEVEL)
+#define IOFF (3 * SHIFT_PER_LEVEL)
+
+#define DATA(impl, index)                              \
+	(impl->data[index >> IOFF][(index >> JOFF) & MASK] \
+			   [(index >> KOFF) & MASK] +              \
+	 (index & MASK))
+
 int64 bitmap_try_allocate(BitMapImpl *impl) {
+	bool has_looped = false;
 	unsigned long long itt = bitmap_last_index[impl->bitmap_index];
 	loop {
-		if (itt >= (impl->cur_blocks * PAGE_SIZE) / 8) break;
-		unsigned long long *ptr =
-			impl->data[itt >> 24][(itt >> 16) & 0xFF][(itt >> 8) & 0xFF];
+		if (itt >= (impl->cur_blocks * PAGE_SIZE) / 8) {
+			if (impl->cur_blocks == impl->max_blocks) {
+				// try one more loop
+				if (!has_looped) {
+					has_looped = true;
+					itt = 0;
+				} else
+					break;
+			} else
+				break;
+		}
+		unsigned long long initial, updated;
+		int x;
+		bool found;
 
-		if (*ptr != ~0) {
-			int x;
-			for (x = 0; (*ptr & (0x1ULL << x)) != 0; x++);
+		do {
+			initial = ALOAD(DATA(impl, itt));
+			if (initial == ~0ULL) {
+				found = false;
+				break;
+			}
+			found = true;
+			x = __builtin_ctzl(~(initial));
+			updated = initial | (0x1ULL << x);
+
+		} while (!CAS_SEQ(DATA(impl, itt), &initial, updated));
+
+		if (found) {
 			bitmap_last_index[impl->bitmap_index] = itt;
 			return (itt << 6) | x;
 		}
@@ -63,18 +97,67 @@ int bitmap_try_resize(BitMapImpl *impl) {
 	if (impl->cur_blocks == impl->max_blocks) return -1;
 
 	lockr(&impl->lock);
-	unsigned long long next = impl->cur_blocks + 1;
-	unsigned long long i = next >> 24;
-	unsigned long long j = (next >> 16) & 0xFF;
-	unsigned long long k = (next >> 8) & 0xFF;
+	unsigned long long next = (impl->cur_blocks + 0) * (PAGE_SIZE / 8);
+	unsigned long long i = next >> IOFF;
+	unsigned long long j = (next >> JOFF) & MASK;
+	unsigned long long k = (next >> KOFF) & MASK;
 
 	if (impl->data == NULL) {
+		unlock(&impl->lock);
+		lockw(&impl->lock);
+		if (impl->data == NULL) {
+			impl->data = (unsigned long long ****)map(1);
+			if (impl->data == NULL) {
+				unlock(&impl->lock);
+				SetErr(AllocErr);
+				return -1;
+			}
+		}
+		unlock(&impl->lock);
+		lockr(&impl->lock);
 	}
 	if (impl->data[i] == NULL) {
+		unlock(&impl->lock);
+		lockw(&impl->lock);
+		if (impl->data[i] == NULL) {
+			impl->data[i] = (unsigned long long ***)map(1);
+			if (impl->data[i] == NULL) {
+				unlock(&impl->lock);
+				SetErr(AllocErr);
+				return -1;
+			}
+		}
+		unlock(&impl->lock);
+		lockr(&impl->lock);
 	}
 	if (impl->data[i][j] == NULL) {
+		unlock(&impl->lock);
+		lockw(&impl->lock);
+		if (impl->data[i][j] == NULL) {
+			impl->data[i][j] = (unsigned long long **)map(1);
+			if (impl->data[i][j] == NULL) {
+				unlock(&impl->lock);
+				SetErr(AllocErr);
+				return -1;
+			}
+		}
+		unlock(&impl->lock);
+		lockr(&impl->lock);
 	}
 	if (impl->data[i][j][k] == NULL) {
+		unlock(&impl->lock);
+		lockw(&impl->lock);
+		if (impl->data[i][j][k] == NULL) {
+			impl->data[i][j][k] = (unsigned long long *)map(1);
+			if (impl->data[i][j][k] == NULL) {
+				unlock(&impl->lock);
+				SetErr(AllocErr);
+				return -1;
+			}
+		}
+		impl->cur_blocks++;
+		unlock(&impl->lock);
+		lockr(&impl->lock);
 	}
 
 	unlock(&impl->lock);
@@ -107,5 +190,18 @@ int64 bitmap_allocate(BitMap *m) {
 	} else
 		return ret;
 }
+
 void bitmap_free(BitMap *m, unsigned long long index) {
+	BitMapImpl *impl = (BitMapImpl *)m;
+	int bit = index & 0x7F;
+	index >>= 6;
+
+	unsigned long long initial, updated;
+	do {
+		initial = ALOAD(DATA(impl, index));
+		updated = initial & ~(0x1ULL << bit);
+	} while (!CAS_SEQ(DATA(impl, index), &initial, updated));
+
+	if (index < bitmap_last_index[impl->bitmap_index])
+		bitmap_last_index[impl->bitmap_index] = index;
 }

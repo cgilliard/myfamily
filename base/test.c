@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/lib.h>
 #include <base/test.h>
 
 Suite(base);
 
-Test(test_colors) {
+Test(colors) {
 	byte buf[1024];
 	int len;
 
@@ -31,4 +32,26 @@ Test(test_colors) {
 				 BRIGHT_RED, RESET, YELLOW, RESET, CYAN, RESET, BLUE, RESET);
 	fam_assert_eq(len, 54);
 	test_reset_colors();
+}
+
+Test(bitmap) {
+	BitMap b1;
+	bitmap_init(&b1, 10);
+
+	int64 last = 0;
+	for (int i = 0; i < (2048 * 64) + 1; i++) {
+		int64 v1 = bitmap_allocate(&b1);
+		if (i) fam_assert_eq(v1, last + 1);
+		last = v1;
+	}
+
+	bitmap_free(&b1, 100);
+	bitmap_free(&b1, 200);
+	bitmap_free(&b1, 300);
+
+	int64 n = bitmap_allocate(&b1);
+	fam_assert_eq(n, 100);
+	fam_assert_eq(bitmap_allocate(&b1), 200);
+	fam_assert_eq(bitmap_allocate(&b1), 300);
+	fam_assert_eq(bitmap_allocate(&b1), (2048 * 64) + 1);
 }
