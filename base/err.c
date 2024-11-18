@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/fam_err.h>
+#include <base/err.h>
 #include <base/print_util.h>
 #include <base/util.h>
 
-_Thread_local byte fam_err_last[ERR_LEN + 1] = {""};
+_Thread_local byte err_last[ERR_LEN + 1] = {""};
 
-_Thread_local int64 fam_err = NoErrors;
+_Thread_local int64 err = NoErrors;
 
 const byte *get_err() {
-	int len = cstring_len(FamErrText[fam_err]);
+	int len = cstring_len(FamErrText[err]);
 	if (len > ERR_LEN) len = ERR_LEN;
-	copy_bytes(fam_err_last, FamErrText[fam_err], len);
-	return fam_err_last;
+	copy_bytes(err_last, FamErrText[err], len);
+	return err_last;
 }
 
 void print_err(const byte *text) {
-	println("%s: %s", FamErrText[fam_err], text);
+	println("%s: %s", FamErrText[err], text);
 }

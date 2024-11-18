@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_FAM_ERR__
-#define _BASE_FAM_ERR__
+#ifndef _BASE_ERR__
+#define _BASE_ERR__
 
 #include <base/macro_util.h>
 #include <base/types.h>
 
 #define ERR_LEN 64
 
-#define DEFINE_FAMERR(e)                                            \
+#define DEFINE_ERR(e)                                               \
 	typedef enum FamErr { FOR_EACH(SECOND, none, (, ), e) } FamErr; \
 	static const byte *FamErrText[] = {                             \
 		FOR_EACH(SECOND_STRINGIFY, none, (, ), e)};
 
 // Define FamErr enum values
 // clang-format off
-#define FAMERR_VALUES                                                                              \
+#define ERR_VALUES                                                                              \
 	NoErrors, \
 	IllegalArgument, \
 	Overflow, \
@@ -60,14 +60,14 @@
 	NotYetImplemented
 // clang-format on
 
-DEFINE_FAMERR(FAMERR_VALUES);
+DEFINE_ERR(ERR_VALUES);
 
-extern _Thread_local byte fam_err_last[ERR_LEN + 1];
-extern _Thread_local int64 fam_err;
+extern _Thread_local byte err_last[ERR_LEN + 1];
+extern _Thread_local int64 err;
 
 void print_err(const byte *text);
 const byte *get_err();
 
-#define SetErr(err) ({ fam_err = err; })
+#define SetErr(err_value) ({ err = err_value; })
 
-#endif	// _BASE_FAM_ERR__
+#endif	// _BASE_ERR__

@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/colors.h>
-#include <base/err.h>
-#include <base/limits.h>
-#include <base/lock.h>
-#include <base/macro_util.h>
-#include <base/macros.h>
-#include <base/print_util.h>
+#ifndef _BASE_BITMAP__
+#define _BASE_BITMAP__
+
 #include <base/types.h>
-#include <base/util.h>
+
+#define BITMAP_IMPL_SIZE 48
+typedef struct BitMap {
+	byte impl[BITMAP_IMPL_SIZE];
+} BitMap;
+
+int bitmap_init(BitMap *m, unsigned long long max_blocks);
+int64 bitmap_allocate(BitMap *m);
+void bitmap_free(BitMap *m, unsigned long long index);
+
+#endif	// _BASE_BITMAP__
