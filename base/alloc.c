@@ -44,9 +44,9 @@ byte *alloc_data(AllocImpl *impl, Ptr ptr) {
 	unsigned long long next = ptr >> (__builtin_ctz(PAGE_SIZE / impl->size));
 	unsigned int entries = ((1U << (__builtin_ctz(PAGE_SIZE / impl->size))));
 	unsigned long long offset = (ptr % entries) * impl->size;
-	unsigned long long i = next >> (entries + (2 * SHIFT_PER_LEVEL));
-	unsigned long long j = (next >> (entries + SHIFT_PER_LEVEL)) & MASK;
-	unsigned long long k = (next >> entries) & MASK;
+	unsigned long long i = next >> (2 * SHIFT_PER_LEVEL);
+	unsigned long long j = (next >> SHIFT_PER_LEVEL) & MASK;
+	unsigned long long k = next & MASK;
 
 	lockr(&impl->lock);
 
