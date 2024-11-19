@@ -24,7 +24,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
-unsigned long long _alloc_sum = 0;
+int64 _alloc_sum = 0;
 
 uid_t getuid(void);
 char *strerror(int e);
@@ -35,39 +35,8 @@ int _gfd = -1;
 int64 _cur_size = 0;
 Lock _gfd_lock = INIT_LOCK;
 
-void fmap_init_path(const char *fpath) {
-	_gfd = open(fpath, O_RDWR);
-	if (_gfd == -1) _gfd = open(fpath, O_CREAT | O_RDWR, 0600);
-	if (_gfd == -1) panic("Could not open global file: %s", strerror(errno));
-}
-
-void fmap_close() {
-	if (_gfd != -1 && close(_gfd)) panic("close error: %s", strerror(errno));
-}
-
-#ifndef TEST
-static void __attribute__((constructor)) open_gfd() {
-	struct passwd *pw = getpwuid(getuid());
-	int len = cstring_len(pw->pw_dir);
-	char fpath[len + 10];
-	copy_bytes(fpath, pw->pw_dir, len);
-	copy_bytes(fpath + len, "/.fam.dat", 9);
-	fpath[len + 9] = 0;
-
-	fmap_init_path(fpath);
-}
-static void __attribute__((destructor)) close_gfd() {
-	fmap_close();
-}
-#endif	// TEST
-
-void *map(unsigned long long pages) {
-	if (pages == 0) return NULL;
-	_alloc_sum += pages;
-	return mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE,
-				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-}
-void *fmap(unsigned long long pages, unsigned long long offset) {
+void *fmap_impl(unsigned long long pages, unsigned long long offset,
+				int flags) {
 	if (pages == 0) return NULL;
 	if (_gfd == -1) panic("Global file descriptor not initialized");
 	bool size_ok = false;
@@ -93,9 +62,60 @@ void *fmap(unsigned long long pages, unsigned long long offset) {
 		unlock(&_gfd_lock);
 	}
 	_alloc_sum += pages;
-	return mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED,
-				_gfd, offset * PAGE_SIZE);
+	return mmap(NULL, pages * PAGE_SIZE, flags, MAP_SHARED, _gfd,
+				offset * PAGE_SIZE);
 }
+
+void fmap_init_path(const char *fpath) {
+	_gfd = open(fpath, O_RDWR);
+	if (_gfd == -1) _gfd = open(fpath, O_CREAT | O_RDWR, 0600);
+	if (_gfd == -1) panic("Could not open global file: %s", strerror(errno));
+}
+
+void fmap_close() {
+	if (_gfd != -1 && close(_gfd)) panic("close error: %s", strerror(errno));
+}
+
+#ifndef TEST
+void __attribute__((constructor)) open_gfd() {
+	struct passwd *pw = getpwuid(getuid());
+	int len = cstring_len(pw->pw_dir);
+	char fpath[len + 10];
+	copy_bytes(fpath, pw->pw_dir, len);
+	copy_bytes(fpath + len, "/.fam.dat", 9);
+	fpath[len + 9] = 0;
+
+	fmap_init_path(fpath);
+}
+void __attribute__((destructor)) close_gfd() {
+	fmap_close();
+}
+#endif	// TEST
+
+void *map(unsigned long long pages) {
+	if (pages == 0) return NULL;
+	_alloc_sum += pages;
+	return mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE,
+				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+}
+void *fmap(unsigned long long pages, unsigned long long offset) {
+	return fmap_impl(pages, offset, PROT_READ | PROT_WRITE);
+}
+void *fview(unsigned long long pages, unsigned long long offset) {
+	return fmap_impl(pages, offset, PROT_READ);
+}
+
+int fset_max(unsigned long long pages) {
+	lockw(&_gfd_lock);
+	if (ftruncate(_gfd, (pages + 1) * PAGE_SIZE)) {
+		SetErr(TooBig);
+		unlock(&_gfd_lock);
+		return -1;
+	}
+	unlock(&_gfd_lock);
+	return 0;
+}
+
 void unmap(void *addr, unsigned long long pages) {
 	_alloc_sum -= pages;
 

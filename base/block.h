@@ -12,25 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_MAP__
-#define _BASE_MAP__
+#ifndef _BASE_BLOCK_ALLOCATOR__
+#define _BASE_BLOCK_ALLOCATOR__
 
 #include <base/types.h>
 
-int getpagesize();
-#define PAGE_SIZE (getpagesize())
+int64 allocate_block();
+void free_block(int64 id);
+int mark_block(int64 id);
+int flush_blocks();
 
-void *map(unsigned long long pages);
-void *fmap(unsigned long long pages, unsigned long long offset);
-void *fview(unsigned long long pages, unsigned long long offset);
-int fset_max(unsigned long long page_num);
-void unmap(void *addr, unsigned long long pages);
-void flush(void *addr, unsigned long long pages);
-
-#ifdef TEST
-void fmap_init_path(const char *fpath);
-void fmap_close();
-extern int64 _alloc_sum;
-#endif	// TEST
-
-#endif	// _BASE_MAP__
+#endif	// _BASE_BLOCK_ALLOCATOR__
