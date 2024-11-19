@@ -26,7 +26,7 @@ typedef struct Alloc {
 
 typedef struct Slab {
 	Ptr ptr;
-	byte *data;
+	void *data;
 } Slab;
 
 int alloc_init(Alloc *a, unsigned int size, unsigned int max_slabs);

@@ -12,23 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_MAP__
-#define _BASE_MAP__
-
 #include <base/types.h>
+#include <crypto/rand.h>
+#include <sys/random.h>
 
-int getpagesize();
-#define PAGE_SIZE (getpagesize())
+bool _debug_getentropy_err = false;
 
-void *map(unsigned long long pages);
-void *fmap(unsigned long long pages, unsigned long long offset);
-void unmap(void *addr, unsigned long long pages);
-void flush(void *addr, unsigned long long pages);
+int rand_byte(byte *v) {
+	if (_debug_getentropy_err) return -1;
+	return getentropy(v, sizeof(byte));
+}
 
-#ifdef TEST
-void fmap_init_path(const char *fpath);
-void fmap_close();
-extern unsigned long long _alloc_sum;
-#endif	// TEST
+int rand_int(int *v) {
+	if (_debug_getentropy_err) return -1;
+	return getentropy(v, sizeof(int));
+}
 
-#endif	// _BASE_MAP__
+int rand_int64(int64 *v) {
+	if (_debug_getentropy_err) return -1;
+	return getentropy(v, sizeof(int64));
+}
+
+int rand_bytes(void *buf, int64 length) {
+	if (_debug_getentropy_err) return -1;
+	return getentropy(buf, length);
+}

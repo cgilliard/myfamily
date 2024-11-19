@@ -12,23 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_MAP__
-#define _BASE_MAP__
-
-#include <base/types.h>
-
-int getpagesize();
-#define PAGE_SIZE (getpagesize())
-
-void *map(unsigned long long pages);
-void *fmap(unsigned long long pages, unsigned long long offset);
-void unmap(void *addr, unsigned long long pages);
-void flush(void *addr, unsigned long long pages);
-
-#ifdef TEST
-void fmap_init_path(const char *fpath);
-void fmap_close();
-extern unsigned long long _alloc_sum;
-#endif	// TEST
-
-#endif	// _BASE_MAP__
+#include <crypto/aes.h>
+#include <crypto/cpsrng.h>
+#include <crypto/rand.h>

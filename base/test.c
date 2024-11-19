@@ -69,7 +69,7 @@ Test(alloc_max_slabs) {
 		arr[i] = alloc(&a1);
 		fam_assert_eq(arr[i].ptr, i);
 		for (int j = 0; j < len; j++) {
-			arr[i].data[j] = ((i + j) % 26) + 'a';
+			((byte *)arr[i].data)[j] = ((i + j) % 26) + 'a';
 		}
 	}
 	Slab inv = alloc(&a1);
@@ -94,7 +94,7 @@ Test(alloc_big) {
 		arr[i] = alloc(&a1);
 		fam_assert_eq(arr[i].ptr, i);
 		for (int j = 0; j < len; j++) {
-			arr[i].data[j] = ((i + j) % 26) + 'a';
+			((byte *)arr[i].data)[j] = ((i + j) % 26) + 'a';
 		}
 	}
 
@@ -104,7 +104,7 @@ Test(alloc_big) {
 	for (int64 i = 0; i < size; i++) {
 		// if (i % 1000000 == 0) println("free i=%lli", i);
 		for (int j = 0; j < len; j++) {
-			fam_assert_eq(arr[i].data[j], ((i + j) % 26) + 'a');
+			fam_assert_eq(((byte *)arr[i].data)[j], ((i + j) % 26) + 'a');
 		}
 		release(&a1, arr[i].ptr);
 	}

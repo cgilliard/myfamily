@@ -61,13 +61,13 @@ static void __attribute__((destructor)) close_gfd() {
 }
 #endif	// TEST
 
-byte *map(unsigned long long pages) {
+void *map(unsigned long long pages) {
 	if (pages == 0) return NULL;
 	_alloc_sum += pages;
 	return mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE,
 				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
-byte *fmap(unsigned long long pages, unsigned long long offset) {
+void *fmap(unsigned long long pages, unsigned long long offset) {
 	if (pages == 0) return NULL;
 	if (_gfd == -1) panic("Global file descriptor not initialized");
 	bool size_ok = false;
@@ -96,14 +96,14 @@ byte *fmap(unsigned long long pages, unsigned long long offset) {
 	return mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED,
 				_gfd, offset * PAGE_SIZE);
 }
-void unmap(byte *addr, unsigned long long pages) {
+void unmap(void *addr, unsigned long long pages) {
 	_alloc_sum -= pages;
 
 	if (munmap(addr, pages * PAGE_SIZE))
 		panic("munmap error: %s", strerror(errno));
 }
 
-void flush(byte *addr, unsigned long long pages) {
+void flush(void *addr, unsigned long long pages) {
 	if (msync(addr, pages * PAGE_SIZE, MS_SYNC))
 		panic("msync error: %s", strerror(errno));
 }

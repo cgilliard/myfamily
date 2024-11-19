@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_MAP__
-#define _BASE_MAP__
+#ifndef _CRYPTO_PSRNG__
+#define _CRYPTO_PSRNG__
 
 #include <base/types.h>
 
-int getpagesize();
-#define PAGE_SIZE (getpagesize())
-
-void *map(unsigned long long pages);
-void *fmap(unsigned long long pages, unsigned long long offset);
-void unmap(void *addr, unsigned long long pages);
-void flush(void *addr, unsigned long long pages);
+void cpsrng_reseed();
+void cpsrng_rand_byte(byte *v);
+void cpsrng_rand_int64(int64 *v);
+void cpsrng_rand_int(int *v);
+void cpsrng_rand_bytes(void *v, unsigned long long size);
 
 #ifdef TEST
-void fmap_init_path(const char *fpath);
-void fmap_close();
-extern unsigned long long _alloc_sum;
+void cpsrng_test_seed(byte iv[16], byte key[32]);
 #endif	// TEST
 
-#endif	// _BASE_MAP__
+#endif	// _CRYPTO_PSRNG__
