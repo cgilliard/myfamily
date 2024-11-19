@@ -95,9 +95,7 @@ bool execute_tests(byte *name) {
 				copy_bytes(gfile, test_dir, test_name_len + 4 + 3);
 				copy_bytes(gfile + test_name_len + 4 + 3, "/.fam.dat", 9);
 				gfile[test_name_len + 4 + 3 + 9] = 0;
-				fmap_init_path(gfile);
 				test_arr[i](test_dir);
-				fmap_close();
 
 				if (_alloc_sum != start_alloc)
 					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",

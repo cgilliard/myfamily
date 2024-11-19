@@ -17,9 +17,12 @@
 
 #include <base/types.h>
 
+int64 root_block();
 int64 allocate_block();
+void *fmap(int64 id);
+void *fview(int64 id);
 void free_block(int64 id);
 int mark_block(int64 id);
-int flush_blocks();
+int flush(bool sync);
 
 #endif	// _BASE_BLOCK_ALLOCATOR__

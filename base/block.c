@@ -12,16 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/block_allocator.h>
+#include <base/block.h>
+
+int _gfd = -1;
+
+void __attribute__((constructor)) __init_blocks() {
+}
+
+int64 root_block() {
+	return 0;
+}
 
 int64 allocate_block() {
 	return 0;
 }
 void free_block(int64 id) {
 }
+
 int mark_block(int64 id) {
 	return 0;
 }
-int flush_blocks() {
+int flush(bool sync) {
 	return 0;
+}
+
+void *fmap(int64 id) {
+	return NULL;
+}
+
+void *fview(int64 id) {
+	return NULL;
 }
