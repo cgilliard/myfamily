@@ -115,7 +115,7 @@ Test(alloc_big) {
 
 Test(slab_allocator) {
 	SlabAllocator sa1;
-	slab_allocator_init(&sa1, 128, 128, 128);
+	fam_assert(!slab_allocator_init(&sa1, 128 - 24, 128, 128));
 	fam_assert_eq(slab_allocator_total_slabs(&sa1), 1);
 	fam_assert_eq(slab_allocator_free_size(&sa1), 1);
 	Slab slab1 = slab_allocator_allocate(&sa1);
@@ -155,4 +155,55 @@ Test(slab_allocator) {
 	fam_assert_eq(slab_allocator_total_slabs(&sa1), 5);
 
 	slab_allocator_cleanup(&sa1);
+}
+
+static int alloc_size = 64;
+static int size = 500;
+static int count = 50;
+
+Test(slab_allocator_recycle) {
+	SlabAllocator sa1;
+
+	fam_assert(
+		!slab_allocator_init(&sa1, alloc_size + 64 - 24, count + 5, count + 5));
+	Slab slabs[count];
+
+	for (long long i = 0; i < size; i++) {
+		for (long long j = 0; j < count; j++) {
+			slabs[j] = slab_allocator_allocate(&sa1);
+			byte *data = slabs[j].data;
+			for (int k = 0; k < alloc_size; k++) data[k] = 'a' + ((i + j) % 26);
+		}
+
+		for (long long j = 0; j < count; j++) {
+			byte *data = slabs[j].data;
+			for (int k = 0; k < alloc_size; k++)
+				fam_assert_eq(data[k], 'a' + ((i + j) % 26));
+			slab_allocator_free(&sa1, &slabs[j]);
+		}
+	}
+
+	slab_allocator_cleanup(&sa1);
+}
+
+#include <stdlib.h>
+
+Test(malloc_recycle) {
+	byte *slabs[count];
+
+	for (long long i = 0; i < size; i++) {
+		for (long long j = 0; j < count; j++) {
+			slabs[j] = malloc(alloc_size);
+			for (int k = 0; k < alloc_size; k++) {
+				slabs[j][k] = 'a' + (k + j) % 26;
+			}
+		}
+
+		for (long long j = 0; j < count; j++) {
+			for (int k = 0; k < alloc_size; k++) {
+				fam_assert_eq(slabs[j][k], 'a' + (k + j) % 26);
+			}
+			free(slabs[j]);
+		}
+	}
 }

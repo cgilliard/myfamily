@@ -19,8 +19,8 @@
 
 typedef struct SlabList {
 	struct SlabList *next;
-	byte *data;
-	Ptr ptr;
+	Slab slab;
+	byte data[];
 } SlabList;
 
 SlabList ptr_reserved_concrete = {};
@@ -59,10 +59,9 @@ Slab slab_allocator_grow(SlabAllocatorImpl *impl) {
 	ret = alloc(&impl->a);
 	if (ret.data == NULL) return ret;
 	SlabList *sl = (SlabList *)ret.data;
+	sl->slab = ret;
 	sl->next = ptr_reserved;
-	sl->ptr = ret.ptr;
-	sl->data = ret.data;
-
+	ret.data = sl->data;
 	return ret;
 }
 
@@ -70,7 +69,8 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 						unsigned int max_free_slabs,
 						unsigned int max_total_slabs) {
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
-	alloc_init(&impl->a, slab_size, UINT32_MAX);
+	if (alloc_init(&impl->a, slab_size + sizeof(SlabList), UINT32_MAX))
+		return -1;
 	impl->slab_size = slab_size;
 	impl->max_free_slabs = max_free_slabs;
 	impl->max_total_slabs = max_total_slabs;
@@ -87,7 +87,7 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 		alloc_cleanup(&impl->a);
 		return -1;
 	}
-	impl->head = impl->tail = (SlabList *)slab.data;
+	impl->head = impl->tail = (SlabList *)(slab.data - sizeof(SlabList));
 
 	ASTORE(&impl->free_size, 1);
 	ASTORE(&impl->total_slabs, 1);
@@ -114,7 +114,7 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 			if (head == tail) {
 				return slab_allocator_grow(impl);
 			} else {
-				ret.ptr = head->ptr;
+				ret.ptr = head->slab.ptr;
 				ret.data = head->data;
 				if (CAS_SEQ(&impl->head, &head, next)) break;
 			}
@@ -122,14 +122,14 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 	}
 
 	ASUB(&impl->free_size, 1);
-	SlabList *sl = (SlabList *)ret.data;
+	SlabList *sl = (SlabList *)((byte *)ret.data - sizeof(SlabList));
 	sl->next = ptr_reserved;
 	return ret;
 }
 void slab_allocator_free(SlabAllocator *sa, Slab *slab) {
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 
-	SlabList *slptr = (SlabList *)slab->data;
+	SlabList *slptr = (SlabList *)((byte *)slab->data - sizeof(SlabList));
 	if (!CAS(&slptr->next, &ptr_reserved, NULL)) {
 		panic("Double free attempt! ptr=%u", slab->ptr);
 	}
@@ -145,8 +145,8 @@ void slab_allocator_free(SlabAllocator *sa, Slab *slab) {
 		tail = impl->tail;
 		next = tail->next;
 		if (tail == impl->tail) {
-			if (CAS_SEQ(&tail->next, &next, (SlabList *)slab->data)) {
-				CAS_SEQ(&impl->tail, &tail, (SlabList *)slab->data);
+			if (CAS_SEQ(&tail->next, &next, slptr)) {
+				CAS_SEQ(&impl->tail, &tail, slptr);
 				break;
 			}
 		}
