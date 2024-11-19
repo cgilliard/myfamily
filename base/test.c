@@ -90,6 +90,7 @@ Test(alloc_big) {
 	Slab *arr = (Slab *)map(1 + (sizeof(Slab) * size) / PAGE_SIZE);
 
 	for (int64 i = 0; i < size; i++) {
+		// if (i % 1000000 == 0) println("i=%lli", i);
 		arr[i] = alloc(&a1);
 		fam_assert_eq(arr[i].ptr, i);
 		for (int j = 0; j < len; j++) {
@@ -101,6 +102,7 @@ Test(alloc_big) {
 	// fam_assert_eq(inv.ptr, 0);
 
 	for (int64 i = 0; i < size; i++) {
+		// if (i % 1000000 == 0) println("free i=%lli", i);
 		for (int j = 0; j < len; j++) {
 			fam_assert_eq(arr[i].data[j], ((i + j) % 26) + 'a');
 		}
@@ -109,4 +111,48 @@ Test(alloc_big) {
 
 	alloc_cleanup(&a1);
 	unmap((byte *)arr, 1 + (sizeof(Slab) * size) / PAGE_SIZE);
+}
+
+Test(slab_allocator) {
+	SlabAllocator sa1;
+	slab_allocator_init(&sa1, 128, 128, 128);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 1);
+	fam_assert_eq(slab_allocator_free_size(&sa1), 1);
+	Slab slab1 = slab_allocator_allocate(&sa1);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 2);
+	fam_assert_eq(slab_allocator_free_size(&sa1), 1);
+	Slab slab2 = slab_allocator_allocate(&sa1);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 3);
+	fam_assert_eq(slab_allocator_free_size(&sa1), 1);
+
+	slab_allocator_free(&sa1, &slab1);
+	fam_assert_eq(slab_allocator_free_size(&sa1), 2);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 3);
+
+	slab_allocator_free(&sa1, &slab2);
+
+	fam_assert_eq(slab_allocator_free_size(&sa1), 3);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 3);
+
+	slab1 = slab_allocator_allocate(&sa1);
+
+	fam_assert_eq(slab_allocator_free_size(&sa1), 2);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 3);
+
+	slab2 = slab_allocator_allocate(&sa1);
+
+	fam_assert_eq(slab_allocator_free_size(&sa1), 1);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 3);
+
+	Slab slab3 = slab_allocator_allocate(&sa1);
+
+	fam_assert_eq(slab_allocator_free_size(&sa1), 1);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 4);
+
+	Slab slab4 = slab_allocator_allocate(&sa1);
+
+	fam_assert_eq(slab_allocator_free_size(&sa1), 1);
+	fam_assert_eq(slab_allocator_total_slabs(&sa1), 5);
+
+	slab_allocator_cleanup(&sa1);
 }

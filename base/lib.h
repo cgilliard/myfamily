@@ -22,5 +22,6 @@
 #include <base/macros.h>
 #include <base/map.h>
 #include <base/print_util.h>
+#include <base/slabs.h>
 #include <base/types.h>
 #include <base/util.h>
