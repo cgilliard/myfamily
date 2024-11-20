@@ -161,8 +161,10 @@ OrbTreeNode *orbtree_insert(OrbTree *tree, OrbTreeNodePair *pair,
 
 OrbTreeNode *orbtree_find_successor(OrbTreeNode *x) {
 	x = RIGHT(x);
-	while (x && LEFT(x)) x = LEFT(x);
-	return x;
+	loop {
+		if (!LEFT(x)) return x;
+		x = LEFT(x);
+	}
 }
 
 void orbtree_remove_transplant(OrbTree *tree, OrbTreeNode *dst,
@@ -177,12 +179,10 @@ void orbtree_remove_transplant(OrbTree *tree, OrbTreeNode *dst,
 }
 
 void orbtree_set_color(OrbTreeNode *child, OrbTreeNode *parent) {
-	if (child) {
-		if (IS_RED(parent))
-			SET_RED(child);
-		else
-			SET_BLACK(child);
-	}
+	if (IS_RED(parent))
+		SET_RED(child);
+	else
+		SET_BLACK(child);
 }
 
 void orbtree_remove_fixup(OrbTree *tree, OrbTreeNode *p, OrbTreeNode *w,
@@ -195,17 +195,17 @@ void orbtree_remove_fixup(OrbTree *tree, OrbTreeNode *p, OrbTreeNode *w,
 				orbtree_rotate_left(tree, p);
 				w = RIGHT(p);
 			}
-
 			if (IS_BLACK(LEFT(w)) && IS_BLACK(RIGHT(w))) {
 				SET_RED(w);
 				x = p;
-				p = PARENT(p);
-				if (p == NULL)
+				if ((p = PARENT(p))) {
+					OrbTreeNode *pl = LEFT(p);
+					if (x == pl)
+						w = RIGHT(p);
+					else
+						w = pl;
+				} else
 					w = NULL;
-				else if (x == LEFT(p))
-					w = RIGHT(p);
-				else
-					w = LEFT(p);
 			} else {
 				if (IS_BLACK(RIGHT(w))) {
 					SET_BLACK(LEFT(w));
@@ -229,13 +229,14 @@ void orbtree_remove_fixup(OrbTree *tree, OrbTreeNode *p, OrbTreeNode *w,
 			if (IS_BLACK(RIGHT(w)) && IS_BLACK(LEFT(w))) {
 				SET_RED(w);
 				x = p;
-				p = PARENT(p);
-				if (p == NULL)
+				if ((p = PARENT(p))) {
+					OrbTreeNode *pl = LEFT(p);
+					if (x == pl)
+						w = RIGHT(p);
+					else
+						w = pl;
+				} else
 					w = NULL;
-				else if (x == LEFT(p))
-					w = RIGHT(p);
-				else
-					w = LEFT(p);
 			} else {
 				if (IS_BLACK(LEFT(w))) {
 					SET_BLACK(RIGHT(w));
@@ -259,18 +260,20 @@ void orbtree_remove_impl(OrbTree *tree, OrbTreeNodePair *pair,
 						 OrbTreeNode *value) {
 	OrbTreeNode *node_to_delete = pair->self;
 	bool do_fixup = IS_BLACK(node_to_delete);
-
 	OrbTreeNode *x = NULL, *w = NULL, *p = NULL;
 
 	if (LEFT(node_to_delete) == NULL) {
 		x = RIGHT(node_to_delete);
-		orbtree_remove_transplant(tree, node_to_delete, RIGHT(node_to_delete));
+		orbtree_remove_transplant(tree, node_to_delete, x);
 		p = PARENT(node_to_delete);
 		if (p) {
 			if (p->left == NULL)
 				w = RIGHT(p);
 			else if (p)
 				w = LEFT(p);
+		} else {
+			do_fixup = false;
+			if (ROOT(tree) != NULL) SET_BLACK(ROOT(tree));
 		}
 	} else if (RIGHT(node_to_delete) == NULL) {
 		x = LEFT(node_to_delete);
@@ -299,17 +302,11 @@ void orbtree_remove_impl(OrbTree *tree, OrbTreeNodePair *pair,
 
 		orbtree_remove_transplant(tree, node_to_delete, successor);
 		SET_LEFT(successor, LEFT(node_to_delete));
-
 		SET_PARENT(LEFT(successor), successor);
 		orbtree_set_color(successor, node_to_delete);
 	}
 
-	if (do_fixup) {
-		if (p)
-			orbtree_remove_fixup(tree, p, w, x);
-		else if (ROOT(tree) != NULL)
-			SET_BLACK(ROOT(tree));
-	}
+	if (do_fixup) orbtree_remove_fixup(tree, p, w, x);
 }
 
 OrbTreeNode *orbtree_put(OrbTree *tree, OrbTreeNode *value,
