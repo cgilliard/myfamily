@@ -188,6 +188,10 @@ Test(slab_allocator_recycle) {
 
 Test(blocks) {
 	fam_assert_eq(root_block(), 4);
+	int64 x1 = allocate_block();
+	int64 x2 = allocate_block();
+	int64 x3 = allocate_block();
+	// println("x1=%lli,x2=%lli,x3=%lli", x1, x2, x3);
 }
 
 #include <stdlib.h>

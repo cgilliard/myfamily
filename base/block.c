@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/block.h>
+#include <base/lock.h>
 #include <base/macros.h>
 #include <base/map.h>
 #include <base/print_util.h>
@@ -32,6 +33,7 @@
 
 #define VERSION '\0'
 #define MAGIC "^l337*Z"
+#define MAX_DIRTY_BITMAP_PAGES 3
 
 typedef struct SuperBlock {
 	byte version;
@@ -45,12 +47,24 @@ typedef struct SuperBlock {
 
 typedef struct Bits {
 	int64 next;
-	byte bits[];
+	unsigned long long bits[];
 } Bits;
 
 int _gfd = -1;
 byte *_test_dir = NULL;
 Bits *mem_bits = NULL;
+SuperBlock *block0, *block1, *sb, *staging_sb;
+Lock block_lock = INIT_LOCK;
+int64 dirty_bitmap_pages[MAX_DIRTY_BITMAP_PAGES] = {};
+bool dirty_bitmap_pages_full = false;
+
+typedef struct BitPageMap {
+	int64 mem_page;
+	int64 disk_page1;
+	int64 disk_page2;
+} BitPageMap;
+
+BitPageMap *bit_page_mappings;
 
 void create_blocks() {
 	if (ftruncate(_gfd, 5 * PAGE_SIZE))
@@ -77,8 +91,6 @@ void create_blocks() {
 
 void check_blocks() {
 }
-
-SuperBlock *block0, *block1, *sb, *staging_sb;
 
 void block_init_bits(SuperBlock *dst, SuperBlock *src) {
 	int64 src_itt = src->bitmap;
@@ -133,11 +145,9 @@ void init_blocks() {
 	} else
 		check_blocks();
 
-	if (O_DIRECT == 0) {
 #ifdef __APPLE__
-		if (fcntl(_gfd, F_NOCACHE, 1)) panic("Could not disable cache!");
+	if (fcntl(_gfd, F_NOCACHE, 1)) panic("Could not disable cache!");
 #endif	// __APPLE__
-	}
 
 	block0 = fmap(0);
 	block1 = fmap(1);
@@ -181,8 +191,19 @@ int64 root_block() {
 }
 
 int64 allocate_block() {
-	return 0;
+	int64 itt = 0;
+	lockr(&block_lock);
+	loop {
+		if (mem_bits->bits[itt] != ~0ULL) {
+			int x = __builtin_ctzl(~(mem_bits->bits[itt]));
+			mem_bits->bits[itt] |= (0x1ULL << x);
+			unlock(&block_lock);
+			return (itt << 6) | x;
+		}
+		itt++;
+	}
 }
+
 void free_block(int64 id) {
 }
 
