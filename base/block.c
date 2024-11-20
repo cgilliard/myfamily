@@ -134,7 +134,9 @@ void init_blocks() {
 		check_blocks();
 
 	if (O_DIRECT == 0) {
+#ifdef __APPLE__
 		if (fcntl(_gfd, F_NOCACHE, 1)) panic("Could not disable cache!");
+#endif	// __APPLE__
 	}
 
 	block0 = fmap(0);

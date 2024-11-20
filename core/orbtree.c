@@ -276,7 +276,7 @@ void orbtree_remove_impl(OrbTree *tree, OrbTreeNodePair *pair,
 		x = LEFT(node_to_delete);
 		orbtree_remove_transplant(tree, node_to_delete, LEFT(node_to_delete));
 		p = PARENT(node_to_delete);
-		if (p) w = LEFT(p);
+		w = LEFT(p);
 	} else {
 		OrbTreeNode *successor = orbtree_find_successor(node_to_delete);
 		do_fixup = IS_BLACK(successor);
