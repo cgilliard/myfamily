@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/map.h>
 #include <base/print_util.h>
 #include <base/types.h>
 
@@ -32,6 +33,9 @@ void __attribute__((constructor)) __check_64bit_arch__() {
 	if (sizeof(float64) != 8) panic("float64 must be 8 bytes. Invalid arch!");
 
 	if (sizeof(bool) != 1) panic("bool must be 1 byte. Invalid arch!");
+
+	if (PAGE_SIZE < 4096)
+		panic("page size must be at least 4096 bytes. Invalid arch!");
 
 	// little endian check
 	int test = 0x1;

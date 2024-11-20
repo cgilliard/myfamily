@@ -21,14 +21,14 @@ int64 _alloc_sum = 0;
 
 char *strerror(int err);
 
-void *map(unsigned long long pages) {
+void *map(int64 pages) {
 	if (pages == 0) return NULL;
 	_alloc_sum += pages;
 	return mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE,
 				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
-void unmap(void *addr, unsigned long long pages) {
+void unmap(void *addr, int64 pages) {
 	_alloc_sum -= pages;
 
 	if (munmap(addr, pages * PAGE_SIZE))

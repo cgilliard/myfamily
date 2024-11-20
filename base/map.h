@@ -20,8 +20,8 @@
 int getpagesize();
 #define PAGE_SIZE (getpagesize())
 
-void *map(unsigned long long pages);
-void unmap(void *addr, unsigned long long pages);
+void *map(int64 pages);
+void unmap(void *addr, int64 pages);
 
 #ifdef TEST
 extern int64 _alloc_sum;

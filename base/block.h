@@ -22,7 +22,12 @@ int64 allocate_block();
 void *fmap(int64 id);
 void *fview(int64 id);
 void free_block(int64 id);
-int mark_block(int64 id);
-int flush(bool sync);
+int flush();
+
+#ifdef TEST
+void init_blocks();
+void destroy_blocks();
+extern byte *_test_dir;
+#endif	// TEST
 
 #endif	// _BASE_BLOCK_ALLOCATOR__

@@ -14,6 +14,7 @@
 
 #include <base/alloc.h>
 #include <base/bitmap.h>
+#include <base/block.h>
 #include <base/colors.h>
 #include <base/err.h>
 #include <base/limits.h>

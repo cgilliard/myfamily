@@ -186,6 +186,10 @@ Test(slab_allocator_recycle) {
 	slab_allocator_cleanup(&sa1);
 }
 
+Test(blocks) {
+	fam_assert_eq(root_block(), 4);
+}
+
 #include <stdlib.h>
 
 Test(malloc_recycle) {

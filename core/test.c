@@ -61,6 +61,9 @@ void my_obj_validate_node(const OrbTreeNode *node, int *black_count,
 			*black_count =
 				current_black_count;  // Set the black count for the first path
 		} else {
+			if (current_black_count != *black_count)
+				println("current_black_count=%i, *black_count=%i",
+						current_black_count, *black_count);
 			// Check for black count
 			// consistency
 			fam_assert(current_black_count == *black_count);
@@ -72,6 +75,8 @@ void my_obj_validate_node(const OrbTreeNode *node, int *black_count,
 		current_black_count++;
 	else {
 		// check parent is not red (red property violation)
+		if (!((unsigned long long)node->parent_color > 1))
+			println("parent pc !+ 1");
 		fam_assert((unsigned long long)node->parent_color > 1);
 		if (!IS_BLACK(PARENT(node))) {
 			println("red violation!");
@@ -89,6 +94,7 @@ void my_obj_validate(const OrbTree *tree) {
 	// check if the root is black
 	if (root != NULL) {
 		// assert root is black
+		if (!IS_BLACK(root)) println("root not black");
 		fam_assert(IS_BLACK(root));
 		my_obj_validate_node(root, &black_count, 0);
 	}
@@ -124,12 +130,12 @@ Test(orbtree) {
 
 Test(orbtree_rand) {
 	// seed rng for reproducibility
-	byte key[32] = {9};
+	byte key[32] = {11};
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
 	OrbTree tree = INIT_ORBTREE;
-	int size = 1000;
+	int size = 5000;
 	SlabAllocator sa;
 	fam_assert(!slab_allocator_init(&sa, 128 - 24, size + 10, size + 10));
 	Slab *arr = map(1 + (sizeof(Slab) * size) / PAGE_SIZE);
@@ -177,6 +183,7 @@ Test(orbtree_rand) {
 	slab_allocator_free(&sa, &obj_out->slab);
 
 	for (int i = 0; i < size; i++) {
+		// println("i=%i", i);
 		tmp = slab_allocator_allocate(&sa);
 		obj = tmp.data;
 		obj->value = values[i];

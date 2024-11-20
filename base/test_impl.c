@@ -15,7 +15,7 @@
 #ifdef __linux__
 #define _XOPEN_SOURCE 500
 #endif	// __linux__
-#include <base/map.h>
+#include <base/lib.h>
 #include <base/test.h>
 #include <dlfcn.h>
 #include <execinfo.h>
@@ -73,6 +73,7 @@ static void __attribute__((constructor)) get_target_test() {
 
 bool execute_tests(byte *name) {
 	struct timespec start, end;
+	bool success[test_count];
 	clock_gettime(CLOCK_MONOTONIC, &start);
 	int test_exe_count = 0;
 
@@ -95,7 +96,11 @@ bool execute_tests(byte *name) {
 				copy_bytes(gfile, test_dir, test_name_len + 4 + 3);
 				copy_bytes(gfile + test_name_len + 4 + 3, "/.fam.dat", 9);
 				gfile[test_name_len + 4 + 3 + 9] = 0;
+				_test_dir = test_dir;
+				init_blocks();
 				test_arr[i](test_dir);
+				destroy_blocks();
+				rmrf(test_dir);
 
 				if (_alloc_sum != start_alloc)
 					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
@@ -107,16 +112,6 @@ bool execute_tests(byte *name) {
 					test_names[i], RESET);
 			fail_count++;
 		}
-	}
-
-	for (int i = 0; i < test_count; i++) {
-		int test_name_len = cstring_len(test_names[i]);
-		char test_dir[test_name_len + 100];
-		copy_bytes(test_dir, "./.", 3);
-		copy_bytes(test_dir + 3, test_names[i], test_name_len);
-		copy_bytes(test_dir + 3 + test_name_len, ".fam", 4);
-		test_dir[4 + 3 + test_name_len] = 0;
-		rmrf(test_dir);
 	}
 
 	clock_gettime(CLOCK_MONOTONIC, &end);
