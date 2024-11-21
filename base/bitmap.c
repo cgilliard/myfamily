@@ -32,7 +32,6 @@ typedef struct BitMapCtx {
 _Thread_local BitMapCtx bitmap_last_index[MAX_BITMAPS] = {};
 
 typedef struct BitMapBits {
-	struct BitMapBits *next;
 	bool dirty;
 	uint64 bits[];
 } BitMapBits;
@@ -64,7 +63,6 @@ int bitmap_try_resize(BitMapImpl *impl, BitMapCtx *ctx) {
 		if (impl->ptrs[impl->ptr_count] == NULL) {
 			ret = -1;
 		} else {
-			impl->ptrs[impl->ptr_count - 1]->next = impl->ptrs[impl->ptr_count];
 			impl->ptrs[impl->ptr_count]->dirty = true;
 			impl->ptrs[impl->ptr_count - 1]->dirty = true;
 			impl->ptr_count++;
@@ -121,7 +119,8 @@ int64 bitmap_try_allocate(BitMapImpl *impl, BitMapCtx *ctx) {
 			ASTORE(&cur->dirty, true);
 			return (ctx->index << 6) | x;
 		}
-		if (++(ctx->index) % BITS_LEN == 0) cur = cur->next;
+		if (++(ctx->index) % BITS_LEN == 0)
+			cur = impl->ptrs[ctx->index / BITS_LEN];
 	}
 	return -1;
 }
@@ -169,8 +168,9 @@ void bitmap_free(BitMap *m, uint64 index) {
 
 void bitmap_cleanup(BitMap *m) {
 	BitMapBits *next, *cur = ((BitMapImpl *)m)->ptrs[0];
+	int i = 0;
 	while (cur) {
-		next = cur->next;
+		next = ((BitMapImpl *)m)->ptrs[++i];
 		unmap(cur, 1);
 		cur = next;
 	}
@@ -185,7 +185,6 @@ int bitmap_extend(BitMap *m, void *ptr) {
 		return -1;
 
 	impl->ptrs[impl->ptr_count] = ptr;
-	impl->ptrs[impl->ptr_count - 1]->next = impl->ptrs[impl->ptr_count];
 	impl->ptr_count++;
 
 	return 0;
@@ -217,9 +216,10 @@ int bitmap_sync(BitMap *dst, BitMap *src) {
 
 void bitmap_clean(BitMap *m) {
 	BitMapBits *next, *cur = ((BitMapImpl *)m)->ptrs[0];
+	int i = 0;
 	while (cur) {
 		cur->dirty = false;
-		next = cur->next;
+		next = ((BitMapImpl *)m)->ptrs[++i];
 		cur = next;
 	}
 }
