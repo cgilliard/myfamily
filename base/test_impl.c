@@ -96,16 +96,12 @@ bool execute_tests(byte *name) {
 				copy_bytes(gfile, test_dir, test_name_len + 4 + 3);
 				copy_bytes(gfile + test_name_len + 4 + 3, "/.fam.dat", 9);
 				gfile[test_name_len + 4 + 3 + 9] = 0;
-				_test_dir = test_dir;
-				init_blocks();
 				test_arr[i](test_dir);
-				destroy_blocks();
-				rmrf(test_dir);
-
 				if (_alloc_sum != start_alloc)
 					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
 							BRIGHT_RED, RESET, _alloc_sum - start_alloc);
 				fam_assert_eq(_alloc_sum, start_alloc);
+				rmrf(test_dir);
 			}
 		} else {
 			println("%sFAIL:%s test '%s%s%s' failed!", BRIGHT_RED, RESET, GREEN,

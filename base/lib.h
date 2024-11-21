@@ -12,17 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/alloc.h>
 #include <base/bitmap.h>
-#include <base/block.h>
 #include <base/colors.h>
-#include <base/err.h>
-#include <base/limits.h>
-#include <base/lock.h>
-#include <base/macro_util.h>
-#include <base/macros.h>
-#include <base/map.h>
 #include <base/print_util.h>
-#include <base/slabs.h>
+#include <base/sys.h>
 #include <base/types.h>
 #include <base/util.h>

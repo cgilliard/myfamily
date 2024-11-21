@@ -19,6 +19,7 @@
 
 // primitives
 typedef signed long long int64;
+typedef unsigned long long uint64;
 typedef unsigned char byte;
 #define float64 double
 

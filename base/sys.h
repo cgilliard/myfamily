@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_BLOCK_ALLOCATOR__
-#define _BASE_BLOCK_ALLOCATOR__
+#ifndef _BASE_SYS__
+#define _BASE_SYS__
 
 #include <base/types.h>
 
+int getpagesize();
+#define PAGE_SIZE (getpagesize())
+
+void *map(int64 pages);
+void unmap(void *addr, int64 pages);
 int64 root_block();
 int64 allocate_block();
 void *fmap(int64 id);
@@ -25,9 +30,7 @@ void free_block(int64 id);
 int flush();
 
 #ifdef TEST
-void init_blocks();
-void destroy_blocks();
-extern byte *_test_dir;
+extern int64 _alloc_sum;
 #endif	// TEST
 
-#endif	// _BASE_BLOCK_ALLOCATOR__
+#endif	// _BASE_SYS__

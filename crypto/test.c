@@ -15,6 +15,3 @@
 #include <base/test.h>
 
 Suite(crypto);
-
-Test(test_rand) {
-}

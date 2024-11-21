@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/map.h>
 #include <base/print_util.h>
+#include <base/sys.h>
 #include <base/types.h>
 
 void __attribute__((constructor)) __check_64bit_arch__() {
@@ -26,7 +26,9 @@ void __attribute__((constructor)) __check_64bit_arch__() {
 	// check primitive types
 	if (sizeof(byte) != 1) panic("byte must be 1 byte. Invalid arch!");
 
-	if (sizeof(int64) != 8) panic("must be 8 bytes. Invalid arch!");
+	if (sizeof(int64) != 8) panic("int64 must be 8 bytes. Invalid arch!");
+
+	if (sizeof(uint64) != 8) panic("uint64 must be 8 bytes. Invalid arch!");
 
 	if (sizeof(int) != 4) panic("int must be 4 bytes. Invalid arch!");
 
