@@ -19,7 +19,8 @@ Suite(base);
 Test(bitmap) {
 	BitMap b1;
 	bitmap_init(&b1, 10);
-	for (int64 i = 0; i < PAGE_SIZE * 16; i++) {
+	int size = 10 * PAGE_SIZE * 16;
+	for (int64 i = 0; i < size; i++) {
 		int64 v = bitmap_allocate(&b1);
 		if (v != i) println("v=%lli,i=%lli", v, i);
 		fam_assert_eq(v, i);
@@ -37,8 +38,8 @@ Test(bitmap) {
 	fam_assert_eq(v1, 1);
 	fam_assert_eq(v2, 77);
 	fam_assert_eq(v3, PAGE_SIZE * 7);
-	fam_assert_eq(v4, PAGE_SIZE * 16);
-	fam_assert_eq(v5, PAGE_SIZE * 16 + 1);
+	fam_assert_eq(v4, size);
+	fam_assert_eq(v5, size + 1);
 
 	bitmap_cleanup(&b1);
 }

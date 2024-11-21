@@ -23,7 +23,12 @@
 #define BITS_LEN ((PAGE_SIZE - sizeof(BitMapBits)) / sizeof(uint64))
 
 int bitmap_index = 0;
-_Thread_local int64 bitmap_last_index[MAX_BITMAPS] = {};
+
+typedef struct BitMapCtx {
+	int64 index;
+} BitMapCtx;
+
+_Thread_local BitMapCtx bitmap_last_index[MAX_BITMAPS] = {};
 
 typedef struct BitMapBits {
 	struct BitMapBits *next;
@@ -44,25 +49,23 @@ void __attribute__((constructor)) __check_bitmap_sizes() {
 			  sizeof(BitMapImpl), sizeof(BitMap));
 }
 
-int bitmap_try_resize(BitMapImpl *impl, int64 ptr_count) {
+int bitmap_try_resize(BitMapImpl *impl, BitMapCtx *ctx) {
+	int ret = 0;
 	lockw(&impl->lock);
-	if (ptr_count != impl->ptr_count) {
-		unlock(&impl->lock);
-		return 0;
-	}
-
-	if (ptr_count + 1 >= (PAGE_SIZE / 8) * impl->bitmap_ptr_pages) {
-		unlock(&impl->lock);
-		return -1;
-	}
-	if (impl->ptrs[ptr_count] == NULL) {
+	if ((ctx->index / BITS_LEN) != impl->ptr_count) {
+		ret = 0;
+	} else if ((ctx->index / BITS_LEN) + 1 >=
+			   (PAGE_SIZE / 8) * impl->bitmap_ptr_pages) {
+		ret = -1;
+	} else if (impl->ptrs[(ctx->index / BITS_LEN)] == NULL) {
 		impl->ptrs[impl->ptr_count] = map(1);
 		if (impl->ptrs[impl->ptr_count] == NULL) {
-			unlock(&impl->lock);
-			return -1;
+			ret = -1;
+		} else {
+			impl->ptrs[impl->ptr_count - 1]->next = impl->ptrs[impl->ptr_count];
+			impl->ptr_count++;
+			ret = 0;
 		}
-		impl->ptrs[impl->ptr_count - 1]->next = impl->ptrs[impl->ptr_count];
-		impl->ptr_count++;
 	}
 	unlock(&impl->lock);
 	return 0;
@@ -93,53 +96,45 @@ int bitmap_init(BitMap *m, int bitmap_ptr_pages) {
 		return -1;
 	}
 
-	bitmap_last_index[impl->index] = 0;
+	bitmap_last_index[impl->index].index = 0;
 
 	return 0;
 }
 
-int64 bitmap_try_allocate(BitMapImpl *impl) {
+int64 bitmap_try_allocate(BitMapImpl *impl, BitMapCtx *ctx) {
 	bool found;
-	uint64 updated, initial, index = bitmap_last_index[impl->index], x = 0;
-	BitMapBits *cur = impl->ptrs[index / BITS_LEN];
+	uint64 updated, initial, x;
+	BitMapBits *cur = impl->ptrs[ctx->index / BITS_LEN];
 	while (cur) {
 		do {
-			initial = ALOAD(&cur->bits[index % BITS_LEN]);
-			if (initial != ~0ULL) {
-				found = true;
-				x = __builtin_ctzl(~(initial));
-				updated = initial | (0x1ULL << x);
-			} else {
-				found = false;
-				break;
-			}
-		} while (!CAS(&cur->bits[index % BITS_LEN], &initial, updated));
-		if (found) {
-			bitmap_last_index[impl->index] = index;
-			return (index << 6) | x;
-		}
-		if (++index % BITS_LEN == 0) cur = cur->next;
+			initial = ALOAD(&cur->bits[ctx->index % BITS_LEN]);
+			found = initial != ~0ULL;
+			if (!found) break;
+			x = __builtin_ctzl(~(initial));
+			updated = initial | (0x1ULL << x);
+		} while (!CAS(&cur->bits[ctx->index % BITS_LEN], &initial, updated));
+		if (found) return (ctx->index << 6) | x;
+		if (++(ctx->index) % BITS_LEN == 0) cur = cur->next;
 	}
-
-	bitmap_last_index[impl->index] = index;
 	return -1;
 }
 
 int64 bitmap_allocate(BitMap *m) {
 	BitMapImpl *impl = (BitMapImpl *)m;
-	int64 ptr_count = ALOAD(&impl->ptr_count);
-	int64 ret = bitmap_try_allocate(impl);
+	BitMapCtx *ctx = &bitmap_last_index[impl->index];
+	int64 ret = bitmap_try_allocate(impl, ctx);
 	if (ret >= 0)
 		return ret;
 	else {
-		if (bitmap_try_resize(impl, ptr_count)) {
-			if (ptr_count + 1 >= (PAGE_SIZE / 8) * impl->bitmap_ptr_pages) {
-				bitmap_last_index[impl->index] = 0;
-				return bitmap_try_allocate(impl);
+		if (bitmap_try_resize(impl, ctx)) {
+			if ((ctx->index / BITS_LEN) + 1 >=
+				(PAGE_SIZE / 8) * impl->bitmap_ptr_pages) {
+				ctx->index = 0;
+				return bitmap_try_allocate(impl, ctx);
 			}
 			return -1;
 		}
-		return bitmap_try_allocate(impl);
+		return bitmap_try_allocate(impl, ctx);
 	}
 }
 
@@ -149,9 +144,8 @@ void bitmap_free(BitMap *m, uint64 index) {
 	uint64 x = 1 << (index & 0x3F);
 	index >>= 6;
 
-	if (index < bitmap_last_index[impl->index]) {
-		bitmap_last_index[impl->index] = index;
-	}
+	BitMapCtx *ctx = &bitmap_last_index[impl->index];
+	if (index < ctx->index) ctx->index = index;
 
 	BitMapBits *cur = impl->ptrs[index / BITS_LEN];
 	uint64 initial, updated;
