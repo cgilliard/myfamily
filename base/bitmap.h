@@ -27,4 +27,9 @@ int64 bitmap_allocate(BitMap *m);
 void bitmap_free(BitMap *m, unsigned long long index);
 void bitmap_cleanup(BitMap *m);
 
+int bitmap_sync(BitMap *dst, BitMap *src);
+void bitmap_clean(BitMap *m);
+int64 bitmap_ptr_count(BitMap *m);
+int bitmap_extend(BitMap *m, void *ptr);
+
 #endif	// _BASE_BITMAP__
