@@ -28,6 +28,8 @@ void *fmap(int64 id);
 void *fview(int64 id);
 void free_block(int64 id);
 int flush();
+int init_sys(const char *path);
+int shutdown_sys();
 
 #ifdef TEST
 extern int64 _alloc_sum;

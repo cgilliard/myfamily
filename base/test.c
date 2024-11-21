@@ -18,7 +18,7 @@ Suite(base);
 
 Test(bitmap) {
 	BitMap b1;
-	bitmap_init(&b1, 10);
+	bitmap_init(&b1, 10, NULL, NULL);
 	int size = 10 * PAGE_SIZE * 16;
 	for (int64 i = 0; i < size; i++) {
 		int64 v = bitmap_allocate(&b1);
@@ -42,4 +42,51 @@ Test(bitmap) {
 	fam_assert_eq(v5, size + 1);
 
 	bitmap_cleanup(&b1);
+}
+
+Test(bitmap_sync) {
+	BitMap b1, b2;
+	bitmap_init(&b1, 10, NULL, NULL);
+	bitmap_init(&b2, 10, NULL, NULL);
+
+	int64 x1 = bitmap_allocate(&b1);
+	int64 x2 = bitmap_allocate(&b1);
+	int64 x3 = bitmap_allocate(&b1);
+	int64 x4 = bitmap_allocate(&b1);
+	int64 x5 = bitmap_allocate(&b1);
+
+	fam_assert_eq(x1, 0);
+	fam_assert_eq(x2, 1);
+	fam_assert_eq(x3, 2);
+	fam_assert_eq(x4, 3);
+	fam_assert_eq(x5, 4);
+
+	bitmap_sync(&b2, &b1);
+	bitmap_clean(&b1);
+
+	int64 x6 = bitmap_allocate(&b2);
+	fam_assert_eq(x6, 5);
+
+	x6 = bitmap_allocate(&b1);
+	fam_assert_eq(x6, 5);
+
+	bitmap_cleanup(&b1);
+	bitmap_cleanup(&b2);
+}
+
+Test(sys) {
+	int64 x1 = allocate_block();
+	int64 x2 = allocate_block();
+
+	flush();
+
+	int64 x3 = allocate_block();
+	flush();
+	shutdown_sys();
+	init_sys("./.sys.fam/.fam.dat");
+	int64 x4 = allocate_block();
+
+	fam_assert_eq(x1 + 1, x2);
+	fam_assert_eq(x2 + 1, x3);
+	fam_assert_eq(x3 + 1, x4);
 }
