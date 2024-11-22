@@ -22,12 +22,11 @@ typedef struct BitMap {
 	byte impl[BITMAP_IMPL_SIZE];
 } BitMap;
 
-int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs, void *ptr0);
+int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs);
 int64 bitmap_allocate(BitMap *m);
 void bitmap_free(BitMap *m, unsigned long long index);
-void bitmap_cleanup(BitMap *m);
 
-int bitmap_sync(BitMap *dst, BitMap *src);
+int bitmap_sync(BitMap *dst, BitMap *src, bool all);
 void bitmap_clean(BitMap *m);
 int64 bitmap_ptr_count(BitMap *m);
 int bitmap_extend(BitMap *m, void *ptr);

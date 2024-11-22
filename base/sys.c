@@ -41,6 +41,21 @@ int fsync(int fd);
 int _gfd = -1;
 int64 _alloc_sum = 0;
 
+void *map(int64 pages) {
+	if (pages == 0) return NULL;
+	_alloc_sum += pages;
+	void *ret = mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE,
+					 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if (ret == NULL) SetErr(AllocErr);
+	return ret;
+}
+void unmap(void *addr, int64 pages) {
+	_alloc_sum -= pages;
+	if (munmap(addr, pages * PAGE_SIZE)) panic("munmap error!");
+}
+
+/*
+
 typedef struct SuperBlock {
 	byte version;
 	byte magic[7];
@@ -199,41 +214,46 @@ int flush() {
 	}
 	return ret;
 }
+*/
 
 int init_sys(const char *path) {
-	_gfd = open(path, O_DIRECT | O_RDWR);
-	bool create = false;
-	if (_gfd == -1) {
-		create = true;
-		_gfd = open(path, O_DIRECT | O_RDWR | O_CREAT, 0600);
-	}
-	if (_gfd == -1) panic("Could not open file [%s]", path);
+	/*
+		_gfd = open(path, O_DIRECT | O_RDWR);
+		bool create = false;
+		if (_gfd == -1) {
+			create = true;
+			_gfd = open(path, O_DIRECT | O_RDWR | O_CREAT, 0600);
+		}
+		if (_gfd == -1) panic("Could not open file [%s]", path);
 
-	if (create)
-		sys_init_file();
-	else
-		sys_check_file();
+		if (create)
+			sys_init_file();
+		else
+			sys_check_file();
 
-#ifdef __APPLE__
-	if (fcntl(_gfd, F_NOCACHE, 1))
-		panic("Could not disable cache for file [%s]", path);
-#endif	// __APPLE__
+	#ifdef __APPLE__
+		if (fcntl(_gfd, F_NOCACHE, 1))
+			panic("Could not disable cache for file [%s]", path);
+	#endif	// __APPLE__
 
-	sys_init_bitmaps();
-	super0->cur_size = super1->cur_size = lseek(_gfd, 0, SEEK_END);
+		sys_init_bitmaps();
+		super0->cur_size = super1->cur_size = lseek(_gfd, 0, SEEK_END);
+	*/
 
 	return 0;
 }
 
 int shutdown_sys() {
-	if (_gfd != -1) {
-		close(_gfd);
+	/*
+		if (_gfd != -1) {
+			close(_gfd);
 
-		unmap(super0, 1);
-		unmap(super1, 1);
-		bitmap_cleanup(&sbm1);
-		bitmap_cleanup(&sbm0);
-		bitmap_cleanup(&mbm);
-	}
+			unmap(super0, 1);
+			unmap(super1, 1);
+			bitmap_cleanup(&sbm1);
+			bitmap_cleanup(&sbm0);
+			bitmap_cleanup(&mbm);
+		}
+	*/
 	return 0;
 }
