@@ -91,8 +91,13 @@ Test(bitmap_sync) {
 	unmap(ptrs20, 1);
 }
 
-/*
 Test(sys) {
+	int test_dir_len = cstring_len(test_dir);
+	char file[test_dir_len + 10];
+	copy_bytes(file, test_dir, test_dir_len);
+	copy_bytes(file + test_dir_len, "/.fam.dat", 9);
+	file[test_dir_len + 9] = 0;
+
 	int64 x1 = allocate_block();
 	int64 x2 = allocate_block();
 
@@ -101,11 +106,10 @@ Test(sys) {
 	int64 x3 = allocate_block();
 	flush();
 	shutdown_sys();
-	init_sys("./.sys.fam/.fam.dat");
+	init_sys(file);
 	int64 x4 = allocate_block();
 
 	fam_assert_eq(x1 + 1, x2);
 	fam_assert_eq(x2 + 1, x3);
 	fam_assert_eq(x3 + 1, x4);
 }
-*/
