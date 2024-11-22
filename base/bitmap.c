@@ -38,11 +38,10 @@ typedef struct BitMapBits {
 
 typedef struct BitMapImpl {
 	BitMapBits **ptrs;
-	int64 *fptrs;
 	int64 ptr_count;
 	Lock lock;
-	int64 bitmap_ptr_pages;
-	int64 index;
+	int bitmap_ptr_pages;
+	int index;
 } BitMapImpl;
 
 void __attribute__((constructor)) __check_bitmap_sizes() {
@@ -52,11 +51,10 @@ void __attribute__((constructor)) __check_bitmap_sizes() {
 			  sizeof(BitMapImpl), sizeof(BitMap));
 }
 
-int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs, int64 *fptrs) {
+int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs) {
 	BitMapImpl *impl = (BitMapImpl *)m;
 
 	impl->ptrs = ptrs;
-	impl->fptrs = fptrs;
 	impl->ptr_count = 0;
 	impl->lock = INIT_LOCK;
 	impl->bitmap_ptr_pages = bitmap_ptr_pages;
@@ -97,7 +95,7 @@ int64 bitmap_allocate(BitMap *m) {
 	return -1;
 }
 
-void bitmap_free(BitMap *m, unsigned long long index) {
+void bitmap_free(BitMap *m, uint64 index) {
 	BitMapImpl *impl = (BitMapImpl *)m;
 	BitMapCtx *ctx = &bitmap_ctx[impl->index];
 
@@ -107,6 +105,7 @@ void bitmap_free(BitMap *m, unsigned long long index) {
 	if (index < ctx->index) ctx->index = index;
 
 	BitMapBits *cur = impl->ptrs[index / BITS_LEN];
+	ASTORE(&cur->dirty, true);
 	uint64 initial, updated;
 
 	do {
@@ -119,27 +118,6 @@ void bitmap_free(BitMap *m, unsigned long long index) {
 	} while (!CAS(&cur->bits[index % BITS_LEN], &initial, updated));
 }
 
-int bitmap_sync(BitMap *dst, BitMap *src, bool all) {
-	int ret = 0;
-	BitMapImpl *dst_impl = (BitMapImpl *)dst;
-	BitMapImpl *src_impl = (BitMapImpl *)src;
-
-	for (int64 i = 0; i < src_impl->ptr_count; i++) {
-		if (all || src_impl->ptrs[i]->dirty) {
-			if (i >= dst_impl->ptr_count) {
-				SetErr(CapacityExceeded);
-				ret = -1;
-				break;
-			}
-			copy_bytes((byte *)dst_impl->ptrs[i]->bits,
-					   (byte *)src_impl->ptrs[i]->bits,
-					   PAGE_SIZE - sizeof(BitMapBits));
-			dst_impl->ptrs[i]->dirty = true;
-		}
-	}
-	return ret;
-}
-
 void bitmap_clean(BitMap *m) {
 	BitMapBits *next, *cur = ((BitMapImpl *)m)->ptrs[0];
 	int i = 0;
@@ -150,19 +128,44 @@ void bitmap_clean(BitMap *m) {
 	}
 }
 
+void bitmap_cleanup(BitMap *m) {
+	BitMapBits *cur = ((BitMapImpl *)m)->ptrs[0];
+	int i = 0;
+	while (cur) {
+		unmap(cur, 1);
+		cur = ((BitMapImpl *)m)->ptrs[++i];
+	}
+	unmap(((BitMapImpl *)m)->ptrs, ((BitMapImpl *)m)->bitmap_ptr_pages);
+}
+
 int64 bitmap_ptr_count(BitMap *m) {
 	return ((BitMapImpl *)m)->ptr_count;
 }
 
-int bitmap_extend(BitMap *m, void *ptr, int64 v) {
+int bitmap_extend(BitMap *m, void *ptr) {
 	BitMapImpl *impl = (BitMapImpl *)m;
 	BitMapCtx *ctx = &bitmap_ctx[impl->index];
-	if ((ctx->index / BITS_LEN) + 1 >= (PAGE_SIZE / 8) * impl->bitmap_ptr_pages)
+	if (impl->ptr_count + 1 >= (PAGE_SIZE / 8) * impl->bitmap_ptr_pages)
 		return -1;
 
 	impl->ptrs[impl->ptr_count] = ptr;
-	if (v >= 0) impl->fptrs[impl->ptr_count] = v;
 	impl->ptr_count++;
 
 	return 0;
+}
+
+PageIndexPair bitmap_next_dirty(BitMap *m, int64 last_index) {
+	BitMapImpl *impl = (BitMapImpl *)m;
+	BitMapCtx *ctx = &bitmap_ctx[impl->index];
+	PageIndexPair ret = {.ptr_index = -1};
+	for (int64 i = last_index + 1;
+		 i < (PAGE_SIZE / 8) * impl->bitmap_ptr_pages && impl->ptrs[i]; i++) {
+		BitMapBits *cur = impl->ptrs[i];
+		if (cur->dirty) {
+			ret.ptr_index = i;
+			ret.page = cur;
+			return ret;
+		}
+	}
+	return ret;
 }

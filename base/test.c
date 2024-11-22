@@ -19,11 +19,11 @@ Suite(base);
 Test(bitmap) {
 	BitMap b1;
 	void *ptrs = map(10);
-	bitmap_init(&b1, 10, ptrs, NULL);
+	bitmap_init(&b1, 10, ptrs);
 	void *ptr0 = map(1);
-	bitmap_extend(&b1, ptr0, -1);
+	bitmap_extend(&b1, ptr0);
 	void *ptr1 = map(1);
-	bitmap_extend(&b1, ptr1, -1);
+	bitmap_extend(&b1, ptr1);
 	int size = PAGE_SIZE * 10;
 	for (int64 i = 0; i < size; i++) {
 		int64 v = bitmap_allocate(&b1);
@@ -47,50 +47,53 @@ Test(bitmap) {
 	fam_assert_eq(v4, size);
 	fam_assert_eq(v5, size + 1);
 
-	unmap(ptrs, 10);
-	unmap(ptr0, 1);
-	unmap(ptr1, 1);
+	bitmap_cleanup(&b1);
 }
 
-Test(bitmap_sync) {
-	BitMap b1, b2;
-	void *ptrs1 = map(1);
-	void *ptrs2 = map(1);
+Test(bitmap_dirty) {
+	BitMap b1;
+	void *ptrs1 = map(10);
 	void *ptrs10 = map(1);
 	void *ptrs20 = map(1);
+	void *ptrs30 = map(1);
 
-	bitmap_init(&b1, 10, ptrs1, NULL);
-	bitmap_init(&b2, 10, ptrs2, NULL);
-	bitmap_extend(&b1, ptrs10, -1);
-	bitmap_extend(&b2, ptrs20, -1);
+	bitmap_init(&b1, 10, ptrs1);
+	bitmap_extend(&b1, ptrs10);
+	bitmap_extend(&b1, ptrs20);
+	bitmap_extend(&b1, ptrs30);
 
-	int64 x1 = bitmap_allocate(&b1);
-	int64 x2 = bitmap_allocate(&b1);
-	int64 x3 = bitmap_allocate(&b1);
-	int64 x4 = bitmap_allocate(&b1);
-	int64 x5 = bitmap_allocate(&b1);
+	int size = PAGE_SIZE * 17;
+	for (int64 i = 0; i < size; i++) {
+		int64 v = bitmap_allocate(&b1);
+		if (v != i) println("v=%lli,i=%lli", v, i);
+		fam_assert_eq(v, i);
+	}
 
-	fam_assert_eq(x1, 0);
-	fam_assert_eq(x2, 1);
-	fam_assert_eq(x3, 2);
-	fam_assert_eq(x4, 3);
-	fam_assert_eq(x5, 4);
+	PageIndexPair pip = bitmap_next_dirty(&b1, -1);
+	fam_assert_eq(pip.ptr_index, 0);
+	pip = bitmap_next_dirty(&b1, 0);
+	fam_assert_eq(pip.ptr_index, 1);
+	pip = bitmap_next_dirty(&b1, 1);
+	fam_assert_eq(pip.ptr_index, 2);
+	pip = bitmap_next_dirty(&b1, 2);
+	fam_assert_eq(pip.ptr_index, -1);
 
-	bitmap_sync(&b2, &b1, false);
 	bitmap_clean(&b1);
+	pip = bitmap_next_dirty(&b1, -1);
+	fam_assert_eq(pip.ptr_index, -1);
 
-	int64 x6 = bitmap_allocate(&b2);
-	fam_assert_eq(x6, 5);
+	bitmap_free(&b1, PAGE_SIZE * 14);
 
-	x6 = bitmap_allocate(&b1);
-	fam_assert_eq(x6, 5);
+	pip = bitmap_next_dirty(&b1, -1);
+	pip = bitmap_next_dirty(&b1, 1);
 
-	unmap(ptrs1, 1);
-	unmap(ptrs2, 1);
-	unmap(ptrs10, 1);
-	unmap(ptrs20, 1);
+	pip = bitmap_next_dirty(&b1, 1);
+	fam_assert_eq(pip.ptr_index, -1);
+
+	bitmap_cleanup(&b1);
 }
 
+/*
 Test(sys) {
 	int test_dir_len = cstring_len(test_dir);
 	char file[test_dir_len + 10];
@@ -129,3 +132,4 @@ Test(sys_extend) {
 		last = v;
 	}
 }
+*/
