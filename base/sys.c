@@ -85,15 +85,15 @@ void sys_init_bitmaps() {
 	bitmap_ptr00 = fmap(2 * MAX_BITMAP_PTR_PAGES + 2);
 	bitmap_ptr01 = fmap(2 * MAX_BITMAP_PTR_PAGES + 3);
 
-	bitmap_init(&sbm0, MAX_BITMAP_PTR_PAGES, bitmap_ptrs0);
-	bitmap_init(&sbm1, MAX_BITMAP_PTR_PAGES, bitmap_ptrs1);
-	bitmap_extend(&sbm0, bitmap_ptr00);
-	bitmap_extend(&sbm1, bitmap_ptr01);
+	bitmap_init(&sbm0, MAX_BITMAP_PTR_PAGES, bitmap_ptrs0, NULL);
+	bitmap_init(&sbm1, MAX_BITMAP_PTR_PAGES, bitmap_ptrs1, NULL);
+	bitmap_extend(&sbm0, bitmap_ptr00, -1);
+	bitmap_extend(&sbm1, bitmap_ptr01, -1);
 
 	bitmap_mem = map(MAX_BITMAP_PTR_PAGES);
-	bitmap_init(&mbm, MAX_BITMAP_PTR_PAGES, bitmap_mem);
+	bitmap_init(&mbm, MAX_BITMAP_PTR_PAGES, bitmap_mem, NULL);
 	bitmap_ptrmem = map(1);
-	bitmap_extend(&mbm, bitmap_ptrmem);
+	bitmap_extend(&mbm, bitmap_ptrmem, -1);
 
 	if (super0->seqno > super1->seqno)
 		bitmap_sync(&mbm, &sbm0, true);
@@ -166,7 +166,21 @@ int64 allocate_block() {
 	int64 alloc = bitmap_allocate(&mbm);
 	unlock(&bitmap_lock);
 	int ret = alloc;
-	if (ret >= 0) ret += 5 + MAX_BITMAP_PTR_PAGES * 2;
+	if (ret >= 0)
+		ret += 5 + MAX_BITMAP_PTR_PAGES * 2;
+	else {
+		// try to extend
+		void *extend = map(1);
+		lockw(&bitmap_lock);
+		if (bitmap_extend(&mbm, extend, -1)) {
+			unmap(extend, 1);
+		} else {
+			alloc = bitmap_allocate(&mbm);
+			ret = alloc;
+			if (ret >= 0) ret += 5 + MAX_BITMAP_PTR_PAGES * 2;
+		}
+		unlock(&bitmap_lock);
+	}
 	if ((alloc + 1) * PAGE_SIZE > size) {
 		lockw(&bitmap_lock);
 		if ((alloc + 1) * PAGE_SIZE > super0->size) {
@@ -249,8 +263,17 @@ int shutdown_sys() {
 		unmap(bitmap_ptrs1, MAX_BITMAP_PTR_PAGES);
 		unmap(bitmap_ptr00, 1);
 		unmap(bitmap_ptr01, 1);
+		void **ptrs = (void **)bitmap_mem;
+		int i = 0;
+		loop {
+			if (ptrs[i])
+				unmap(ptrs[i], 1);
+			else
+				break;
+			i++;
+			if (i >= MAX_BITMAP_PTR_PAGES * (PAGE_SIZE / 8)) break;
+		}
 		unmap(bitmap_mem, MAX_BITMAP_PTR_PAGES);
-		unmap(bitmap_ptrmem, 1);
 	}
 	return 0;
 }

@@ -19,11 +19,11 @@ Suite(base);
 Test(bitmap) {
 	BitMap b1;
 	void *ptrs = map(10);
-	bitmap_init(&b1, 10, ptrs);
+	bitmap_init(&b1, 10, ptrs, NULL);
 	void *ptr0 = map(1);
-	bitmap_extend(&b1, ptr0);
+	bitmap_extend(&b1, ptr0, -1);
 	void *ptr1 = map(1);
-	bitmap_extend(&b1, ptr1);
+	bitmap_extend(&b1, ptr1, -1);
 	int size = PAGE_SIZE * 10;
 	for (int64 i = 0; i < size; i++) {
 		int64 v = bitmap_allocate(&b1);
@@ -59,10 +59,10 @@ Test(bitmap_sync) {
 	void *ptrs10 = map(1);
 	void *ptrs20 = map(1);
 
-	bitmap_init(&b1, 10, ptrs1);
-	bitmap_init(&b2, 10, ptrs2);
-	bitmap_extend(&b1, ptrs10);
-	bitmap_extend(&b2, ptrs20);
+	bitmap_init(&b1, 10, ptrs1, NULL);
+	bitmap_init(&b2, 10, ptrs2, NULL);
+	bitmap_extend(&b1, ptrs10, -1);
+	bitmap_extend(&b2, ptrs20, -1);
 
 	int64 x1 = bitmap_allocate(&b1);
 	int64 x2 = bitmap_allocate(&b1);
@@ -112,4 +112,20 @@ Test(sys) {
 	fam_assert_eq(x1 + 1, x2);
 	fam_assert_eq(x2 + 1, x3);
 	fam_assert_eq(x3 + 1, x4);
+}
+
+Test(sys_extend) {
+	int test_dir_len = cstring_len(test_dir);
+	char file[test_dir_len + 10];
+	copy_bytes(file, test_dir, test_dir_len);
+	copy_bytes(file + test_dir_len, "/.fam.dat", 9);
+	file[test_dir_len + 9] = 0;
+	int size = PAGE_SIZE * 8 - 63;
+	int64 last = 0;
+	for (int64 i = 0; i < size; i++) {
+		int64 v = allocate_block();
+		if (i && v != last + 1) println("v=%lli,last=%lli", v, last);
+		if (i) fam_assert_eq(v, last + 1);
+		last = v;
+	}
 }

@@ -17,18 +17,18 @@
 
 #include <base/types.h>
 
-#define BITMAP_IMPL_SIZE 32
+#define BITMAP_IMPL_SIZE 48
 typedef struct BitMap {
 	byte impl[BITMAP_IMPL_SIZE];
 } BitMap;
 
-int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs);
+int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs, int64 *fptrs);
 int64 bitmap_allocate(BitMap *m);
-void bitmap_free(BitMap *m, unsigned long long index);
+void bitmap_free(BitMap *m, uint64 index);
 
 int bitmap_sync(BitMap *dst, BitMap *src, bool all);
 void bitmap_clean(BitMap *m);
 int64 bitmap_ptr_count(BitMap *m);
-int bitmap_extend(BitMap *m, void *ptr);
+int bitmap_extend(BitMap *m, void *ptr, int64 v);
 
 #endif	// _BASE_BITMAP__

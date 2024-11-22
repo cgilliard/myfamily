@@ -38,10 +38,11 @@ typedef struct BitMapBits {
 
 typedef struct BitMapImpl {
 	BitMapBits **ptrs;
+	int64 *fptrs;
 	int64 ptr_count;
 	Lock lock;
-	int bitmap_ptr_pages;
-	int index;
+	int64 bitmap_ptr_pages;
+	int64 index;
 } BitMapImpl;
 
 void __attribute__((constructor)) __check_bitmap_sizes() {
@@ -51,10 +52,11 @@ void __attribute__((constructor)) __check_bitmap_sizes() {
 			  sizeof(BitMapImpl), sizeof(BitMap));
 }
 
-int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs) {
+int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs, int64 *fptrs) {
 	BitMapImpl *impl = (BitMapImpl *)m;
 
 	impl->ptrs = ptrs;
+	impl->fptrs = fptrs;
 	impl->ptr_count = 0;
 	impl->lock = INIT_LOCK;
 	impl->bitmap_ptr_pages = bitmap_ptr_pages;
@@ -152,13 +154,14 @@ int64 bitmap_ptr_count(BitMap *m) {
 	return ((BitMapImpl *)m)->ptr_count;
 }
 
-int bitmap_extend(BitMap *m, void *ptr) {
+int bitmap_extend(BitMap *m, void *ptr, int64 v) {
 	BitMapImpl *impl = (BitMapImpl *)m;
 	BitMapCtx *ctx = &bitmap_ctx[impl->index];
 	if ((ctx->index / BITS_LEN) + 1 >= (PAGE_SIZE / 8) * impl->bitmap_ptr_pages)
 		return -1;
 
 	impl->ptrs[impl->ptr_count] = ptr;
+	if (v >= 0) impl->fptrs[impl->ptr_count] = v;
 	impl->ptr_count++;
 
 	return 0;
