@@ -12,10 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/bitmap.h>
-#include <base/cache.h>
-#include <base/colors.h>
-#include <base/print_util.h>
-#include <base/sys.h>
+#ifndef _BASE_CACHE__
+#define _BASE_CACHE__
+
 #include <base/types.h>
-#include <base/util.h>
+
+#define CACHE_IMPL_SIZE 64
+typedef struct Cache {
+	byte impl[CACHE_IMPL_SIZE];
+} Cache;
+
+typedef struct CacheItem {
+	struct CacheItem *next;
+	struct CacheItem *prev;
+	struct CacheItem *chain_next;
+	int64 id;
+	void *addr;
+} CacheItem;
+
+int cache_init(Cache *cache, int64 capacity, float load_factor);
+const CacheItem *cache_insert(Cache *cache, CacheItem *item);
+int cache_move_to_head(Cache *cache, const CacheItem *item);
+const CacheItem *cache_find(const Cache *cache, int64 id);
+void cache_cleanup(Cache *cache);
+
+#endif	// _BASE_CACHE__

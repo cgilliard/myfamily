@@ -93,6 +93,31 @@ Test(bitmap_dirty) {
 	bitmap_cleanup(&b1);
 }
 
+Test(cache) {
+	Cache c1;
+	cache_init(&c1, 10, 0.75);
+	int size = 12;
+	CacheItem arr[size];
+
+	for (int i = 0; i < size; i++) {
+		arr[i].id = i;
+		cache_insert(&c1, &arr[i]);
+	}
+
+	fam_assert(cache_find(&c1, 0) == NULL);
+	fam_assert(cache_find(&c1, 1) == NULL);
+	fam_assert(cache_find(&c1, 2) != NULL);
+	fam_assert(cache_find(&c1, size + 1) == NULL);
+	cache_move_to_head(&c1, &arr[2]);
+	CacheItem evictor = {.id = size + 1};
+	cache_insert(&c1, &evictor);
+	fam_assert(cache_find(&c1, size + 1) != NULL);
+	fam_assert(cache_find(&c1, 2) != NULL);
+	fam_assert(cache_find(&c1, 3) == NULL);
+
+	cache_cleanup(&c1);
+}
+
 /*
 Test(sys) {
 	int test_dir_len = cstring_len(test_dir);
