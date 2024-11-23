@@ -25,6 +25,7 @@ void unmap(void *addr, int64 pages);
 void *fmap(int64 id);
 void *fview(int64 id);
 int flush();
+int64 fsize();
 
 void init_sys(const char *path);
 void shutdown_sys();

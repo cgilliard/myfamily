@@ -22,17 +22,10 @@ typedef struct BitMap {
 	byte impl[BITMAP_IMPL_SIZE];
 } BitMap;
 
-typedef struct PageIndexPair {
-	int64 ptr_index;
-	void *page;
-} PageIndexPair;
-
 int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs);
 int64 bitmap_allocate(BitMap *m);
 void bitmap_free(BitMap *m, uint64 index);
 
-PageIndexPair bitmap_next_dirty(BitMap *m, int64 last_index);
-void bitmap_clean(BitMap *m);
 void bitmap_cleanup(BitMap *m);
 int64 bitmap_ptr_count(BitMap *m);
 int bitmap_extend(BitMap *m, void *ptr);

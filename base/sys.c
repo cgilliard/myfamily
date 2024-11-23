@@ -90,6 +90,10 @@ int flush() {
 	return fsync(_gfd);
 }
 
+int64 fsize() {
+	return cur_file_size;
+}
+
 void init_sys(const char *path) {
 	_gfd = open(path, O_DIRECT | O_RDWR);
 	bool create = false;
@@ -98,6 +102,12 @@ void init_sys(const char *path) {
 		_gfd = open(path, O_DIRECT | O_RDWR | O_CREAT, 0600);
 	}
 	if (_gfd == -1) panic("Could not open file [%s]", path);
+
+#ifdef __APPLE__
+	if (fcntl(_gfd, F_NOCACHE, 1))
+		panic("Could not disable cache for file [%s]", path);
+#endif	// __APPLE__
+
 	if (!create) cur_file_size = lseek(_gfd, 0, SEEK_END);
 }
 

@@ -16,7 +16,6 @@
 
 Suite(base);
 
-/*
 Test(bitmap) {
 	BitMap b1;
 	void *ptrs = map(10);
@@ -50,7 +49,6 @@ Test(bitmap) {
 
 	bitmap_cleanup(&b1);
 }
-*/
 
 /*
 Test(bitmap_dirty) {
@@ -96,6 +94,7 @@ Test(bitmap_dirty) {
 	bitmap_cleanup(&b1);
 }
 */
+
 Test(cache) {
 	Cache c1;
 	cache_init(&c1, 10, 0.75);
@@ -119,43 +118,53 @@ Test(cache) {
 	cache_cleanup(&c1);
 }
 
-/*
-Test(sys) {
-	int test_dir_len = cstring_len(test_dir);
-	char file[test_dir_len + 10];
-	copy_bytes(file, test_dir, test_dir_len);
-	copy_bytes(file + test_dir_len, "/.fam.dat", 9);
-	file[test_dir_len + 9] = 0;
+int count = 5000;
+int size = 50;
+int alloc_size = 64 - SLAB_LIST_SIZE;
 
-	int64 x1 = allocate_block();
-	int64 x2 = allocate_block();
+Test(slab_allocator) {
+	SlabAllocator sa1;
+	fam_assert(!slab_allocator_init(&sa1, alloc_size, size + 5, size + 5));
+	Slab **arr = map(1 + (size * sizeof(Slab *)) / PAGE_SIZE);
 
-	flush();
+	for (int64 i = 0; i < count; i++) {
+		for (int64 j = 0; j < size; j++) {
+			arr[j] = slab_allocator_allocate(&sa1);
+			for (int k = 0; k < alloc_size; k++)
+				arr[j]->data[k] = ((i + j + k) % 26) + 'a';
+		}
 
-	int64 x3 = allocate_block();
-	flush();
-	shutdown_sys();
-	init_sys(file);
-	int64 x4 = allocate_block();
-
-	fam_assert_eq(x1 + 1, x2);
-	fam_assert_eq(x2 + 1, x3);
-	fam_assert_eq(x3 + 1, x4);
-}
-
-Test(sys_extend) {
-	int test_dir_len = cstring_len(test_dir);
-	char file[test_dir_len + 10];
-	copy_bytes(file, test_dir, test_dir_len);
-	copy_bytes(file + test_dir_len, "/.fam.dat", 9);
-	file[test_dir_len + 9] = 0;
-	int size = PAGE_SIZE * 8 - 63;
-	int64 last = 0;
-	for (int64 i = 0; i < size; i++) {
-		int64 v = allocate_block();
-		if (i && v != last + 1) println("v=%lli,last=%lli", v, last);
-		if (i) fam_assert_eq(v, last + 1);
-		last = v;
+		for (int64 j = 0; j < size; j++) {
+			for (int k = 0; k < alloc_size; k++) {
+				fam_assert_eq(arr[j]->data[k], ((i + j + k) % 26) + 'a');
+			}
+			slab_allocator_free(&sa1, arr[j]);
+		}
 	}
+
+	slab_allocator_cleanup(&sa1);
+	unmap(arr, 1 + (size * sizeof(Slab *)) / PAGE_SIZE);
 }
-*/
+
+#include <stdlib.h>
+
+Test(malloc) {
+	byte **arr = map(1 + (size * sizeof(Slab *)) / PAGE_SIZE);
+
+	for (int64 i = 0; i < count; i++) {
+		for (int64 j = 0; j < size; j++) {
+			arr[j] = malloc(alloc_size);
+			for (int k = 0; k < alloc_size; k++)
+				arr[j][k] = ((i + j + k) % 26) + 'a';
+		}
+
+		for (int64 j = 0; j < size; j++) {
+			for (int k = 0; k < alloc_size; k++) {
+				fam_assert_eq(arr[j][k], ((i + j + k) % 26) + 'a');
+			}
+			free(arr[j]);
+		}
+	}
+
+	unmap(arr, 1 + (size * sizeof(byte *)) / PAGE_SIZE);
+}

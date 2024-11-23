@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/bitmap.h>
-#include <base/cache.h>
-#include <base/colors.h>
-#include <base/print_util.h>
-#include <base/slabs.h>
-#include <base/sys.h>
+#ifndef _BASE_BLOCK__
+#define _BASE_BLOCK__
+
 #include <base/types.h>
-#include <base/util.h>
+
+typedef struct Block {
+	void *addr;
+	int64 id;
+} Block;
+
+Block block_load(int64 id);
+void block_release(Block block);
+
+#endif	// _BASE_BLOCK__

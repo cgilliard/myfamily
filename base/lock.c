@@ -85,6 +85,23 @@ void lock_upgrade(Lock *lock) {
 	} while (!CAS_ACQUIRE(lock, &state, state_update));
 }
 
+void lock_downgrade(Lock *lock) {
+	_lock_is_write__ = false;
+
+	unsigned long long state;
+	unsigned long long state_update;
+	do {
+		// get current state
+		state = ALOAD(lock);
+		// increment the read counter and add 1 to the sequence number (upper 32
+		// bits), also set write bit to false
+		state_update = ((state + 0x100000000ULL) & ~0x80000000ULL) + 1ULL;
+
+		// while our target state (no change including sequence number and
+		// write_pending != false, we spin)
+	} while (!CAS_ACQUIRE(lock, &state, state_update));
+}
+
 void lock_unlock(Lock *lock) {
 	unsigned long long state;
 	unsigned long long state_update;

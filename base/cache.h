@@ -28,6 +28,7 @@ typedef struct CacheItem {
 	struct CacheItem *chain_next;
 	int64 id;
 	void *addr;
+	int64 ref_count;
 } CacheItem;
 
 int cache_init(Cache *cache, int64 capacity, float load_factor);
