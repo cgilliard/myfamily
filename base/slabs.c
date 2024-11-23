@@ -192,7 +192,7 @@ void slab_allocator_cleanup(SlabAllocator *sa) {
 	}
 }
 
-Slab *slab_allocator_allocate(SlabAllocator *sa) {
+void *slab_allocator_allocate(SlabAllocator *sa) {
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 	SlabList *ret, *head, *tail, *next;
 	loop {
@@ -201,7 +201,7 @@ Slab *slab_allocator_allocate(SlabAllocator *sa) {
 		next = head->next;
 		if (head == impl->head) {
 			if (head == tail) {
-				return ((Slab *)slab_allocator_grow(impl));
+				return ((byte *)slab_allocator_grow(impl) + sizeof(SlabList));
 			} else {
 				ret = head;
 				if (CAS_SEQ(&impl->head, &head, next)) break;
@@ -210,19 +210,20 @@ Slab *slab_allocator_allocate(SlabAllocator *sa) {
 	}
 	ASUB(&impl->free_slabs, 1);
 	ASTORE(&ret->next, sl_reserved);
-	return ((Slab *)ret);
+	return ((byte *)ret + sizeof(SlabList));
 }
 
-void slab_allocator_free(SlabAllocator *sa, Slab *slab) {
+void slab_allocator_free(SlabAllocator *sa, void *ptr) {
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
-	SlabList *slptr = (SlabList *)slab, *tail, *next;
+	SlabList *slptr = (SlabList *)((byte *)ptr - sizeof(SlabList)), *tail,
+			 *next;
 	if (!CAS(&slptr->next, &sl_reserved, NULL)) {
 		panic("Double free attempt! id=%lli", slptr->id);
 	}
 
 	if (AADD(&impl->free_slabs, 1) >= impl->max_free_slabs) {
 		ASUB(&impl->free_slabs, 1);
-		bitmap_free(&impl->bm, ((SlabList *)slab)->id);
+		bitmap_free(&impl->bm, slptr->id);
 	}
 	loop {
 		tail = impl->tail;

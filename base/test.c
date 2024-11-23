@@ -125,31 +125,31 @@ int alloc_size = 64 - SLAB_LIST_SIZE;
 Test(slab_allocator) {
 	SlabAllocator sa1;
 	fam_assert(!slab_allocator_init(&sa1, alloc_size, size + 5, size + 5));
-	Slab **arr = map(1 + (size * sizeof(Slab *)) / PAGE_SIZE);
+	byte **arr = map(1 + (size * sizeof(byte *)) / PAGE_SIZE);
 
 	for (int64 i = 0; i < count; i++) {
 		for (int64 j = 0; j < size; j++) {
 			arr[j] = slab_allocator_allocate(&sa1);
 			for (int k = 0; k < alloc_size; k++)
-				arr[j]->data[k] = ((i + j + k) % 26) + 'a';
+				arr[j][k] = ((i + j + k) % 26) + 'a';
 		}
 
 		for (int64 j = 0; j < size; j++) {
 			for (int k = 0; k < alloc_size; k++) {
-				fam_assert_eq(arr[j]->data[k], ((i + j + k) % 26) + 'a');
+				fam_assert_eq(arr[j][k], ((i + j + k) % 26) + 'a');
 			}
 			slab_allocator_free(&sa1, arr[j]);
 		}
 	}
 
 	slab_allocator_cleanup(&sa1);
-	unmap(arr, 1 + (size * sizeof(Slab *)) / PAGE_SIZE);
+	unmap(arr, 1 + (size * sizeof(byte *)) / PAGE_SIZE);
 }
 
 #include <stdlib.h>
 
 Test(malloc) {
-	byte **arr = map(1 + (size * sizeof(Slab *)) / PAGE_SIZE);
+	byte **arr = map(1 + (size * sizeof(byte *)) / PAGE_SIZE);
 
 	for (int64 i = 0; i < count; i++) {
 		for (int64 j = 0; j < size; j++) {

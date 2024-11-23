@@ -23,6 +23,13 @@
 #define CACHE_SIZE 1530
 #define LOAD_FACTOR 0.75
 
+typedef struct Block {
+	int64 id;
+	int64 id2;
+	byte padding[16];
+	byte data[];
+} Block;
+
 bool block_is_init = false;
 Lock block_init_lock = INIT_LOCK;
 Cache global_cache;
@@ -35,18 +42,20 @@ void block_init() {
 	unlock(&block_init_lock);
 }
 
-Block block_load(int64 id) {
+void *block_load(int64 id) {
 	if (!block_is_init) block_init();
 	const CacheItem *ci = cache_find(&global_cache, id);
-	Block ret = {.id = id};
-	if (ci)
-		ret.addr = ci->addr;
-	else {
-		ret.addr = fmap(id);
-	}
+	void *ret = NULL;
+	/*
+		if (ci)
+			ret.addr = ci->addr;
+		else {
+			ret.addr = fmap(id);
+		}
+	*/
 	return ret;
 }
 
-void block_release(Block block) {
+void block_free(void *addr) {
 	if (!block_is_init) block_init();
 }

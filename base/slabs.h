@@ -23,16 +23,18 @@ typedef struct SlabAllocator {
 } SlabAllocator;
 
 #define SLAB_LIST_SIZE 32
+/*
 typedef struct Slab {
 	byte impl[SLAB_LIST_SIZE];
 	byte data[];
 } Slab;
+*/
 
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 						unsigned int max_free_slabs,
 						unsigned int max_total_slabs);
 void slab_allocator_cleanup(SlabAllocator *sa);
-Slab *slab_allocator_allocate(SlabAllocator *sa);
-void slab_allocator_free(SlabAllocator *sa, Slab *slab);
+void *slab_allocator_allocate(SlabAllocator *sa);
+void slab_allocator_free(SlabAllocator *sa, void *slab);
 
 #endif	// _BASE_SLABS__

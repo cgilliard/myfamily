@@ -15,14 +15,10 @@
 #ifndef _BASE_BLOCK__
 #define _BASE_BLOCK__
 
+#include <base/slabs.h>
 #include <base/types.h>
 
-typedef struct Block {
-	void *addr;
-	int64 id;
-} Block;
-
-Block block_load(int64 id);
-void block_release(Block block);
+void *block_load(int64 id);
+void block_free(void *slab);
 
 #endif	// _BASE_BLOCK__
