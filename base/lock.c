@@ -59,6 +59,32 @@ void lock_write(Lock *lock) {
 	} while (!CAS_ACQUIRE(lock, &state, state_update));
 }
 
+void lock_upgrade(Lock *lock) {
+	_lock_is_write__ = true;
+
+	unsigned long long state;
+	unsigned long long state_update;
+
+	// first step, set write bit true indicating a writer is waiting
+	// this lock should be obtained soon after the previous writer
+	// is complete indicating to readers our desire to write
+	// this avoids write starvation. We also unset our own read lock bit
+	// atomically at the same time we obtain the write lock.
+	do {
+		state = ALOAD(lock) & ~0x80000000ULL;
+		state_update = ((state + 0x100000000ULL) | 0x80000000ULL) - 1ULL;
+	} while (!CAS_SEQ(lock, &state, state_update));
+
+	// now we wait for the read count to go to 1 (just our lock remains)
+	do {
+		// get current state. We will wait for the read count to go to 0.
+		state = ALOAD(lock) & 0xFFFFFFFF80000000ULL;
+		// set the updated value to set the write bit true and read count to 0,
+		// increment the sequence number
+		state_update = (state + 0x100000000ULL) & 0xFFFFFFFF80000000ULL;
+	} while (!CAS_ACQUIRE(lock, &state, state_update));
+}
+
 void lock_unlock(Lock *lock) {
 	unsigned long long state;
 	unsigned long long state_update;

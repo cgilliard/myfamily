@@ -102,15 +102,30 @@ const CacheItem *cache_insert(Cache *cache, CacheItem *item) {
 	CacheImpl *impl = (CacheImpl *)cache;
 	unsigned int index = HASH(item->id);
 
-	lockw(&impl->lock);
-	if (impl->arr[index]) {
-		CacheItem *cur = impl->arr[index];
-		while (cur && cur->chain_next) cur = cur->chain_next;
-		cur->chain_next = item;
-	} else
-		impl->arr[index] = item;
+	lockr(&impl->lock);
 	item->next = impl->head;
 	item->chain_next = item->prev = NULL;
+
+	if (impl->arr[index]) {
+		CacheItem *cur = impl->arr[index];
+		while (cur && cur->chain_next) {
+			if (cur->id == item->id) {
+				unlock(&impl->lock);
+				return NULL;
+			}
+			cur = cur->chain_next;
+		}
+		if (cur->id == item->id) {
+			unlock(&impl->lock);
+			return NULL;
+		}
+		locku(&impl->lock);
+		cur->chain_next = item;
+	} else {
+		locku(&impl->lock);
+		impl->arr[index] = item;
+	}
+
 	if (impl->head) impl->head->prev = item;
 	impl->head = item;
 	if (impl->tail == NULL) impl->tail = item;
@@ -136,10 +151,11 @@ const CacheItem *cache_find(const Cache *cache, int64 id) {
 int cache_move_to_head(Cache *cache, const CacheItem *item) {
 	int ret = -1;
 	CacheImpl *impl = (CacheImpl *)cache;
-	lockw(&impl->lock);
+	lockr(&impl->lock);
 	CacheItem *cur = impl->arr[HASH(item->id)];
 	while (cur && cur->id != item->id) cur = cur->chain_next;
 	if (cur) {
+		locku(&impl->lock);
 		if (impl->tail == cur) impl->tail = cur->prev;
 		if (impl->head == cur) impl->head = cur->next;
 		if (cur->prev) cur->prev->next = cur->next;
@@ -147,7 +163,7 @@ int cache_move_to_head(Cache *cache, const CacheItem *item) {
 		ret = 0;
 	}
 	unlock(&impl->lock);
-	return -1;
+	return ret;
 }
 
 void cache_cleanup(Cache *cache) {

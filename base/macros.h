@@ -24,6 +24,7 @@
 #define lock() (lock_create())
 #define lockr(l) lock_read(l)
 #define lockw(l) lock_write(l)
+#define locku(l) lock_upgrade(l)
 #define unlock(l) lock_unlock(l)
 #define rsync(l, exe)                          \
 	({                                         \
