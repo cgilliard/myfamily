@@ -22,14 +22,12 @@ int getpagesize();
 
 void *map(int64 pages);
 void unmap(void *addr, int64 pages);
-int64 root_block();
-int64 allocate_block();
 void *fmap(int64 id);
 void *fview(int64 id);
-void free_block(int64 id);
 int flush();
-int init_sys(const char *path);
-int shutdown_sys();
+
+void init_sys(const char *path);
+void shutdown_sys();
 
 #ifdef TEST
 extern int64 _alloc_sum;

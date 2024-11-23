@@ -19,27 +19,46 @@
 #include <base/print_util.h>
 #include <base/sys.h>
 #include <base/util.h>
-#include <fcntl.h>
-#include <sys/mman.h>
+#include <fcntl.h>	   // for O_ constants
+#include <sys/mman.h>  // for MAP and PROT constants
 
 // needed system calls:
+int open(const char *pathname, int flags, ...);
 int close(int fd);
 int lseek(int fd, off_t offset, int whence);
 int ftruncate(int fd, off_t size);
 int fsync(int fd);
-// also mmap/munmap
+void *mmap(void *addr, size_t length, int prot, int flags, int fd,
+		   off_t offset);
+int munmap(void *addr, size_t length);
 
 // for macos
 #ifndef O_DIRECT
 #define O_DIRECT 0
 #endif	// O_DIRECT
 
-#define VERSION '\0'
-#define MAGIC "^1337*Z"
-#define MAX_BITMAP_PTR_PAGES 16
-
 int _gfd = -1;
+int64 cur_file_size = 0;
 int64 _alloc_sum = 0;
+Lock resize_lock = INIT_LOCK;
+
+int check_size(int64 id) {
+	if (_gfd == -1) return -1;
+
+	int ret = 0;
+	if ((1 + id) * PAGE_SIZE > ALOAD(&cur_file_size)) {
+		lockw(&resize_lock);
+		if ((1 + id) * PAGE_SIZE > ALOAD(&cur_file_size)) {
+			ret = ftruncate(_gfd, (1 + id) * PAGE_SIZE);
+			if (!ret)
+				cur_file_size = (1 + id) * PAGE_SIZE;
+			else
+				SetErr(OutOfSpace);
+		}
+		unlock(&resize_lock);
+	}
+	return ret;
+}
 
 void *map(int64 pages) {
 	if (pages == 0) return NULL;
@@ -54,197 +73,24 @@ void unmap(void *addr, int64 pages) {
 	if (munmap(addr, pages * PAGE_SIZE)) panic("munmap error!");
 }
 
-typedef struct SuperBlock {
-	byte version;
-	byte magic[7];
-	uint64 seqno;
-	int64 size;
-	byte padding[];
-} SuperBlock;
-
-SuperBlock *super0 = NULL;
-SuperBlock *super1 = NULL;
-int64 *bitmap_ptrs0 = NULL, *bitmap_ptrs1 = NULL;
-BitMap sbm0;
-BitMap sbm1;
-BitMap mbm;
-Lock bitmap_lock = INIT_LOCK;
-
-void sys_init_bitmaps() {
-	_alloc_sum += MAX_BITMAP_PTR_PAGES * 2;
-	bitmap_ptrs0 =
-		mmap(NULL, PAGE_SIZE * MAX_BITMAP_PTR_PAGES, PROT_READ | PROT_WRITE,
-			 MAP_SHARED, _gfd, 2 * PAGE_SIZE);
-	bitmap_ptrs1 =
-		mmap(NULL, PAGE_SIZE * MAX_BITMAP_PTR_PAGES, PROT_READ | PROT_WRITE,
-			 MAP_SHARED, _gfd, (MAX_BITMAP_PTR_PAGES + 2) * PAGE_SIZE);
-	/*
-		_alloc_sum += MAX_BITMAP_PTR_PAGES * 2;
-		bitmap_ptrs0 =
-			mmap(NULL, PAGE_SIZE * MAX_BITMAP_PTR_PAGES, PROT_READ | PROT_WRITE,
-				 MAP_SHARED, _gfd, 2 * PAGE_SIZE);
-		bitmap_ptrs1 =
-			mmap(NULL, PAGE_SIZE * MAX_BITMAP_PTR_PAGES, PROT_READ | PROT_WRITE,
-				 MAP_SHARED, _gfd, (MAX_BITMAP_PTR_PAGES + 2) * PAGE_SIZE);
-
-		bitmap_ptr00 = fmap(2 * MAX_BITMAP_PTR_PAGES + 2);
-		bitmap_ptr01 = fmap(2 * MAX_BITMAP_PTR_PAGES + 3);
-
-		bitmap_init(&sbm0, MAX_BITMAP_PTR_PAGES, bitmap_ptrs0);
-		bitmap_init(&sbm1, MAX_BITMAP_PTR_PAGES, bitmap_ptrs1);
-		bitmap_extend(&sbm0, bitmap_ptr00);
-		bitmap_extend(&sbm1, bitmap_ptr01);
-
-		bitmap_mem = map(MAX_BITMAP_PTR_PAGES);
-		bitmap_init(&mbm, MAX_BITMAP_PTR_PAGES, bitmap_mem);
-		bitmap_ptrmem = map(1);
-		bitmap_extend(&mbm, bitmap_ptrmem);
-
-		bitmap_clean(&mbm);
-		bitmap_clean(&sbm1);
-		bitmap_clean(&sbm0);
-	*/
-}
-
-void sys_check_file() {
-	/*
-		super0 = fmap(0);
-		super1 = fmap(1);
-		if (super0->version != VERSION) panic("version mismatch");
-		if (super1->version != VERSION) panic("version mismatch");
-		if (super0->seqno > super1->seqno) {
-			if (cstring_compare_n(super0->magic, MAGIC, 7))
-				panic("magic mismatch!");
-		} else {
-			if (cstring_compare_n(super1->magic, MAGIC, 7))
-				panic("magic mismatch!");
-		}
-	*/
-}
-
-void sys_init_file() {
-	if (ftruncate(_gfd, PAGE_SIZE * (5 + MAX_BITMAP_PTR_PAGES * 2)))
-		panic("Could not create sys file: insufficient storage");
-
-	super0 = fmap(0);
-	super1 = fmap(1);
-
-	super1->version = super0->version = VERSION;
-	copy_bytes(super0->magic, MAGIC, 7);
-	copy_bytes(super1->magic, MAGIC, 7);
-
-	super0->seqno = 1;
-	super1->seqno = 0;
-
-	bitmap_ptrs0 =
-		mmap(NULL, PAGE_SIZE * MAX_BITMAP_PTR_PAGES, PROT_READ | PROT_WRITE,
-			 MAP_SHARED, _gfd, 2 * PAGE_SIZE);
-
-	bitmap_ptrs0[0] = 2 * MAX_BITMAP_PTR_PAGES + 2;
-	munmap(bitmap_ptrs0, PAGE_SIZE * MAX_BITMAP_PTR_PAGES);
-
-	bitmap_ptrs1 =
-		mmap(NULL, PAGE_SIZE * MAX_BITMAP_PTR_PAGES, PROT_READ | PROT_WRITE,
-			 MAP_SHARED, _gfd, (MAX_BITMAP_PTR_PAGES + 2) * PAGE_SIZE);
-	bitmap_ptrs1[0] = 2 * MAX_BITMAP_PTR_PAGES + 3;
-
-	munmap(bitmap_ptrs1, PAGE_SIZE * MAX_BITMAP_PTR_PAGES);
-}
-
-int64 root_block() {
-	return MAX_BITMAP_PTR_PAGES * 2 + 4;
-}
 void *fmap(int64 id) {
+	if (check_size(id)) return NULL;
 	_alloc_sum += 1;
 	return mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, _gfd,
 				id * PAGE_SIZE);
 }
 void *fview(int64 id) {
+	if (check_size(id)) return NULL;
+	_alloc_sum += 1;
 	return mmap(NULL, PAGE_SIZE, PROT_READ, MAP_SHARED, _gfd, id * PAGE_SIZE);
 }
 
-void free_block(int64 id) {
-	/*
-		id -= 5 + MAX_BITMAP_PTR_PAGES * 2;
-		lockr(&bitmap_lock);
-		bitmap_free(&mbm, id);
-		unlock(&bitmap_lock);
-	*/
-}
-
-int64 allocate_block() {
-	int ret;
-	/*
-		int64 size;
-		lockr(&bitmap_lock);
-		size = super0->size;
-		int64 alloc = bitmap_allocate(&mbm);
-		unlock(&bitmap_lock);
-		int ret = alloc;
-		if (ret >= 0)
-			ret += 5 + MAX_BITMAP_PTR_PAGES * 2;
-		else {
-			// try to extend
-			void *extend = map(1);
-			lockw(&bitmap_lock);
-			if (bitmap_extend(&mbm, extend)) {
-				unmap(extend, 1);
-			} else {
-				alloc = bitmap_allocate(&mbm);
-				ret = alloc;
-				if (ret >= 0) ret += 5 + MAX_BITMAP_PTR_PAGES * 2;
-			}
-			unlock(&bitmap_lock);
-		}
-		if ((alloc + 1) * PAGE_SIZE > size) {
-			lockw(&bitmap_lock);
-			if ((alloc + 1) * PAGE_SIZE > super0->size) {
-				if (ftruncate(_gfd, PAGE_SIZE * (alloc + 1))) {
-					free_block(ret);
-					ret = -1;
-				} else {
-					super0->size = super1->size = (alloc + 1) * PAGE_SIZE;
-				}
-			}
-			unlock(&bitmap_lock);
-		}
-	*/
-	return ret;
-}
-
 int flush() {
-	int ret = 0;
-	/*
-		BitMap *staging, *prod;
-		lockw(&bitmap_lock);
-		if (super0->seqno > super1->seqno) {
-			staging = &sbm1;
-			prod = &sbm0;
-		} else {
-			staging = &sbm0;
-			prod = &sbm1;
-		}
-		// TODO: need to handle case where additional bitmap blocks are used by
-		// allocating additional fmap blocks and using bitmap_extend.
-		bitmap_clean(&mbm);
-		unlock(&bitmap_lock);
-
-		if (fsync(_gfd))
-			ret = -1;
-		else {
-			if (staging == &sbm1) {
-				super1->seqno += 2;
-			} else {
-				super0->seqno += 2;
-			}
-			bitmap_clean(&sbm1);
-			bitmap_clean(&sbm0);
-		}
-	*/
-	return ret;
+	if (_gfd == -1) return -1;
+	return fsync(_gfd);
 }
 
-int init_sys(const char *path) {
+void init_sys(const char *path) {
 	_gfd = open(path, O_DIRECT | O_RDWR);
 	bool create = false;
 	if (_gfd == -1) {
@@ -252,47 +98,11 @@ int init_sys(const char *path) {
 		_gfd = open(path, O_DIRECT | O_RDWR | O_CREAT, 0600);
 	}
 	if (_gfd == -1) panic("Could not open file [%s]", path);
-
-	if (create)
-		sys_init_file();
-	else
-		sys_check_file();
-
-#ifdef __APPLE__
-	if (fcntl(_gfd, F_NOCACHE, 1))
-		panic("Could not disable cache for file [%s]", path);
-#endif	// __APPLE__
-
-	sys_init_bitmaps();
-	super0->size = super1->size = lseek(_gfd, 0, SEEK_END);
-
-	return 0;
+	if (!create) cur_file_size = lseek(_gfd, 0, SEEK_END);
 }
 
-int shutdown_sys() {
+void shutdown_sys() {
 	if (_gfd != -1) {
 		close(_gfd);
-
-		unmap(super0, 1);
-		unmap(super1, 1);
-		unmap(bitmap_ptrs0, MAX_BITMAP_PTR_PAGES);
-		unmap(bitmap_ptrs1, MAX_BITMAP_PTR_PAGES);
-		/*
-							unmap(bitmap_ptr00, 1);
-							unmap(bitmap_ptr01, 1);
-							void **ptrs = (void **)bitmap_mem;
-							int i = 0;
-							loop {
-								if (ptrs[i])
-									unmap(ptrs[i], 1);
-								else
-									break;
-								i++;
-								if (i >= MAX_BITMAP_PTR_PAGES * (PAGE_SIZE / 8))
-		   break;
-							}
-							unmap(bitmap_mem, MAX_BITMAP_PTR_PAGES);
-				*/
 	}
-	return 0;
 }

@@ -52,6 +52,7 @@
 	Permission, \
 	BacktraceErr, \
 	ExpectedTypeMismatch, \
+	OutOfSpace, \
 	MaxPathErr, \
 	AllocErr, \
 	TypeMismatch, \

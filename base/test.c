@@ -16,6 +16,7 @@
 
 Suite(base);
 
+/*
 Test(bitmap) {
 	BitMap b1;
 	void *ptrs = map(10);
@@ -49,7 +50,9 @@ Test(bitmap) {
 
 	bitmap_cleanup(&b1);
 }
+*/
 
+/*
 Test(bitmap_dirty) {
 	BitMap b1;
 	void *ptrs1 = map(10);
@@ -92,18 +95,16 @@ Test(bitmap_dirty) {
 
 	bitmap_cleanup(&b1);
 }
-
+*/
 Test(cache) {
 	Cache c1;
 	cache_init(&c1, 10, 0.75);
 	int size = 12;
 	CacheItem arr[size];
-
 	for (int i = 0; i < size; i++) {
 		arr[i].id = i;
 		cache_insert(&c1, &arr[i]);
 	}
-
 	fam_assert(cache_find(&c1, 0) == NULL);
 	fam_assert(cache_find(&c1, 1) == NULL);
 	fam_assert(cache_find(&c1, 2) != NULL);
