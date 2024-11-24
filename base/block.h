@@ -23,6 +23,7 @@
 #define BLOCK_SIZE (PAGE_SIZE - BLOCK_HEADER_SIZE)
 
 Block *block_load(int64 id);
+const Block *block_load_rw(int64 id);
 void block_free(Block *item);
 
 void block_cleanup();

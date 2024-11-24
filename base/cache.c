@@ -102,7 +102,7 @@ const Block *cache_insert(Cache *cache, Block *item) {
 	CacheImpl *impl = (CacheImpl *)cache;
 	unsigned int index = HASH(item->id);
 
-	lockr(&impl->lock);
+	lockw(&impl->lock);
 	item->next = impl->head;
 	item->chain_next = item->prev = NULL;
 
@@ -119,10 +119,8 @@ const Block *cache_insert(Cache *cache, Block *item) {
 			unlock(&impl->lock);
 			return NULL;
 		}
-		locku(&impl->lock);
 		cur->chain_next = item;
 	} else {
-		locku(&impl->lock);
 		impl->arr[index] = item;
 	}
 
@@ -152,15 +150,13 @@ int cache_move_to_head(Cache *cache, const Block *item) {
 	int ret = -1;
 	CacheImpl *impl = (CacheImpl *)cache;
 
-	lockr(&impl->lock);
+	lockw(&impl->lock);
 	Block *cur = impl->arr[HASH(item->id)];
 	while (cur && cur->id != item->id) {
 		cur = cur->chain_next;
 	}
 
 	if (cur && impl->head != cur) {
-		locku(&impl->lock);
-
 		Block *check = impl->arr[HASH(item->id)];
 		while (check && check != cur) {
 			check = check->chain_next;
@@ -198,41 +194,6 @@ int cache_move_to_head(Cache *cache, const Block *item) {
 	unlock(&impl->lock);
 	return ret;
 }
-
-/*
-int cache_move_to_head(Cache *cache, const Block *item) {
-	int ret = -1;
-	CacheImpl *impl = (CacheImpl *)cache;
-	lockr(&impl->lock);
-	Block *cur = impl->arr[HASH(item->id)];
-	while (cur && cur->id != item->id) cur = cur->chain_next;
-	if (cur && impl->head != cur) {
-		println("not head");
-		locku(&impl->lock);
-		if (impl->tail == cur) {
-			println("case1");
-			impl->tail = cur->prev;
-			if (impl->tail) impl->tail->next = NULL;
-			cur->next = impl->head;
-			cur->prev = NULL;
-			impl->head = cur;
-		} else {
-			println("case2");
-			if (cur->prev) {
-				cur->prev->next = cur->next;
-			}
-			if (cur->next) cur->next->prev = cur->prev;
-			cur->next = impl->head;
-			cur->prev = NULL;
-			impl->head = cur;
-		}
-
-		ret = 0;
-	}
-	unlock(&impl->lock);
-	return ret;
-}
-*/
 
 void cache_cleanup(Cache *cache, bool unmap_addr) {
 	CacheImpl *impl = (CacheImpl *)cache;

@@ -22,8 +22,6 @@ typedef unsigned long long Lock;
 Lock lock_create();
 void lock_read(Lock *lock);
 void lock_write(Lock *lock);
-void lock_upgrade(Lock *lock);
-void lock_downgrade(Lock *lock);
 void lock_unlock(Lock *lock);
 
 void lock_guard_cleanup(Lock *lg);

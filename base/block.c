@@ -62,6 +62,10 @@ void block_free(Block *item) {
 	if (!block_is_init) block_init();
 }
 
+const Block *block_load_rw(int64 id) {
+	return block_load(id);
+}
+
 void block_cleanup() {
 	if (block_is_init) {
 		cache_cleanup(&global_cache, true);

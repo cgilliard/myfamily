@@ -89,31 +89,47 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 	lockr(&impl->lock);
 
 	if (impl->data == NULL) {
-		locku(&impl->lock);
-		impl->data = (byte ****)map(1);
-		if (impl->data == NULL) alloc_err = true;
-		lockd(&impl->lock);
+		unlock(&impl->lock);
+		lockw(&impl->lock);
+		if (impl->data == NULL) {
+			impl->data = (byte ****)map(1);
+			if (impl->data == NULL) alloc_err = true;
+		}
+		unlock(&impl->lock);
+		lockr(&impl->lock);
 	}
 
 	if (!alloc_err && impl->data[i] == NULL) {
-		locku(&impl->lock);
-		impl->data[i] = (byte ***)map(1);
-		if (impl->data[i] == NULL) alloc_err = true;
-		lockd(&impl->lock);
+		unlock(&impl->lock);
+		lockw(&impl->lock);
+		if (impl->data[i] == NULL) {
+			impl->data[i] = (byte ***)map(1);
+			if (impl->data[i] == NULL) alloc_err = true;
+		}
+		unlock(&impl->lock);
+		lockr(&impl->lock);
 	}
 
 	if (!alloc_err && impl->data[i][j] == NULL) {
-		locku(&impl->lock);
-		impl->data[i][j] = (byte **)map(1);
-		if (impl->data[i][j] == NULL) alloc_err = true;
-		lockd(&impl->lock);
+		unlock(&impl->lock);
+		lockw(&impl->lock);
+		if (impl->data[i][j] == NULL) {
+			impl->data[i][j] = (byte **)map(1);
+			if (impl->data[i][j] == NULL) alloc_err = true;
+		}
+		unlock(&impl->lock);
+		lockr(&impl->lock);
 	}
 
 	if (!alloc_err && impl->data[i][j][k] == NULL) {
-		locku(&impl->lock);
-		impl->data[i][j][k] = (byte *)map(1);
-		if (impl->data[i][j][k] == NULL) alloc_err = true;
-		lockd(&impl->lock);
+		unlock(&impl->lock);
+		lockw(&impl->lock);
+		if (impl->data[i][j][k] == NULL) {
+			impl->data[i][j][k] = (byte *)map(1);
+			if (impl->data[i][j][k] == NULL) alloc_err = true;
+		}
+		unlock(&impl->lock);
+		lockr(&impl->lock);
 	}
 
 	if (!alloc_err) {
