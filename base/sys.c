@@ -80,11 +80,6 @@ void *fmap(int64 id) {
 	return mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, _gfd,
 				id * PAGE_SIZE);
 }
-void *fview(int64 id) {
-	if (check_size(id)) return NULL;
-	_alloc_sum += 1;
-	return mmap(NULL, PAGE_SIZE, PROT_READ, MAP_SHARED, _gfd, id * PAGE_SIZE);
-}
 
 int flush() {
 	if (_gfd == -1) return -1;

@@ -99,7 +99,7 @@ Test(cache) {
 	Cache c1;
 	cache_init(&c1, 10, 0.75);
 	int size = 12;
-	CacheItem arr[size];
+	Block arr[size];
 	for (int i = 0; i < size; i++) {
 		arr[i].id = i;
 		cache_insert(&c1, &arr[i]);
@@ -109,7 +109,7 @@ Test(cache) {
 	fam_assert(cache_find(&c1, 2) != NULL);
 	fam_assert(cache_find(&c1, size + 1) == NULL);
 	cache_move_to_head(&c1, &arr[2]);
-	CacheItem evictor = {.id = size + 1};
+	Block evictor = {.id = size + 1};
 	cache_insert(&c1, &evictor);
 	fam_assert(cache_find(&c1, size + 1) != NULL);
 	fam_assert(cache_find(&c1, 2) != NULL);
@@ -119,7 +119,31 @@ Test(cache) {
 }
 
 Test(block) {
-	CacheItem *item1 = block_load(0);
+	Block *item1 = block_load(0);
+	byte *ref;
+
+	ref = item1->addr;
+	for (int i = 0; i < 10; i++) ref[i] = i + 'a';
+
+	Block *item2 = block_load(1);
+	ref = item2->addr;
+	for (int i = 0; i < 10; i++) ref[i] = i + 'A';
+
+	Block *item3 = block_load(0);
+	ref = item3->addr;
+	for (int i = 0; i < 10; i++) fam_assert_eq(ref[i], i + 'a');
+
+	Block *item4 = block_load(1);
+	ref = item4->addr;
+	for (int i = 0; i < 10; i++) fam_assert_eq(ref[i], i + 'A');
+
+	Block *item5 = block_load(0);
+	ref = item5->addr;
+	for (int i = 0; i < 10; i++) fam_assert_eq(ref[i], i + 'a');
+
+	Block *item6 = block_load(1);
+	ref = item6->addr;
+	for (int i = 0; i < 10; i++) fam_assert_eq(ref[i], i + 'A');
 }
 
 int count = 5000;

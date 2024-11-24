@@ -22,19 +22,19 @@ typedef struct Cache {
 	byte impl[CACHE_IMPL_SIZE];
 } Cache;
 
-typedef struct CacheItem {
-	struct CacheItem *next;
-	struct CacheItem *prev;
-	struct CacheItem *chain_next;
+typedef struct Block {
+	struct Block *next;
+	struct Block *prev;
+	struct Block *chain_next;
 	int64 id;
 	void *addr;
 	int64 ref_count;
-} CacheItem;
+} Block;
 
 int cache_init(Cache *cache, int64 capacity, float load_factor);
-const CacheItem *cache_insert(Cache *cache, CacheItem *item);
-int cache_move_to_head(Cache *cache, const CacheItem *item);
-CacheItem *cache_find(const Cache *cache, int64 id);
+const Block *cache_insert(Cache *cache, Block *item);
+int cache_move_to_head(Cache *cache, const Block *item);
+Block *cache_find(const Cache *cache, int64 id);
 void cache_cleanup(Cache *cache, bool unmap_addr);
 
 #endif	// _BASE_CACHE__

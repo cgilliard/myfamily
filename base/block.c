@@ -26,12 +26,6 @@
 
 SlabAllocator block_slab_allocator;
 
-typedef struct Block {
-	int64 id;
-	byte padding[24];
-	byte data[];
-} Block;
-
 bool block_is_init = false;
 Lock block_init_lock = INIT_LOCK;
 Cache global_cache;
@@ -46,24 +40,25 @@ void block_init() {
 	unlock(&block_init_lock);
 }
 
-CacheItem *block_load(int64 id) {
+Block *block_load(int64 id) {
 	if (!block_is_init) block_init();
-	CacheItem *ci = cache_find(&global_cache, id);
+	Block *ci = cache_find(&global_cache, id);
 	if (ci == NULL) {
 		void *addr = fmap(id);
 		if (addr) {
 			ci = slab_allocator_allocate(&block_slab_allocator);
 			ci->addr = addr;
 			ci->id = id;
-			const CacheItem *to_delete = cache_insert(&global_cache, ci);
+			const Block *to_delete = cache_insert(&global_cache, ci);
 			if (to_delete) unmap(to_delete->addr, 1);
 		}
-	} else
+	} else {
 		cache_move_to_head(&global_cache, ci);
+	}
 	return ci;
 }
 
-void block_free(CacheItem *item) {
+void block_free(Block *item) {
 	if (!block_is_init) block_init();
 }
 

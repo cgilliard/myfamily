@@ -23,7 +23,6 @@ int getpagesize();
 void *map(int64 pages);
 void unmap(void *addr, int64 pages);
 void *fmap(int64 id);
-void *fview(int64 id);
 int flush();
 int64 fsize();
 
