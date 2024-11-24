@@ -19,6 +19,7 @@
 #include <base/print_util.h>
 #include <base/slabs.h>
 #include <base/sys.h>
+#include <base/util.h>
 
 // Will round up array size to 2048 (based on power of 2 and load factor)
 #define CACHE_SIZE 1530
@@ -26,22 +27,10 @@
 
 SlabAllocator block_slab_allocator;
 
-bool block_is_init = false;
-Lock block_init_lock = INIT_LOCK;
 Cache global_cache;
-
-void block_init() {
-	lockw(&block_init_lock);
-	if (cache_init(&global_cache, CACHE_SIZE, LOAD_FACTOR))
-		panic("Could not initialize cache!");
-	block_is_init = true;
-	slab_allocator_init(&block_slab_allocator, 128 - SLAB_LIST_SIZE, CACHE_SIZE,
-						UINT32_MAX);
-	unlock(&block_init_lock);
-}
+Lock block_init_lock = INIT_LOCK;
 
 Block *block_load(int64 id) {
-	if (!block_is_init) block_init();
 	Block *ci = cache_find(&global_cache, id);
 	if (ci == NULL) {
 		void *addr = fmap(id);
@@ -49,27 +38,43 @@ Block *block_load(int64 id) {
 			ci = slab_allocator_allocate(&block_slab_allocator);
 			ci->addr = addr;
 			ci->id = id;
-			const Block *to_delete = cache_insert(&global_cache, ci);
+			ci->ref_count = 1;
+			int ref_count = 1;
+			Block *to_delete;
+			while (ref_count) {
+				to_delete = cache_insert(&global_cache, ci);
+				if (to_delete == NULL) break;
+				ref_count = to_delete->ref_count;
+				ci = to_delete;
+			}
 			if (to_delete) unmap(to_delete->addr, 1);
 		}
 	} else {
+		ci->ref_count++;
 		cache_move_to_head(&global_cache, ci);
 	}
 	return ci;
 }
 
 void block_free(Block *item) {
-	if (!block_is_init) block_init();
+	item->ref_count--;
+	if (item->ref_count < 0) panic("double free of block! %lli", item->id);
 }
 
 const Block *block_load_rw(int64 id) {
 	return block_load(id);
 }
 
+void init_block() {
+	lockw(&block_init_lock);
+	if (cache_init(&global_cache, CACHE_SIZE, LOAD_FACTOR))
+		panic("Could not initialize cache!");
+	slab_allocator_init(&block_slab_allocator, 128 - SLAB_LIST_SIZE, CACHE_SIZE,
+						UINT32_MAX);
+	unlock(&block_init_lock);
+}
+
 void block_cleanup() {
-	if (block_is_init) {
-		cache_cleanup(&global_cache, true);
-		slab_allocator_cleanup(&block_slab_allocator);
-		block_is_init = false;
-	}
+	cache_cleanup(&global_cache, true);
+	slab_allocator_cleanup(&block_slab_allocator);
 }

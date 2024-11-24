@@ -19,13 +19,13 @@
 #include <base/slabs.h>
 #include <base/types.h>
 
-#define BLOCK_HEADER_SIZE 32
-#define BLOCK_SIZE (PAGE_SIZE - BLOCK_HEADER_SIZE)
+#define BLOCK_SIZE PAGE_SIZE
 
 Block *block_load(int64 id);
 const Block *block_load_rw(int64 id);
 void block_free(Block *item);
 
+void init_block();
 void block_cleanup();
 
 #endif	// _BASE_BLOCK__

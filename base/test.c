@@ -124,26 +124,32 @@ Test(block) {
 
 	ref = item1->addr;
 	for (int i = 0; i < 10; i++) ref[i] = i + 'a';
+	block_free(item1);
 
 	Block *item2 = block_load(1);
 	ref = item2->addr;
 	for (int i = 0; i < 10; i++) ref[i] = i + 'A';
+	block_free(item2);
 
 	Block *item3 = block_load(0);
 	ref = item3->addr;
 	for (int i = 0; i < 10; i++) fam_assert_eq(ref[i], i + 'a');
+	block_free(item3);
 
 	Block *item4 = block_load(1);
 	ref = item4->addr;
 	for (int i = 0; i < 10; i++) fam_assert_eq(ref[i], i + 'A');
+	block_free(item4);
 
 	Block *item5 = block_load(0);
 	ref = item5->addr;
 	for (int i = 0; i < 10; i++) fam_assert_eq(ref[i], i + 'a');
+	block_free(item5);
 
 	Block *item6 = block_load(1);
 	ref = item6->addr;
 	for (int i = 0; i < 10; i++) fam_assert_eq(ref[i], i + 'A');
+	block_free(item6);
 }
 
 int count = 5000;

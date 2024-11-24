@@ -80,7 +80,7 @@ int cache_init(Cache *cache, int64 capacity, float load_factor) {
 	(murmurhash(((const byte *)&id), sizeof(int64), MURMUR_HASH_SEED) % \
 	 impl->arr_size)
 
-const Block *cache_evict(CacheImpl *impl) {
+Block *cache_evict(CacheImpl *impl) {
 	unsigned int index = HASH(impl->tail->id);
 	Block *cur = impl->arr[index], *prev = NULL;
 	while (cur) {
@@ -98,7 +98,7 @@ const Block *cache_evict(CacheImpl *impl) {
 	return NULL;
 }
 
-const Block *cache_insert(Cache *cache, Block *item) {
+Block *cache_insert(Cache *cache, Block *item) {
 	CacheImpl *impl = (CacheImpl *)cache;
 	unsigned int index = HASH(item->id);
 
@@ -128,7 +128,7 @@ const Block *cache_insert(Cache *cache, Block *item) {
 	impl->head = item;
 	if (impl->tail == NULL) impl->tail = item;
 
-	const Block *ret = NULL;
+	Block *ret = NULL;
 	if (impl->size >= impl->capacity)
 		ret = cache_evict(impl);
 	else
@@ -202,7 +202,6 @@ void cache_cleanup(Cache *cache, bool unmap_addr) {
 		Block *to_delete = itt;
 		itt = itt->next;
 		if (unmap_addr) {
-			// println("delete node %p", to_delete);
 			unmap(to_delete->addr, 1);
 		}
 	}

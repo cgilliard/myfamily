@@ -32,7 +32,7 @@ typedef struct Block {
 } Block;
 
 int cache_init(Cache *cache, int64 capacity, float load_factor);
-const Block *cache_insert(Cache *cache, Block *item);
+Block *cache_insert(Cache *cache, Block *item);
 int cache_move_to_head(Cache *cache, const Block *item);
 Block *cache_find(const Cache *cache, int64 id);
 void cache_cleanup(Cache *cache, bool unmap_addr);

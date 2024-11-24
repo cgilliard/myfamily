@@ -105,6 +105,7 @@ void init_sys(const char *path) {
 #endif	// __APPLE__
 
 	if (!create) cur_file_size = lseek(_gfd, 0, SEEK_END);
+	init_block();
 }
 
 void shutdown_sys() {
