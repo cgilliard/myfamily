@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/bitmap.h>
+#include <base/block.h>
 #include <base/cache.h>
 #include <base/colors.h>
 #include <base/print_util.h>

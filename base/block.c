@@ -17,16 +17,18 @@
 #include <base/lock.h>
 #include <base/macros.h>
 #include <base/print_util.h>
+#include <base/slabs.h>
 #include <base/sys.h>
 
 // Will round up array size to 2048 (based on power of 2 and load factor)
 #define CACHE_SIZE 1530
 #define LOAD_FACTOR 0.75
 
+SlabAllocator block_slab_allocator;
+
 typedef struct Block {
 	int64 id;
-	int64 id2;
-	byte padding[16];
+	byte padding[24];
 	byte data[];
 } Block;
 
@@ -39,23 +41,36 @@ void block_init() {
 	if (cache_init(&global_cache, CACHE_SIZE, LOAD_FACTOR))
 		panic("Could not initialize cache!");
 	block_is_init = true;
+	slab_allocator_init(&block_slab_allocator, 128 - SLAB_LIST_SIZE, CACHE_SIZE,
+						UINT32_MAX);
 	unlock(&block_init_lock);
 }
 
-void *block_load(int64 id) {
+CacheItem *block_load(int64 id) {
 	if (!block_is_init) block_init();
-	const CacheItem *ci = cache_find(&global_cache, id);
-	void *ret = NULL;
-	/*
-		if (ci)
-			ret.addr = ci->addr;
-		else {
-			ret.addr = fmap(id);
+	CacheItem *ci = cache_find(&global_cache, id);
+	if (ci == NULL) {
+		void *addr = fmap(id);
+		if (addr) {
+			ci = slab_allocator_allocate(&block_slab_allocator);
+			ci->addr = addr;
+			ci->id = id;
+			const CacheItem *to_delete = cache_insert(&global_cache, ci);
+			if (to_delete) unmap(to_delete->addr, 1);
 		}
-	*/
-	return ret;
+	} else
+		cache_move_to_head(&global_cache, ci);
+	return ci;
 }
 
-void block_free(void *addr) {
+void block_free(CacheItem *item) {
 	if (!block_is_init) block_init();
+}
+
+void block_cleanup() {
+	if (block_is_init) {
+		cache_cleanup(&global_cache, true);
+		slab_allocator_cleanup(&block_slab_allocator);
+		block_is_init = false;
+	}
 }

@@ -15,10 +15,15 @@
 #ifndef _BASE_BLOCK__
 #define _BASE_BLOCK__
 
+#include <base/cache.h>
 #include <base/slabs.h>
 #include <base/types.h>
 
-void *block_load(int64 id);
-void block_free(void *slab);
+#define BLOCK_HEADER_SIZE 32
+#define BLOCK_SIZE (PAGE_SIZE - BLOCK_HEADER_SIZE)
+
+CacheItem *block_load(int64 id);
+void block_free(CacheItem *item);
+void block_cleanup();
 
 #endif	// _BASE_BLOCK__

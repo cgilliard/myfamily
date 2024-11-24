@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/bitmap.h>
+#include <base/block.h>
 #include <base/err.h>
 #include <base/lock.h>
 #include <base/macros.h>
@@ -113,6 +114,7 @@ void init_sys(const char *path) {
 
 void shutdown_sys() {
 	if (_gfd != -1) {
+		block_cleanup();
 		close(_gfd);
 	}
 }

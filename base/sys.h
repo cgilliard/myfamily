@@ -35,13 +35,3 @@ extern int64 _alloc_sum;
 #endif	// TEST
 
 #endif	// _BASE_SYS__
-
-/*
-void *map(int64 num_pages);
-void *fmap(int64 block_num);
-void *fview(int64 block_num);
-void *slab(int size);
-void unmap(void *addr);
-int flush();
-int64 fsize();
-*/

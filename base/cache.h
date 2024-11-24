@@ -34,7 +34,7 @@ typedef struct CacheItem {
 int cache_init(Cache *cache, int64 capacity, float load_factor);
 const CacheItem *cache_insert(Cache *cache, CacheItem *item);
 int cache_move_to_head(Cache *cache, const CacheItem *item);
-const CacheItem *cache_find(const Cache *cache, int64 id);
-void cache_cleanup(Cache *cache);
+CacheItem *cache_find(const Cache *cache, int64 id);
+void cache_cleanup(Cache *cache, bool unmap_addr);
 
 #endif	// _BASE_CACHE__

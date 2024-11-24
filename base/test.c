@@ -115,7 +115,11 @@ Test(cache) {
 	fam_assert(cache_find(&c1, 2) != NULL);
 	fam_assert(cache_find(&c1, 3) == NULL);
 
-	cache_cleanup(&c1);
+	cache_cleanup(&c1, false);
+}
+
+Test(block) {
+	CacheItem *item1 = block_load(0);
 }
 
 int count = 5000;

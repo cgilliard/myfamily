@@ -16,13 +16,17 @@
 #include <base/macros.h>
 #include <base/print_util.h>
 
-_Thread_local bool _lock_is_write__ = false;
+#define MAX_LOCK_LEVEL 128
+_Thread_local bool _lock_is_write__[MAX_LOCK_LEVEL + 1] = {};
+_Thread_local int stack_level = 0;
 
 Lock lock_create() {
 	return 0;
 }
 void lock_read(Lock *lock) {
-	_lock_is_write__ = false;
+	if (stack_level >= MAX_LOCK_LEVEL)
+		panic("too many lock levels: MAX=%i", MAX_LOCK_LEVEL);
+	_lock_is_write__[stack_level++] = false;
 	unsigned long long state;
 	unsigned long long state_update;
 	do {
@@ -36,7 +40,9 @@ void lock_read(Lock *lock) {
 	} while (!CAS_ACQUIRE(lock, &state, state_update));
 }
 void lock_write(Lock *lock) {
-	_lock_is_write__ = true;
+	if (stack_level >= MAX_LOCK_LEVEL)
+		panic("too many lock levels: MAX=%i", MAX_LOCK_LEVEL);
+	_lock_is_write__[stack_level++] = true;
 	unsigned long long state;
 	unsigned long long state_update;
 
@@ -60,7 +66,7 @@ void lock_write(Lock *lock) {
 }
 
 void lock_upgrade(Lock *lock) {
-	_lock_is_write__ = true;
+	_lock_is_write__[stack_level - 1] = true;
 
 	unsigned long long state;
 	unsigned long long state_update;
@@ -86,7 +92,7 @@ void lock_upgrade(Lock *lock) {
 }
 
 void lock_downgrade(Lock *lock) {
-	_lock_is_write__ = false;
+	_lock_is_write__[stack_level - 1] = false;
 
 	unsigned long long state;
 	unsigned long long state_update;
@@ -106,7 +112,7 @@ void lock_unlock(Lock *lock) {
 	unsigned long long state;
 	unsigned long long state_update;
 	// check thread local write variable
-	if (_lock_is_write__) {
+	if (_lock_is_write__[--stack_level]) {
 		// writer
 		do {
 			// get current state

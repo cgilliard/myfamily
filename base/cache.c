@@ -139,7 +139,7 @@ const CacheItem *cache_insert(Cache *cache, CacheItem *item) {
 
 	return ret;
 }
-const CacheItem *cache_find(const Cache *cache, int64 id) {
+CacheItem *cache_find(const Cache *cache, int64 id) {
 	CacheImpl *impl = (CacheImpl *)cache;
 	lockr(&impl->lock);
 	CacheItem *cur = impl->arr[HASH(id)];
@@ -166,8 +166,14 @@ int cache_move_to_head(Cache *cache, const CacheItem *item) {
 	return ret;
 }
 
-void cache_cleanup(Cache *cache) {
+void cache_cleanup(Cache *cache, bool unmap_addr) {
 	CacheImpl *impl = (CacheImpl *)cache;
+	CacheItem *itt = impl->head;
+	while (itt) {
+		CacheItem *to_delete = itt;
+		itt = itt->next;
+		if (unmap_addr) unmap(to_delete->addr, 1);
+	}
 	unmap(impl->arr,
 		  (sizeof(CacheItem *) * ((impl->arr_size / PAGE_SIZE) + 1)));
 }
