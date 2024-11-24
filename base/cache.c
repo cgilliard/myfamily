@@ -33,7 +33,7 @@ typedef struct CacheImpl {
 	byte padding[8];
 } CacheImpl;
 
-unsigned int cache_next_power_of_two(unsigned int n) {
+uint32 cache_next_power_of_two(uint32 n) {
 	n--;
 	n |= n >> 1;
 	n |= n >> 2;
@@ -81,7 +81,7 @@ int cache_init(Cache *cache, int64 capacity, float load_factor) {
 	 impl->arr_size)
 
 Block *cache_evict(CacheImpl *impl) {
-	unsigned int index = HASH(impl->tail->id);
+	uint32 index = HASH(impl->tail->id);
 	Block *cur = impl->arr[index], *prev = NULL;
 	while (cur) {
 		if (impl->tail->id == cur->id) {
@@ -100,7 +100,7 @@ Block *cache_evict(CacheImpl *impl) {
 
 Block *cache_insert(Cache *cache, Block *item) {
 	CacheImpl *impl = (CacheImpl *)cache;
-	unsigned int index = HASH(item->id);
+	uint32 index = HASH(item->id);
 
 	lockw(&impl->lock);
 	item->next = impl->head;

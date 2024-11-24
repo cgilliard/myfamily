@@ -52,7 +52,7 @@ int print(const byte *fmt, ...) {
 	return ret;
 }
 
-int sprint(byte *str, unsigned long long capacity, const byte *fmt, ...) {
+int sprint(byte *str, uint64 capacity, const byte *fmt, ...) {
 	__builtin_va_list args;
 	__builtin_va_start(args, fmt);
 	int ret = 0;

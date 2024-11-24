@@ -103,7 +103,7 @@ bool execute_tests(byte *name) {
 					println("%sFAIL%s: alloc_diff=%lli (Memory leak?)",
 							BRIGHT_RED, RESET, _alloc_sum - start_alloc);
 				fam_assert_eq(_alloc_sum, start_alloc);
-				// rmrf(test_dir);
+				rmrf(test_dir);
 			}
 		} else {
 			println("%sFAIL:%s test '%s%s%s' failed!", BRIGHT_RED, RESET, GREEN,
@@ -169,7 +169,7 @@ void fail_assert() {
 				}
 				itt++;
 			}
-			unsigned long long address = strtoul(addr, NULL, 16);
+			uint64 address = strtoul(addr, NULL, 16);
 			address -= 8;
 
 			char command[256];
@@ -196,10 +196,8 @@ void fail_assert() {
 #else	// MACOS
 		Dl_info info;
 		dladdr(array[i], &info);
-		unsigned long long addr =
-			0x0000000100000000 + info.dli_saddr - info.dli_fbase;
-		unsigned long long offset =
-			(uintptr_t)array[i] - (uintptr_t)info.dli_saddr;
+		uint64 addr = 0x0000000100000000 + info.dli_saddr - info.dli_fbase;
+		uint64 offset = (uintptr_t)array[i] - (uintptr_t)info.dli_saddr;
 		addr += offset;
 		addr -= 4;
 		snprintf(address, sizeof(address), "0x%" PRIx64 "", addr);

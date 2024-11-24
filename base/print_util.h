@@ -19,7 +19,7 @@
 
 int println(const byte *fmt, ...);
 int print(const byte *fmt, ...);
-int sprint(byte *str, unsigned long long capacity, const byte *fmt, ...);
+int sprint(byte *str, uint64 capacity, const byte *fmt, ...);
 void panic(const byte *fmt, ...);
 
 #ifdef TEST

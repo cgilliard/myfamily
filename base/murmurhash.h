@@ -49,6 +49,6 @@
  * using the MurmurHash3 algorithm
  */
 
-unsigned int murmurhash(const byte *, unsigned int len, unsigned int seed);
+uint32 murmurhash(const byte *, uint32 len, uint32 seed);
 
 #endif	// _CRYPTO_MURMURHASH__

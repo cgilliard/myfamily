@@ -34,6 +34,10 @@ void __attribute__((constructor)) __check_64bit_arch__() {
 
 	if (sizeof(float64) != 8) panic("float64 must be 8 bytes. Invalid arch!");
 
+	if (sizeof(float) != 4) panic("float must be 4 bytes. Invalid arch!");
+
+	if (sizeof(uint32) != 4) panic("uint32 must be 4 bytes. Invalid arch!");
+
 	if (sizeof(bool) != 1) panic("bool must be 1 byte. Invalid arch!");
 
 	if (PAGE_SIZE < 4096)

@@ -15,26 +15,22 @@
 #include <base/types.h>
 #include <base/util.h>
 
-// note: assume non-null strings passed in
-void copy_bytes(byte *dst, const byte *src, unsigned long long n) {
-	for (unsigned long long i = 0; i < n; i++) {
+void copy_bytes(byte *dst, const byte *src, uint64 n) {
+	for (uint64 i = 0; i < n; i++) {
 		dst[i] = src[i];
 	}
 }
 
-// note: assume non-null strings passed in
-void set_bytes(byte *ptr, byte x, unsigned long long n) {
-	for (unsigned long long i = 0; i < n; i++) ptr[i] = x;
+void set_bytes(byte *ptr, byte x, uint64 n) {
+	for (uint64 i = 0; i < n; i++) ptr[i] = x;
 }
 
-// note: assume non-null strings passed in and null terminated
-unsigned long long cstring_len(const char *S) {
+uint64 cstring_len(const char *S) {
 	const char *s = S;
 	while (*S) S++;
 	return S - s;
 }
 
-// note: assume non-null strings passed in and null terminated
 int cstring_compare(const char *X, const char *Y) {
 	while (*X && *X == *Y) {
 		X++;
@@ -45,8 +41,7 @@ int cstring_compare(const char *X, const char *Y) {
 	return 0;
 }
 
-// we compare byte by byte for length n, even if null
-int cstring_compare_n(const byte *X, const byte *Y, unsigned long long n) {
+int cstring_compare_n(const byte *X, const byte *Y, uint64 n) {
 	while (n && *X == *Y) {
 		n--;
 		X++;

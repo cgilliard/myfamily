@@ -30,9 +30,8 @@ typedef struct Slab {
 } Slab;
 */
 
-int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
-						unsigned int max_free_slabs,
-						unsigned int max_total_slabs);
+int slab_allocator_init(SlabAllocator *sa, uint32 slab_size,
+						uint32 max_free_slabs, uint32 max_total_slabs);
 void slab_allocator_cleanup(SlabAllocator *sa);
 void *slab_allocator_allocate(SlabAllocator *sa);
 void slab_allocator_free(SlabAllocator *sa, void *slab);

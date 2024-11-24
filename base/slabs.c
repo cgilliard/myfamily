@@ -43,12 +43,12 @@ typedef struct SlabAllocatorImpl {
 	SlabList *head;
 	SlabList *tail;
 	void *bitmap_pages;
-	unsigned int slab_size;
-	unsigned int sl_size;
-	unsigned int max_free_slabs;
-	unsigned int max_total_slabs;
-	unsigned int free_slabs;
-	unsigned int total_slabs;
+	uint32 slab_size;
+	uint32 sl_size;
+	uint32 max_free_slabs;
+	uint32 max_total_slabs;
+	uint32 free_slabs;
+	uint32 total_slabs;
 	byte padding[32];
 } SlabAllocatorImpl;
 
@@ -77,7 +77,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 	}
 	if (id < 0) return NULL;
 	int64 next = id >> (__builtin_ctz(PAGE_SIZE / impl->sl_size));
-	unsigned int entries = ((1U << (__builtin_ctz(PAGE_SIZE / impl->sl_size))));
+	uint32 entries = ((1U << (__builtin_ctz(PAGE_SIZE / impl->sl_size))));
 	int offset = (id % entries) * impl->sl_size;
 	int i = next >> (2 * SHIFT_PER_LEVEL);
 	int j = (next >> SHIFT_PER_LEVEL) & MASK;
@@ -143,16 +143,15 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 	return sl;
 }
 
-bool is_power_of_2(unsigned int n) {
+bool is_power_of_2(uint32 n) {
 	if (n == 0) {
 		return false;
 	}
 	return (n & (n - 1)) == 0;
 }
 
-int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
-						unsigned int max_free_slabs,
-						unsigned int max_total_slabs) {
+int slab_allocator_init(SlabAllocator *sa, uint32 slab_size,
+						uint32 max_free_slabs, uint32 max_total_slabs) {
 	if (!is_power_of_2(slab_size + sizeof(SlabList))) {
 		SetErr(IllegalArgument);
 		return -1;

@@ -15,9 +15,11 @@
 #ifndef _BASE_LOCK__
 #define _BASE_LOCK__
 
+#include <base/types.h>
+
 #define INIT_LOCK (0)
 
-typedef unsigned long long Lock;
+typedef uint64 Lock;
 
 Lock lock_create();
 void lock_read(Lock *lock);

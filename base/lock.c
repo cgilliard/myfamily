@@ -27,8 +27,8 @@ void lock_read(Lock *lock) {
 	if (stack_level >= MAX_LOCK_LEVEL)
 		panic("too many lock levels: MAX=%i", MAX_LOCK_LEVEL);
 	_lock_is_write__[stack_level++] = false;
-	unsigned long long state;
-	unsigned long long state_update;
+	uint64 state;
+	uint64 state_update;
 	do {
 		// get current state set the write_pending bit to false
 		state = ALOAD(lock) & ~0x80000000ULL;
@@ -43,8 +43,8 @@ void lock_write(Lock *lock) {
 	if (stack_level >= MAX_LOCK_LEVEL)
 		panic("too many lock levels: MAX=%i", MAX_LOCK_LEVEL);
 	_lock_is_write__[stack_level++] = true;
-	unsigned long long state;
-	unsigned long long state_update;
+	uint64 state;
+	uint64 state_update;
 
 	// first step, set write bit true indicating a writer is waiting
 	// this lock should be obtained soon after the previous writer
@@ -66,8 +66,8 @@ void lock_write(Lock *lock) {
 }
 
 void lock_unlock(Lock *lock) {
-	unsigned long long state;
-	unsigned long long state_update;
+	uint64 state;
+	uint64 state_update;
 	// check thread local write variable
 	if (_lock_is_write__[--stack_level]) {
 		// writer

@@ -6,25 +6,25 @@
 
 #include <base/murmurhash.h>
 
-unsigned int murmurhash(const byte *key, unsigned int len, unsigned int seed) {
-	unsigned int c1 = 0xcc9e2d51;
-	unsigned int c2 = 0x1b873593;
-	unsigned int r1 = 15;
-	unsigned int r2 = 13;
-	unsigned int m = 5;
-	unsigned int n = 0xe6546b64;
-	unsigned int h = 0;
-	unsigned int k = 0;
+uint32 murmurhash(const byte *key, uint32 len, uint32 seed) {
+	uint32 c1 = 0xcc9e2d51;
+	uint32 c2 = 0x1b873593;
+	uint32 r1 = 15;
+	uint32 r2 = 13;
+	uint32 m = 5;
+	uint32 n = 0xe6546b64;
+	uint32 h = 0;
+	uint32 k = 0;
 	byte *d = (byte *)key;	// 32 bit extract from `key'
-	const unsigned int *chunks = NULL;
+	const uint32 *chunks = NULL;
 	const byte *tail = NULL;  // tail - last 8 bytes
 	int i = 0;
 	int l = len / 4;  // chunk length
 
 	h = seed;
 
-	chunks = (const unsigned int *)(d + l * 4);	 // body
-	tail = (const byte *)(d + l * 4);			 // last 8 byte chunk of `key'
+	chunks = (const uint32 *)(d + l * 4);  // body
+	tail = (const byte *)(d + l * 4);	   // last 8 byte chunk of `key'
 
 	// for each 4 byte chunk of `key'
 	for (i = -l; i != 0; ++i) {
