@@ -16,10 +16,17 @@
 #define _BASE_PRINT_UTIL__
 
 #include <base/types.h>
+#ifndef va_list
+#define va_list __builtin_va_list
+#define va_start(args, n) __builtin_va_start(args, n)
+#define va_end(args) __builtin_va_end(args)
+#endif	// va_list
 
 int println(const byte *fmt, ...);
 int print(const byte *fmt, ...);
+int vprint(const byte *fmt, va_list args);
 int sprint(byte *str, uint64 capacity, const byte *fmt, ...);
+int vsprint(byte *str, uint64 capacity, const byte *fmt, va_list args);
 void panic(const byte *fmt, ...);
 
 #ifdef TEST

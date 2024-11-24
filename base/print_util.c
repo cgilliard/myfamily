@@ -13,50 +13,68 @@
 // limitations under the License.
 
 #include <base/print_util.h>
+#include <base/sys.h>
+#include <sys/types.h>	// for size_t
 
-// currently using stdio, will move to write
-#include <stdio.h>
+int vsnprintf(char *s, size_t n, const char *formt, va_list args);
+
+#define STDERR 0
 
 bool _debug_print_util_disable__ = false;
 
-void exit(int);
+int64 prot_send(byte *buf, int64 len) {
+	if (_debug_print_util_disable__) return 0;
+	int64 sum = 0;
+	while (sum < len) {
+		int64 cur = send(STDERR, buf, len);
+		if (cur == -1) return -1;
+		sum += cur;
+	}
+	return sum;
+}
 
 void panic(const byte *fmt, ...) {
-	byte buf[1024];
-	__builtin_va_list args;
-	if (!_debug_print_util_disable__) fprintf(stderr, "Panic: ");
-	__builtin_va_start(args, fmt);
-	if (!_debug_print_util_disable__) vfprintf(stderr, fmt, args);
-	__builtin_va_end(args);
-	if (!_debug_print_util_disable__) fprintf(stderr, "\n");
-
-	if (!_debug_print_util_disable__) exit(-1);
+	prot_send("Panic: ", 7);
+	va_list args;
+	va_start(args, fmt);
+	print(fmt, args);
+	va_end(args);
+	prot_send("\n", 1);
+	if (!_debug_print_util_disable__) halt(-1);
 }
 
 int println(const byte *fmt, ...) {
-	__builtin_va_list args;
-	__builtin_va_start(args, fmt);
-	int ret;
-	if (!_debug_print_util_disable__) ret = vfprintf(stdout, fmt, args);
-	__builtin_va_end(args);
-	if (!_debug_print_util_disable__) fprintf(stdout, "\n");
+	va_list args;
+	va_start(args, fmt);
+	int ret = vprint(fmt, args);
+	va_end(args);
+	prot_send("\n", 1);
 	return ret;
 }
 
 int print(const byte *fmt, ...) {
-	__builtin_va_list args;
-	__builtin_va_start(args, fmt);
-	int ret = 0;
-	if (!_debug_print_util_disable__) ret = vfprintf(stdout, fmt, args);
-	__builtin_va_end(args);
+	va_list args;
+	va_start(args, fmt);
+	int ret = vprint(fmt, args);
+	va_end(args);
 	return ret;
 }
 
+int vprint(const byte *fmt, va_list args) {
+	int reqd = vsprint(NULL, 0, fmt, args);
+	byte buf[reqd + 1];
+	int len = vsprint(buf, reqd, fmt, args);
+	return prot_send(buf, len);
+}
+
 int sprint(byte *str, uint64 capacity, const byte *fmt, ...) {
-	__builtin_va_list args;
-	__builtin_va_start(args, fmt);
-	int ret = 0;
-	if (!_debug_print_util_disable__) ret = vsnprintf(str, capacity, fmt, args);
-	__builtin_va_end(args);
+	va_list args;
+	va_start(args, fmt);
+	int ret = vsprint(str, capacity, fmt, args);
+	va_end(args);
 	return ret;
+}
+
+int vsprint(byte *str, uint64 capacity, const byte *fmt, va_list args) {
+	return vsnprintf(str, capacity, fmt, args);
 }

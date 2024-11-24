@@ -25,6 +25,9 @@ void unmap(void *addr, int64 pages);
 void *fmap(int64 id);
 int flush();
 int64 fsize();
+int64 send(int fd, const byte *buf, uint64 len);
+int64 recv(int fd, byte *buf, uint64 len);
+void __attribute__((noreturn)) halt(int code);
 
 void init_sys(const char *path);
 void shutdown_sys();
