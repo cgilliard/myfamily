@@ -19,6 +19,7 @@
 
 #define EVENT_READ 0x1
 #define EVENT_WRITE (0x1 << 1)
+#define EVENT_ERROR (0x1 << 2)
 
 typedef struct EvhEvent {
 	uint32 events;

@@ -17,6 +17,7 @@
 #include <base/print_util.h>
 #include <base/sys.h>
 #include <base/util.h>
+#include <errno.h>
 #include <fcntl.h>		 // for O_ constants
 #include <sys/mman.h>	 // for MAP and PROT constants
 #include <sys/socket.h>	 // for struct sockaddr
@@ -237,12 +238,17 @@ int evh_register(int evh, int64 handle, int op) {
 	int ret = -1;
 #ifdef __APPLE__
 	int fd = FD(handle);
-	struct kevent event;
+	struct kevent event[2];
+	int ev_count = 0;
 	uint32 filt = 0;
-	if (op & EVENT_READ) filt |= EVFILT_READ;
-	if (op & EVENT_WRITE) filt |= EVFILT_WRITE;
-	EV_SET(&event, fd, filt, EV_ADD | EV_CLEAR, 0, 0, NULL);
-	ret = kevent(evh, &event, 1, NULL, 0, NULL);
+	if (op & EVENT_READ)
+		EV_SET(&event[ev_count++], fd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0,
+			   NULL);
+	if (op & EVENT_WRITE)
+		EV_SET(&event[ev_count++], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR, 0, 0,
+			   NULL);
+	errno = 0;
+	ret = kevent(evh, event, ev_count, NULL, 0, NULL);
 #endif	// __APPLE__
 #ifdef __linux__
 	int fd = FD(handle);
@@ -250,7 +256,12 @@ int evh_register(int evh, int64 handle, int op) {
 	if (op & EVENT_READ) events |= EPOLLIN;
 	if (op & EVENT_WRITE) events |= EPOLLOUT;
 	struct epoll_event event = {.data.u64 = handle, .events = events};
+	errno = 0;
 	ret = epoll_ctl(evh, EPOLL_CTL_ADD, fd, &event);
+	if (ret < 0 && errno == EEXIST) {
+		errno = 0;
+		ret = epoll_ctl(evh, EPOLL_CTL_MOD, fd, &event);
+	}
 #endif	// __linux__
 	return ret;
 }
@@ -282,6 +293,10 @@ int evh_wait(int evh, int64 max_events, EvhEvent *events) {
 			events[i].events |= EVENT_READ;
 		} else if (res[i].filter == EVFILT_WRITE) {
 			events[i].events |= EVENT_WRITE;
+		}
+
+		if (res[i].flags & EV_ERROR) {
+			events[i].events |= EVENT_ERROR;
 		}
 	}
 #endif	// __APPLE__
