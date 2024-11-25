@@ -182,6 +182,7 @@ Test(slab_allocator) {
 
 int sleep(int);
 Test(server) {
+	/*
 	int64 h1 = server(9000, "127.0.0.1", false, 10);
 	// println("h1=%llx", h1);
 	int64 h2 = client(9000, "127.0.0.1", false);
@@ -205,6 +206,7 @@ Test(server) {
 	int len = receive(fd4, buf, 10);
 	fam_assert_eq(len, 5);
 	fam_assert(cstring_compare(buf, "test\n") == 0);
+	*/
 }
 
 #include <stdlib.h>

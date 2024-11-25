@@ -17,11 +17,17 @@
 #include <base/print_util.h>
 #include <base/sys.h>
 #include <base/util.h>
-#include <fcntl.h>	// for O_ constants
-#include <sys/event.h>
+#include <fcntl.h>		 // for O_ constants
 #include <sys/mman.h>	 // for MAP and PROT constants
 #include <sys/socket.h>	 // for struct sockaddr
 #include <sys/types.h>	 // for ssize_t/size_t/off_t
+
+#ifdef __APPLE__
+#include <sys/event.h>
+#endif	// __APPLE__
+#ifdef __linux__
+#include <sys/epoll.h>
+#endif	// __linux__
 
 #define SOCKET_FLAG_CLIENT 0x2000000000000000ULL
 #define SOCKET_FLAG_UDP 0x4000000000000000ULL
@@ -37,8 +43,7 @@ int socket(int domain, int type, int protocol);
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int listen(int sockfd, int backlog);
 int shutdown(int sockfd, int how);
-int accept(int sockfd, struct sockaddr *_Nullable restrict addr,
-		   socklen_t *_Nullable restrict addrlen);
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int setsockopt(int socket, int level, int option_name, const void *option_value,
 			   socklen_t option_len);
@@ -230,10 +235,13 @@ int evh() {
 	return ret;
 }
 int evh_register(int evh, int64 handle, int op) {
+	int ret;
+#ifdef __APPLE__
 	int fd = FD(handle);
 	struct kevent event;
 	EV_SET(&event, fd, EVFILT_READ, EV_ADD | EV_CLEAR, NOTE_WRITE, 0, NULL);
-	int ret = kevent(evh, &event, 1, NULL, 0, NULL);
+	ret = kevent(evh, &event, 1, NULL, 0, NULL);
+#endif	// __APPLE__
 	return ret;
 }
 int evh_unregister(int evh, int64 handle) {
@@ -241,8 +249,10 @@ int evh_unregister(int evh, int64 handle) {
 }
 int evh_wait(int evh, int64 timeout_millis, int64 max_events,
 			 EvhEvent *events) {
+	int ret;
+#ifdef __APPLE__
 	struct kevent res[max_events];
-	int ret = kevent(evh, NULL, 0, res, max_events, NULL);
+	ret = kevent(evh, NULL, 0, res, max_events, NULL);
 	for (int i = 0; i < ret; i++) {
 		int64 fd = (int)res[i].ident;
 		events[i].handle = fd | SOCKET_FLAG_CLIENT;
@@ -253,5 +263,6 @@ int evh_wait(int evh, int64 timeout_millis, int64 max_events,
 			events[i].events |= EVENT_WRITE;
 		}
 	}
+#endif	// __APPLE__
 	return ret;
 }
