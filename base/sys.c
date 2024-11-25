@@ -44,7 +44,9 @@ void __attribute__((noreturn)) _exit(int code);
 
 int _gfd = -1;
 int64 cur_file_size = 0;
+#ifdef TEST
 int64 _alloc_sum = 0;
+#endif	// TEST
 Lock resize_lock = INIT_LOCK;
 
 int check_size(int64 id) {
@@ -67,22 +69,37 @@ int check_size(int64 id) {
 
 void *map(int64 pages) {
 	if (pages == 0) return NULL;
+#ifdef TEST
 	_alloc_sum += pages;
+#endif	// TEST
 	void *ret = mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE,
 					 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (ret == NULL) SetErr(AllocErr);
 	return ret;
 }
 void unmap(void *addr, int64 pages) {
+#ifdef TEST
 	_alloc_sum -= pages;
+#endif	// TEST
 	if (munmap(addr, pages * PAGE_SIZE)) panic("munmap error!");
 }
 
 void *fmap(int64 id) {
 	if (check_size(id)) return NULL;
+#ifdef TEST
 	_alloc_sum += 1;
-	return mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, _gfd,
-				id * PAGE_SIZE);
+#endif	// TEST
+	void *ret = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, _gfd,
+					 id * PAGE_SIZE);
+	if (ret == MAP_FAILED) {
+		SetErr(AllocErr);
+		return NULL;
+	}
+	// trigger page fault
+	volatile byte *p = (byte *)ret;
+	*p = *p;
+
+	return ret;
 }
 
 int flush() {

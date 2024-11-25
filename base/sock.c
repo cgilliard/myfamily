@@ -148,10 +148,6 @@ int64 establish(int64 handle) {
 	int64 sock;
 
 	if (handle & SOCKET_FLAG_CLIENT) {
-		// client
-		// println("establish client conn to host: %u,port=%i,udp=%i", host,
-		// port, 		udp);
-
 		sock = socket(AF_INET, type, 0);
 
 		if (sock < 0) {
@@ -175,10 +171,6 @@ int64 establish(int64 handle) {
 
 		sock |= SOCKET_FLAG_CLIENT;
 	} else {
-		// server
-		// println("establish server conn to host:
-		// %u,port=%i,udp=%i,backlog=%i", 		host, port, udp, backlog);
-
 		sock = socket(AF_INET, type, 0);
 
 		if (sock < 0) {
