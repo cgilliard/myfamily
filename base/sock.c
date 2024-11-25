@@ -246,8 +246,11 @@ int evh_register(int evh, int64 handle, int op) {
 #endif	// __APPLE__
 #ifdef __linux__
 	int fd = FD(handle);
-	struct epoll_event event = {.data.u64 = handle, .events = EPOLLIN};
-	ret = epoll_ctl(evh, EPOLLIN, fd, &event);
+	int events = 0;
+	if (op & EVENT_READ) events |= EPOLLIN;
+	if (op & EVENT_WRITE) events |= EPOLLOUT;
+	struct epoll_event event = {.data.u64 = handle, .events = events};
+	ret = epoll_ctl(evh, EPOLL_CTL_ADD, fd, &event);
 #endif	// __linux__
 	return ret;
 }
@@ -259,6 +262,11 @@ int evh_unregister(int evh, int64 handle) {
 	EV_SET(&event, fd, 0, EV_DELETE, 0, 0, NULL);
 	ret = kevent(evh, &event, 1, NULL, 0, NULL);
 #endif	// __APPLE__
+#ifdef __linux__
+	int fd = FD(handle);
+	struct epoll_event event = {.data.u64 = handle, .events = 0};
+	ret = epoll_ctl(evh, EPOLL_CTL_DEL, fd, &event);
+#endif	// __linux__
 	return ret;
 }
 int evh_wait(int evh, int64 max_events, EvhEvent *events) {
