@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <arpa/inet.h>	// for sockaddr_in
 #include <base/bitmap.h>
 #include <base/block.h>
 #include <base/err.h>
@@ -20,9 +21,10 @@
 #include <base/print_util.h>
 #include <base/sys.h>
 #include <base/util.h>
-#include <fcntl.h>		// for O_ constants
-#include <sys/mman.h>	// for MAP and PROT constants
-#include <sys/types.h>	// for ssize_t/size_t/off_t
+#include <fcntl.h>	   // for O_ constants
+#include <sys/mman.h>  // for MAP and PROT constants
+// #include <sys/socket.h>	 // for struct sockaddr
+// #include <sys/types.h>	 // for ssize_t/size_t/off_t
 
 // needed system calls:
 int open(const char *pathname, int flags, ...);
@@ -33,9 +35,7 @@ int fsync(int fd);
 void *mmap(void *addr, size_t length, int prot, int flags, int fd,
 		   off_t offset);
 int munmap(void *addr, size_t length);
-ssize_t read(int fd, void *buf, size_t count);
-ssize_t write(int fd, const void *buf, size_t count);
-void __attribute__((noreturn)) _exit(int);
+void __attribute__((noreturn)) _exit(int code);
 
 // for macos
 #ifndef O_DIRECT
@@ -92,18 +92,6 @@ int flush() {
 
 int64 fsize() {
 	return cur_file_size;
-}
-
-int64 send(int fd, const byte *buf, uint64 len) {
-	int64 ret = write(fd, buf, len);
-	if (ret == -1) SetErr(IO);
-	return ret;
-}
-
-int64 recv(int fd, byte *buf, uint64 len) {
-	int64 ret = read(fd, buf, len);
-	if (ret == -1) SetErr(IO);
-	return ret;
 }
 
 void __attribute__((noreturn)) halt(int code) {

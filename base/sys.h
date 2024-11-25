@@ -17,6 +17,14 @@
 
 #include <base/types.h>
 
+#define EVENT_READ 0x1
+#define EVENT_WRITE (0x1 << 1)
+
+typedef struct EvhEvent {
+	uint32 events;
+	int64 handle;
+} EvhEvent;
+
 int getpagesize();
 #define PAGE_SIZE (getpagesize())
 
@@ -25,9 +33,18 @@ void unmap(void *addr, int64 pages);
 void *fmap(int64 id);
 int flush();
 int64 fsize();
-int64 send(int fd, const byte *buf, uint64 len);
-int64 recv(int fd, byte *buf, uint64 len);
+int64 transmit(int64 handle, const byte *buf, uint64 len);
+int64 receive(int64 handle, byte *buf, uint64 len);
+int64 accept_conn(int64 handle);
 void __attribute__((noreturn)) halt(int code);
+
+int64 server(int port, const char *addr, bool udp, int backlog);
+int64 client(int port, const char *addr, bool udp);
+int64 establish(int64 handle);
+int evh();
+int evh_register(int evh, int64 conn, int op);
+int evh_unregister(int evh, int64 conn);
+int evh_wait(int evh, int64 timeout_millis, int64 max_events, EvhEvent *events);
 
 void init_sys(const char *path);
 void shutdown_sys();

@@ -26,7 +26,7 @@ int64 prot_send(byte *buf, int64 len) {
 	if (_debug_print_util_disable__) return 0;
 	int64 sum = 0;
 	while (sum < len) {
-		int64 cur = send(STDERR, buf, len);
+		int64 cur = transmit(STDERR, buf, len);
 		if (cur == -1) return -1;
 		sum += cur;
 	}
@@ -61,9 +61,13 @@ int print(const byte *fmt, ...) {
 }
 
 int vprint(const byte *fmt, va_list args) {
+	va_list args2;
+	__builtin_va_copy(args2, args);
 	int reqd = vsprint(NULL, 0, fmt, args);
+	if (reqd < 0) return reqd;
 	byte buf[reqd + 1];
-	int len = vsprint(buf, reqd, fmt, args);
+	int len = vsprint(buf, reqd + 1, fmt, args2);
+	va_end(args2);
 	return prot_send(buf, len);
 }
 

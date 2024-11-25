@@ -34,6 +34,8 @@
 	Underflow, \
 	LockInitErr, \
 	InitErr, \
+	ConnectionRefused, \
+	InvalidAddr, \
 	AlreadyInitialized, \
 	IndexOutOfBounds, \
 	POpenErr, \
@@ -46,6 +48,7 @@
 	UnsupportedVersion, \
 	FileCorrupted, \
 	IllegalState, \
+	MaxFds, \
 	TooBig, \
 	ResourceNotAvailable, \
 	NoStream, \
