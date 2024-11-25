@@ -201,7 +201,7 @@ Test(server) {
 	fam_assert_eq(count, 1);
 	int fd4 = accept_conn(fd1);
 	// println("events=%i,fd4=%lli,events=%i", count, fd4, events[0].events);
-	byte buf[10];
+	byte buf[10] = {};
 	int len = receive(fd4, buf, 10);
 	fam_assert_eq(len, 5);
 	fam_assert(cstring_compare(buf, "test\n") == 0);

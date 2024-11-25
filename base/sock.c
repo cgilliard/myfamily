@@ -234,7 +234,7 @@ int evh() {
 	return ret;
 }
 int evh_register(int evh, int64 handle, int op) {
-	int ret;
+	int ret = -1;
 #ifdef __APPLE__
 	int fd = FD(handle);
 	struct kevent event;
@@ -244,10 +244,15 @@ int evh_register(int evh, int64 handle, int op) {
 	EV_SET(&event, fd, filt, EV_ADD | EV_CLEAR, 0, 0, NULL);
 	ret = kevent(evh, &event, 1, NULL, 0, NULL);
 #endif	// __APPLE__
+#ifdef __linux__
+	int fd = FD(handle);
+	struct epoll_event event = {.data.u64 = handle, .events = EPOLLIN};
+	ret = epoll_ctl(evh, EPOLLIN, fd, &event);
+#endif	// __linux__
 	return ret;
 }
 int evh_unregister(int evh, int64 handle) {
-	int ret;
+	int ret = -1;
 #ifdef __APPLE__
 	int fd = FD(handle);
 	struct kevent event;
@@ -257,7 +262,7 @@ int evh_unregister(int evh, int64 handle) {
 	return ret;
 }
 int evh_wait(int evh, int64 max_events, EvhEvent *events) {
-	int ret;
+	int ret = -1;
 #ifdef __APPLE__
 	struct kevent res[max_events];
 	ret = kevent(evh, NULL, 0, res, max_events, NULL);
@@ -272,5 +277,8 @@ int evh_wait(int evh, int64 max_events, EvhEvent *events) {
 		}
 	}
 #endif	// __APPLE__
+#ifdef __linux__
+	ret = epoll_wait(evh, (struct epoll_event *)events, max_events, -1);
+#endif	// __linux__
 	return ret;
 }
