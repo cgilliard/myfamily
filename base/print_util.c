@@ -19,6 +19,7 @@
 int vsnprintf(char *s, size_t n, const char *formt, va_list args);
 
 #define STDERR 0
+#define STDOUT 2
 
 bool _debug_print_util_disable__ = false;
 
@@ -26,7 +27,7 @@ int64 prot_send(byte *buf, int64 len) {
 	if (_debug_print_util_disable__) return 0;
 	int64 sum = 0;
 	while (sum < len) {
-		int64 cur = transmit(STDERR, buf, len);
+		int64 cur = transmit(STDOUT, buf, len);
 		if (cur == -1) return -1;
 		sum += cur;
 	}
