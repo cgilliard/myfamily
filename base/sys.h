@@ -44,7 +44,7 @@ int64 establish(int64 handle);
 int evh();
 int evh_register(int evh, int64 conn, int op);
 int evh_unregister(int evh, int64 conn);
-int evh_wait(int evh, int64 timeout_millis, int64 max_events, EvhEvent *events);
+int evh_wait(int evh, int64 max_events, EvhEvent *events);
 
 void init_sys(const char *path);
 void shutdown_sys();

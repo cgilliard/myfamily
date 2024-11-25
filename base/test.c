@@ -182,7 +182,6 @@ Test(slab_allocator) {
 
 int sleep(int);
 Test(server) {
-	/*
 	int64 h1 = server(9000, "127.0.0.1", false, 10);
 	// println("h1=%llx", h1);
 	int64 h2 = client(9000, "127.0.0.1", false);
@@ -195,10 +194,10 @@ Test(server) {
 	// println("fd1=%llx,fd2=%llx,fd3=%llx", fd1, fd2, fd3);
 
 	int selector = evh();
-	evh_register(selector, fd1, 0);
+	evh_register(selector, fd1, EVENT_READ);
 	transmit(fd2, "test\n", 5);
 	EvhEvent events[1];
-	int count = evh_wait(selector, 1000, 1, events);
+	int count = evh_wait(selector, 1, events);
 	fam_assert_eq(count, 1);
 	int fd4 = accept_conn(fd1);
 	// println("events=%i,fd4=%lli,events=%i", count, fd4, events[0].events);
@@ -206,7 +205,6 @@ Test(server) {
 	int len = receive(fd4, buf, 10);
 	fam_assert_eq(len, 5);
 	fam_assert(cstring_compare(buf, "test\n") == 0);
-	*/
 }
 
 #include <stdlib.h>

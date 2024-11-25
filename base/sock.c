@@ -231,7 +231,6 @@ int evh() {
 #else
 	int ret = -1;
 #endif
-
 	return ret;
 }
 int evh_register(int evh, int64 handle, int op) {
@@ -239,16 +238,25 @@ int evh_register(int evh, int64 handle, int op) {
 #ifdef __APPLE__
 	int fd = FD(handle);
 	struct kevent event;
-	EV_SET(&event, fd, EVFILT_READ, EV_ADD | EV_CLEAR, NOTE_WRITE, 0, NULL);
+	uint32 filt = 0;
+	if (op & EVENT_READ) filt |= EVFILT_READ;
+	if (op & EVENT_WRITE) filt |= EVFILT_WRITE;
+	EV_SET(&event, fd, filt, EV_ADD | EV_CLEAR, 0, 0, NULL);
 	ret = kevent(evh, &event, 1, NULL, 0, NULL);
 #endif	// __APPLE__
 	return ret;
 }
 int evh_unregister(int evh, int64 handle) {
-	return 0;
+	int ret;
+#ifdef __APPLE__
+	int fd = FD(handle);
+	struct kevent event;
+	EV_SET(&event, fd, 0, EV_DELETE, 0, 0, NULL);
+	ret = kevent(evh, &event, 1, NULL, 0, NULL);
+#endif	// __APPLE__
+	return ret;
 }
-int evh_wait(int evh, int64 timeout_millis, int64 max_events,
-			 EvhEvent *events) {
+int evh_wait(int evh, int64 max_events, EvhEvent *events) {
 	int ret;
 #ifdef __APPLE__
 	struct kevent res[max_events];
