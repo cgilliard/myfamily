@@ -12,29 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_CACHE__
-#define _BASE_CACHE__
+#ifndef _BASE_OBJECT__
+#define _BASE_OBJECT__
 
-#include <base/types.h>
+typedef __int128_t Object;
 
-#define CACHE_IMPL_SIZE 64
-typedef struct Cache {
-	byte impl[CACHE_IMPL_SIZE];
-} Cache;
+typedef enum ObjectType {
+	Int,
+	Float,
+	Box,
+	Function,
+	Err,
+} ObjectType;
 
-typedef struct Block {
-	struct Block *next;
-	struct Block *prev;
-	struct Block *chain_next;
-	int64 id;
-	void *addr;
-	int64 ref_count;
-} Block;
+Object object(ObjectType type, void *value);
+Object box(long long size);
 
-int cache_init(Cache *cache, int64 capacity, float load_factor);
-Block *cache_insert(Cache *cache, Block *item);
-int cache_move_to_head(Cache *cache, const Block *item);
-Block *cache_find(const Cache *cache, int64 id);
-void cache_cleanup(Cache *cache, bool unmap_addr);
-
-#endif	// _BASE_CACHE__
+#endif	// _BASE_OBJECT__

@@ -12,22 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_BITMAP__
-#define _BASE_BITMAP__
+#ifndef _BASE_FAM__
+#define _BASE_FAM__
 
-#include <base/types.h>
+#include <base/channel.h>
+#include <base/object.h>
 
-#define BITMAP_IMPL_SIZE 32
-typedef struct BitMap {
-	byte impl[BITMAP_IMPL_SIZE];
-} BitMap;
+Object init(int (*init)(), int threads);
+Channel run(Object (*task)(Channel channel));
+Object send(Channel channel, Object object);
+Object recv(Channel channel, int timeout_millis);
 
-int bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs);
-int64 bitmap_allocate(BitMap *m);
-void bitmap_free(BitMap *m, uint64 index);
-
-void bitmap_cleanup(BitMap *m);
-int64 bitmap_ptr_count(BitMap *m);
-int bitmap_extend(BitMap *m, void *ptr);
-
-#endif	// _BASE_BITMAP__
+#endif	// _BASE_FAM__

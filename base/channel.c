@@ -12,28 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_SLABS__
-#define _BASE_SLABS__
+#include <base/channel.h>
 
-#include <base/types.h>
-
-#define SLAB_ALLOCATOR_IMPL_SIZE 128
-typedef struct SlabAllocator {
-	byte impl[SLAB_ALLOCATOR_IMPL_SIZE];
-} SlabAllocator;
-
-#define SLAB_LIST_SIZE 32
-/*
-typedef struct Slab {
-	byte impl[SLAB_LIST_SIZE];
-	byte data[];
-} Slab;
-*/
-
-int slab_allocator_init(SlabAllocator *sa, uint32 slab_size,
-						uint32 max_free_slabs, uint32 max_total_slabs);
-void slab_allocator_cleanup(SlabAllocator *sa);
-void *slab_allocator_allocate(SlabAllocator *sa);
-void slab_allocator_free(SlabAllocator *sa, void *slab);
-
-#endif	// _BASE_SLABS__
+Channel channel() {
+	Channel ch;
+	return ch;
+}

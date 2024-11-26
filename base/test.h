@@ -12,62 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/lib.h>
-
 #define MAX_TESTS 100
 #define MAX_TEST_NAME 1024
 
 extern int test_count;
 extern int fail_count;
-typedef void (*test_fn_ptr)(const byte *);
+typedef void (*test_fn_ptr)(const unsigned char *);
 extern test_fn_ptr test_arr[MAX_TESTS + 1];
-extern byte test_names[MAX_TESTS][MAX_TEST_NAME + 1];
+extern unsigned char test_names[MAX_TESTS][MAX_TEST_NAME + 1];
 
-bool execute_tests(byte *suite_name);
+int execute_tests(unsigned char *suite_name);
 void fail_assert();
 
 #define fam_assert(v) \
 	if (!(v)) fail_assert();
 
-#define fam_assert_eq(v1, v2)                      \
-	if ((v1) != (v2)) {                            \
-		if (fail_count == 0)                       \
-			println(                               \
-				"--------------------------------" \
-				"--------------------------------" \
-				"--------------------------------" \
-				"--------------------");           \
-		_Generic((v1),                             \
-			int: println("%i != %i", v1, v2),      \
-			float: println("%f != %f", v1, v2),    \
-			byte: println("%i != %i", v1, v2),     \
-			bool: println("%i != %i", v1, v2),     \
-			void *: println("%p != %p", v1, v2),   \
-			int *: println("%p != %p", v1, v2),    \
-			default: ({}));                        \
-		fail_assert();                             \
+#define fam_assert_eq(v1, v2)                                   \
+	if ((v1) != (v2)) {                                         \
+		if (fail_count == 0)                                    \
+			printf(                                             \
+				"--------------------------------"              \
+				"--------------------------------"              \
+				"--------------------------------"              \
+				"--------------------");                        \
+		_Generic((v1),                                          \
+			float: printf("%f != %f", v1, v2),                  \
+			unsigned char: printf("%i != %i", v1, v2),          \
+			unsigned long long: printf("%llu != %llu", v1, v2), \
+			void *: printf("%p != %p", v1, v2),                 \
+			long long: printf("%lli != %lli", v1, v2),          \
+			int *: printf("%p != %p", v1, v2),                  \
+			int: printf("%i != %i", v1, v2),                    \
+			default: ({}));                                     \
+		fail_assert();                                          \
 	}
 
-#define Suite(name)                          \
-	int main() {                             \
-		bool success = execute_tests(#name); \
-		if (!success) {                      \
-			return -1;                       \
-		}                                    \
-		return 0;                            \
+#define Suite(name)                         \
+	int main() {                            \
+		int success = execute_tests(#name); \
+		if (!success) {                     \
+			return -1;                      \
+		}                                   \
+		return 0;                           \
 	}
 
-#define Test(name)                                                  \
-	void _tfwork_##name(const byte *test_dir);                      \
-	static void __attribute__((constructor)) __test_init_##name() { \
-		if (test_count > MAX_TESTS)                                 \
-			panic("Too many tests (MAX=%i)", MAX_TESTS);            \
-		int name_len = cstring_len(#name);                          \
-		if (name_len > MAX_TEST_NAME)                               \
-			panic("test name: '%s' too long!", #name);              \
-		test_arr[test_count] = &_tfwork_##name;                     \
-		copy_bytes(test_names[test_count], #name, name_len);        \
-		test_names[test_count][name_len] = 0;                       \
-		test_count++;                                               \
-	}                                                               \
-	void _tfwork_##name(const byte *test_dir)
+#define Test(name)                                                    \
+	void _tfwork_##name(const unsigned char *test_dir);               \
+	static void __attribute__((constructor)) __test_init_##name() {   \
+		if (test_count > MAX_TESTS)                                   \
+			panic("Too many tests (MAX=%i)", MAX_TESTS);              \
+		int name_len = cstring_len(#name);                            \
+		if (name_len > MAX_TEST_NAME)                                 \
+			panic("test name: '%s' too long!", #name);                \
+		test_arr[test_count] = &_tfwork_##name;                       \
+		copy_unsigned chars(test_names[test_count], #name, name_len); \
+		test_names[test_count][name_len] = 0;                         \
+		test_count++;                                                 \
+	}                                                                 \
+	void _tfwork_##name(const unsigned char *test_dir)

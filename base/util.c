@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/types.h>
 #include <base/util.h>
 
-void copy_bytes(byte *dst, const byte *src, uint64 n) {
-	for (uint64 i = 0; i < n; i++) {
+void copy_bytes(unsigned char *dst, const unsigned char *src,
+				unsigned long long n) {
+	for (unsigned long long i = 0; i < n; i++) {
 		dst[i] = src[i];
 	}
 }
 
-void set_bytes(byte *ptr, byte x, uint64 n) {
-	for (uint64 i = 0; i < n; i++) ptr[i] = x;
+void set_bytes(unsigned char *ptr, unsigned char x, unsigned long long n) {
+	for (unsigned long long i = 0; i < n; i++) ptr[i] = x;
 }
 
-uint64 cstring_len(const char *S) {
+unsigned long long cstring_len(const char *S) {
 	const char *s = S;
 	while (*S) S++;
 	return S - s;
@@ -41,7 +41,7 @@ int cstring_compare(const char *X, const char *Y) {
 	return 0;
 }
 
-int cstring_compare_n(const byte *X, const byte *Y, uint64 n) {
+int cstring_compare_n(const char *X, const char *Y, unsigned long long n) {
 	while (n && *X == *Y) {
 		n--;
 		X++;

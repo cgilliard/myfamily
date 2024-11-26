@@ -16,17 +16,17 @@
 #include <base/print_util.h>
 #include <base/util.h>
 
-_Thread_local byte err_last[ERR_LEN + 1] = {""};
+_Thread_local char err_last[ERR_LEN + 1] = {""};
 
-_Thread_local int64 err = NoErrors;
+_Thread_local long long err = NoErrors;
 
-const byte *get_err() {
+const unsigned char *get_err() {
 	int len = cstring_len(FamErrText[err]);
 	if (len > ERR_LEN) len = ERR_LEN;
 	copy_bytes(err_last, FamErrText[err], len);
 	return err_last;
 }
 
-void print_err(const byte *text) {
-	println("%s: %s", FamErrText[err], text);
+void print_err(const char *text) {
+	// println("%s: %s", FamErrText[err], text);
 }

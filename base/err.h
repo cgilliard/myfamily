@@ -16,61 +16,28 @@
 #define _BASE_ERR__
 
 #include <base/macro_util.h>
-#include <base/types.h>
 
 #define ERR_LEN 64
 
 #define DEFINE_ERR(e)                                               \
 	typedef enum FamErr { FOR_EACH(SECOND, none, (, ), e) } FamErr; \
-	static const byte *FamErrText[] = {                             \
+	static const unsigned char *FamErrText[] = {                    \
 		FOR_EACH(SECOND_STRINGIFY, none, (, ), e)};
 
 // Define FamErr enum values
 // clang-format off
 #define ERR_VALUES                                                                              \
 	NoErrors, \
-	IllegalArgument, \
-	Overflow, \
-	Underflow, \
-	LockInitErr, \
-	InitErr, \
-	ConnectionRefused, \
-	InvalidAddr, \
-	AlreadyInitialized, \
-	IndexOutOfBounds, \
-	POpenErr, \
-	IO, \
-	Busy, \
-	CapacityExceeded, \
-	FileNotFound, \
-	NotADirectory, \
-	UnsupportedOperation, \
-	UnsupportedVersion, \
-	FileCorrupted, \
-	IllegalState, \
-	MaxFds, \
-	TooBig, \
-	ResourceNotAvailable, \
-	NoStream, \
-	Permission, \
-	BacktraceErr, \
-	ExpectedTypeMismatch, \
-	OutOfSpace, \
-	MaxPathErr, \
-	AllocErr, \
-	TypeMismatch, \
-	ObjectConsumed, \
-	DuplicateSizes, \
-	NotYetImplemented
+	AllocErr
 // clang-format on
 
 DEFINE_ERR(ERR_VALUES);
 
-extern _Thread_local byte err_last[ERR_LEN + 1];
-extern _Thread_local int64 err;
+extern _Thread_local char err_last[ERR_LEN + 1];
+extern _Thread_local long long err;
 
-void print_err(const byte *text);
-const byte *get_err();
+void print_err(const char *text);
+const unsigned char *get_err();
 
 #define SetErr(err_value) ({ err = err_value; })
 

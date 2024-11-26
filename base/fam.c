@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_BLOCK__
-#define _BASE_BLOCK__
+#include <base/fam.h>
 
-#include <base/cache.h>
-#include <base/slabs.h>
-#include <base/types.h>
-
-#define BLOCK_SIZE PAGE_SIZE
-
-Block *block_load(int64 id);
-const Block *block_load_rw(int64 id);
-void block_free(Block *item);
-
-void init_block();
-void block_cleanup();
-
-#endif	// _BASE_BLOCK__
+Object send(Channel channel, Object object) {
+	return 0;
+}
+Channel run(Object (*task)(Channel channel)) {
+	Channel ch;
+	return ch;
+}
+Object recv(Channel channel, int timeout_millis) {
+	return 0;
+}
+Object init(int (*init)(), int threads) {
+	return 0;
+}

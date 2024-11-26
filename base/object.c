@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/bitmap.h>
-#include <base/block.h>
-#include <base/cache.h>
-#include <base/colors.h>
-#include <base/print_util.h>
-#include <base/slabs.h>
-#include <base/sys.h>
-#include <base/types.h>
-#include <base/util.h>
+#include <base/object.h>
+
+Object object(ObjectType type, void *value) {
+	return 0;
+}
+Object box(long long size) {
+	return 0;
+}
