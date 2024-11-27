@@ -98,8 +98,8 @@ int execute_tests(unsigned char *name) {
 				rmrf(test_dir);
 			}
 		} else {
-			println("%sFAIL:%s test '%s%s%s' failed!", BRIGHT_RED, RESET, GREEN,
-					test_names[i], RESET);
+			printf("%sFAIL:%s test '%s%s%s' failed!\n", BRIGHT_RED, RESET,
+				   GREEN, test_names[i], RESET);
 			fail_count++;
 		}
 	}
@@ -109,27 +109,27 @@ int execute_tests(unsigned char *name) {
 		(end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec);
 
 	if (fail_count)
-		println(
+		printf(
 			"--------------------------------"
 			"--------------------------------"
 			"--------------------------------"
-			"--------------------");
-	println(
+			"--------------------\n");
+	printf(
 		"[%s====%s] Tested: %s%i%s | Passing: %s%i%s | Failing: %s%i%s "
-		"(Execution time: %s%f%ss)",
+		"(Execution time: %s%f%ss)\n",
 		BLUE, RESET, YELLOW, test_exe_count, RESET, GREEN,
 		test_exe_count - fail_count, RESET, CYAN, fail_count, RESET, CYAN,
 		time_ns / 1e9, RESET);
 
-	println(
+	printf(
 		"[%s================================"
 		"================================================"
-		"===================================%s]",
+		"===================================%s]\n",
 		BLUE, RESET);
 
 	if (fail_count != 0)
-		println("%sFAIL:%s Test suite %s%s%s failed!", BRIGHT_RED, RESET, GREEN,
-				name, RESET);
+		printf("%sFAIL:%s Test suite %s%s%s failed!\n", BRIGHT_RED, RESET,
+			   GREEN, name, RESET);
 
 	return fail_count == 0;
 }

@@ -27,6 +27,7 @@ void __attribute__((constructor)) __check_sizes() {
 	arch(int, 4);
 	arch(long long, 8);
 	arch(unsigned long long, 8);
+	arch(unsigned long, 8);
 	arch(__uint128_t, 16);
 	arch(char, 1);
 	arch(unsigned char, 1);

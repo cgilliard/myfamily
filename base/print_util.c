@@ -13,20 +13,21 @@
 // limitations under the License.
 
 #include <base/fam.h>
+#include <base/object.h>
 #include <base/print_util.h>
-#include <sys/types.h>	// for size_t
+#include <base/sys.h>
+#include <base/util.h>
 
-int vsnprintf(char *s, size_t n, const char *formt, va_list args);
+// int vsnprintf(char *s, size_t n, const char *formt, va_list args);
+int printf(const char *fmt, ...);
 #define va_end(...) __builtin_va_end(__VA_ARGS__)
 #define va_start(...) __builtin_va_start(__VA_ARGS__)
+#define va_arg(...) __builtin_va_arg(__VA_ARGS__)
 
 int _debug_print_util_disable__ = 0;
 
-#include <stdio.h>
-
 long long prot_send(char *buf, long long len) {
-	printf("%s", buf);
-	return 0;
+	return printf("%s", buf);
 }
 
 void panic(const char *fmt, ...) {
@@ -77,5 +78,5 @@ int sprint(char *str, unsigned long long capacity, const char *fmt, ...) {
 
 int vsprint(char *str, unsigned long long capacity, const char *fmt,
 			va_list args) {
-	return vsnprintf(str, capacity, fmt, args);
+	return __builtin_vsnprintf(str, capacity, fmt, args);
 }

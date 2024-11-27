@@ -20,7 +20,12 @@ void copy_bytes(unsigned char *dest, const unsigned char *src,
 void set_bytes(unsigned char *dst, unsigned char b, unsigned long long n);
 unsigned long long cstring_len(const char *S);
 int cstring_compare(const char *s1, const char *s2);
-int cstring_compare_n(const unsigned char *s1, const unsigned char *s2,
-					  unsigned long long n);
+int cstring_compare_n(const char *s1, const char *s2, unsigned long long n);
+const char *cstring_strstr(const char *X, const char *Y);
+void reverse(unsigned char *str, long long end);
+unsigned long long cstring_itoau64(unsigned long long num, char *str, int base,
+								   unsigned long long capacity);
+unsigned long long cstring_itoai64(long long num, char *str, int base,
+								   unsigned long long capacity);
 
 #endif	// _BASE_UTIL__

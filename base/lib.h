@@ -14,6 +14,8 @@
 
 #include <base/channel.h>
 #include <base/fam.h>
+#include <base/limits.h>
 #include <base/lock.h>
 #include <base/object.h>
 #include <base/print_util.h>
+#include <base/util.h>

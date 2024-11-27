@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_SYS__
-#define _BASE_SYS__
+#define INT64_MAX ((long long)0x7FFFFFFFFFFFFFFFLL)
+#define INT64_MIN (-INT64_MAX - 1)
 
-typedef unsigned long size_t;
-
-int getpagesize();
-void sched_yield();
-int munmap(void *addr, size_t n);
-
-#endif	// _BASE_SYS__
+#define INT32_MAX ((int)0x7FFFFFFF)
+#define INT32_MIN (-INT32_MAX - 1)

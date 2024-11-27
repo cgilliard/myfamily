@@ -113,3 +113,46 @@ Test(test_lock) {
 	// lower bits are set to 0 now
 	assert_eq(l1 & 0xFFFFFFFF, 0x00000000);
 }
+
+Test(util) {
+	char arr1[10];
+	for (int i = 0; i < 10; i++) arr1[i] = 2;
+	set_bytes(arr1, '\0', 10);
+	for (int i = 0; i < 10; i++) assert_eq(arr1[i], 0);
+
+	char s1[10];
+	strcpy(s1, "abcdefghi");
+	reverse(s1, cstring_len(s1));
+
+	char s2[10];
+	int len = cstring_itoau64(123, s2, 10, 9);
+	s2[len] = 0;
+
+	assert(!cstring_compare("123", s2));
+
+	len = cstring_itoau64(0, s2, 10, 9);
+	s2[len] = 0;
+	assert(!cstring_compare("0", s2));
+
+	char s3[10];
+	len = cstring_itoai64(-100, s3, 10, 9);
+	assert_eq(len, 4);
+	s3[len] = 0;
+	assert(!cstring_compare("-100", s3));
+
+	char s4[10];
+	len = cstring_itoai64(40, s4, 10, 9);
+	assert_eq(len, 2);
+	s4[len] = 0;
+	assert(!cstring_compare("40", s4));
+}
+
+#pragma GCC diagnostic ignored "-Winteger-overflow"
+#pragma clang diagnostic ignored "-Winteger-overflow"
+
+Test(limits) {
+	assert_eq(INT64_MIN - 1, INT64_MAX);
+	assert_eq(INT64_MAX + 1, INT64_MIN);
+	assert_eq(INT32_MIN - 1, INT32_MAX);
+	assert_eq(INT32_MAX + 1, INT32_MIN);
+}
