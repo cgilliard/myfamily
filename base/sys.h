@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_UTIL__
-#define _BASE_UTIL__
+#ifndef _BASE_SYS__
+#define _BASE_SYS__
 
-void copy_bytes(unsigned char *dest, const unsigned char *src,
-				unsigned long long n);
-void set_bytes(unsigned char *dst, unsigned char b, unsigned long long n);
-unsigned long long cstring_len(const char *S);
-int cstring_compare(const char *s1, const char *s2);
-int cstring_compare_n(const unsigned char *s1, const unsigned char *s2,
-					  unsigned long long n);
+#include <sys/types.h>
 
-#endif	// _BASE_UTIL__
+int getpagesize();
+int munmap(void *addr, size_t n);
+
+#endif	// _BASE_SYS__

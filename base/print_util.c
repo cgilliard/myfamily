@@ -17,23 +17,15 @@
 #include <sys/types.h>	// for size_t
 
 int vsnprintf(char *s, size_t n, const char *formt, va_list args);
-
-#define STDERR 0
-#define STDOUT 2
+#define va_end(...) __builtin_va_end(__VA_ARGS__)
+#define va_start(...) __builtin_va_start(__VA_ARGS__)
 
 int _debug_print_util_disable__ = 0;
 
+#include <stdio.h>
+
 long long prot_send(char *buf, long long len) {
-	/*
-		if (_debug_print_util_disable__) return 0;
-		long long sum = 0;
-		while (sum < len) {
-			long long cur = transmit(STDOUT, buf, len);
-			if (cur == -1) return -1;
-			sum += cur;
-		}
-		return sum;
-	*/
+	printf("%s", buf);
 	return 0;
 }
 
@@ -41,11 +33,10 @@ void panic(const char *fmt, ...) {
 	prot_send("Panic: ", 7);
 	va_list args;
 	va_start(args, fmt);
-	print(fmt, args);
+	vprint(fmt, args);
 	va_end(args);
 	prot_send("\n", 1);
-	if (!_debug_print_util_disable__) /*halt(-1);*/
-		;
+	if (!_debug_print_util_disable__) halt(-1);
 }
 
 int println(const char *fmt, ...) {

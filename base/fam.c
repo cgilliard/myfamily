@@ -12,18 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define _XOPEN_SOURCE
 #include <base/fam.h>
+#include <base/print_util.h>
+#include <ucontext.h>
+
+// system calls:
+void __attribute__((noreturn)) _exit(int code);
 
 Object send(Channel channel, Object object) {
 	return 0;
 }
 Channel run(Object (*task)(Channel channel)) {
-	Channel ch;
-	return ch;
+	Channel channel;
+	return channel;
 }
 Object recv(Channel channel, int timeout_millis) {
 	return 0;
 }
-Object init(int (*init)(), int threads) {
+Object init(Object (*init)(Channel channel), int threads) {
 	return 0;
+}
+
+void __attribute__((noreturn)) halt(int code) {
+	_exit(code);
 }

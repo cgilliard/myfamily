@@ -13,10 +13,67 @@
 // limitations under the License.
 
 #include <base/object.h>
+#include <base/print_util.h>
 
-Object object(ObjectType type, void *value) {
-	return 0;
+typedef struct ObjectImpl {
+	unsigned long long type;
+	union {
+		unsigned char bytes[8];
+		long long int_value;
+		unsigned long long uint_value;
+		double float_value;
+		int code_value;
+		void *ptr_value;
+	} value;
+} ObjectImpl;
+
+void __attribute__((constructor)) __confirm_object_impl() {
+	if (sizeof(ObjectImpl) != sizeof(__int128_t)) {
+		panic("sizeof(ObjectImpl) (%lu) != sizeof(Object) (%lu)",
+			  sizeof(ObjectImpl), sizeof(Object));
+	}
 }
+
+Object object_int(long long value) {
+	ObjectImpl ret = {.type = Int};
+	ret.value.int_value = value;
+	return *((Object *)&ret);
+}
+
+Object object_uint(unsigned long long value) {
+	ObjectImpl ret = {.type = UInt};
+	ret.value.uint_value = value;
+	return *((Object *)&ret);
+}
+
+Object object_float(double value) {
+	ObjectImpl ret = {.type = Float};
+	ret.value.float_value = value;
+	return *((Object *)&ret);
+}
+
+Object object_function(void *fn) {
+	ObjectImpl ret = {.type = Function};
+	ret.value.ptr_value = fn;
+	return *((Object *)&ret);
+}
+
+Object object_err(int code) {
+	ObjectImpl ret = {.type = Err};
+	ret.value.code_value = code;
+	return *((Object *)&ret);
+}
+
 Object box(long long size) {
 	return 0;
+}
+
+const void *value_of(const Object *obj) {
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	if (impl->type == Function) return impl->value.ptr_value;
+	return &impl->value.bytes;
+}
+
+ObjectType object_type(const Object *obj) {
+	return ((ObjectImpl *)obj)->type;
 }

@@ -41,7 +41,8 @@ int cstring_compare(const char *X, const char *Y) {
 	return 0;
 }
 
-int cstring_compare_n(const char *X, const char *Y, unsigned long long n) {
+int cstring_compare_n(const unsigned char *X, const unsigned char *Y,
+					  unsigned long long n) {
 	while (n && *X == *Y) {
 		n--;
 		X++;

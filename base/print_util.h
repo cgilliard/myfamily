@@ -15,11 +15,7 @@
 #ifndef _BASE_PRINT_UTIL__
 #define _BASE_PRINT_UTIL__
 
-#ifndef va_list
 #define va_list __builtin_va_list
-#define va_start(args, n) __builtin_va_start(args, n)
-#define va_end(args) __builtin_va_end(args)
-#endif	// va_list
 
 int println(const char *fmt, ...);
 int print(const char *fmt, ...);
@@ -28,9 +24,5 @@ int sprint(char *str, unsigned long long capacity, const char *fmt, ...);
 int vsprint(char *str, unsigned long long capacity, const char *fmt,
 			va_list args);
 void panic(const char *fmt, ...);
-
-#ifdef TEST
-extern int _debug_print_util_disable__;
-#endif	// TEST
 
 #endif	// _BASE_PRINT_UTIL__

@@ -12,15 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_UTIL__
-#define _BASE_UTIL__
-
-void copy_bytes(unsigned char *dest, const unsigned char *src,
-				unsigned long long n);
-void set_bytes(unsigned char *dst, unsigned char b, unsigned long long n);
-unsigned long long cstring_len(const char *S);
-int cstring_compare(const char *s1, const char *s2);
-int cstring_compare_n(const unsigned char *s1, const unsigned char *s2,
-					  unsigned long long n);
-
-#endif	// _BASE_UTIL__
+#include <base/channel.h>
+#include <base/fam.h>
+#include <base/lock.h>
+#include <base/object.h>
+#include <base/print_util.h>

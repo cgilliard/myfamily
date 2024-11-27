@@ -12,21 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/err.h>
-#include <base/print_util.h>
-#include <base/util.h>
+#ifndef _BASE_LOCK__
+#define _BASE_LOCK__
 
-_Thread_local char err_last[ERR_LEN + 1] = {""};
+#define INIT_LOCK (0)
 
-_Thread_local long long err = NoErrors;
+typedef long long Lock;
 
-const unsigned char *get_err() {
-	int len = cstring_len(FamErrText[err]);
-	if (len > ERR_LEN) len = ERR_LEN;
-	copy_bytes(err_last, FamErrText[err], len);
-	return err_last;
-}
+#define lockr(l) lock_read(l)
+#define lockw(l) lock_write(l)
+#define locku(l) lock_upgrade(l)
+#define lockd(l) lock_downgrade(l)
 
-void print_err(const char *text) {
-	// println("%s: %s", FamErrText[err], text);
-}
+Lock lock_create();
+void lock_read(Lock *lock);
+void lock_write(Lock *lock);
+void lock_unlock(Lock *lock);
+void lock_upgrade(Lock *lock);
+void lock_downgrade(Lock *lock);
+
+#endif	// _BASE_LOCK__

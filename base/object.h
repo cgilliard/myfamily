@@ -19,13 +19,46 @@ typedef __int128_t Object;
 
 typedef enum ObjectType {
 	Int,
+	UInt,
 	Float,
 	Box,
 	Function,
 	Err,
 } ObjectType;
 
-Object object(ObjectType type, void *value);
+#define $(v)                                                                   \
+	_Generic((v),                                                              \
+		double: object_float(_Generic((v), double: v, default: 0)),            \
+		float: object_float(_Generic((v), float: v, default: 0)),              \
+		long long: object_int(_Generic((v), long long: v, default: 0)),        \
+		int: object_int(_Generic((v), int: v, default: 0)),                    \
+		unsigned long long: object_uint(                                       \
+				 _Generic((v), unsigned long long: v, default: 0)),            \
+		unsigned int: object_uint(_Generic((v), unsigned int: v, default: 0)), \
+		default: ({                                                            \
+				 object_function(_Generic((v),                                 \
+					 double: 0,                                                \
+					 int: 0,                                                   \
+					 long long: 0,                                             \
+					 unsigned long long: 0,                                    \
+					 default: v));                                             \
+			 }))
+
+#define $fn(v) value_of(v)
+#define $int(obj) (*(long long *)value_of(&obj))
+#define $float(obj) (*(double *)value_of(&obj))
+#define $uint(obj) (*(unsigned long long *)value_of(&obj))
+#define let const Object
+#define var Object
+
+Object object_int(long long value);
+Object object_uint(unsigned long long value);
+Object object_float(double value);
+Object object_function(void *fn);
+Object object_err(int code);
 Object box(long long size);
+const void *value_of(const Object *obj);
+const void *value_of_fn(const Object *obj);
+ObjectType object_type(const Object *obj);
 
 #endif	// _BASE_OBJECT__
