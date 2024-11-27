@@ -147,7 +147,7 @@ Test(util) {
 	assert(!cstring_compare("40", s4));
 }
 
-#pragma GCC diagnostic ignored "-Winteger-overflow"
+#pragma GCC diagnostic ignored "-Woverflow"
 #pragma clang diagnostic ignored "-Winteger-overflow"
 
 Test(limits) {
