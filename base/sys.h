@@ -15,7 +15,7 @@
 #ifndef _BASE_SYS__
 #define _BASE_SYS__
 
-#include <sys/types.h>
+typedef unsigned long long size_t;
 
 int getpagesize();
 void sched_yield();
