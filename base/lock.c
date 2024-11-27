@@ -15,7 +15,7 @@
 #include <base/atomic.h>
 #include <base/lock.h>
 #include <base/print_util.h>
-#include <sched.h>
+#include <base/sys.h>
 
 #define MAX_LOCK_LEVEL 128
 _Thread_local char _lock_is_write__[MAX_LOCK_LEVEL + 1] = {};

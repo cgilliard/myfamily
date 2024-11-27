@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef __linux__
+#define _XOPEN_SOURCE 500
+#endif	// __linux__
 #include <base/colors.h>
 #include <base/test.h>
 #include <base/util.h>
@@ -70,7 +73,7 @@ int rmrf(char *path) {
 
 int execute_tests(unsigned char *name) {
 	struct timespec start, end;
-	bool success[test_count];
+	char success[test_count];
 	clock_gettime(CLOCK_MONOTONIC, &start);
 	int test_exe_count = 0;
 
@@ -149,7 +152,7 @@ void fail_assert() {
 			len--;
 		}
 		if (last_plus > 0) {
-			byte *addr = strings[i] + last_plus + 1;
+			unsigned char *addr = strings[i] + last_plus + 1;
 			int itt = 0;
 			while (addr[itt]) {
 				if (addr[itt] == ')') {

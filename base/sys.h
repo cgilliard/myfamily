@@ -18,6 +18,7 @@
 #include <sys/types.h>
 
 int getpagesize();
+void sched_yield();
 int munmap(void *addr, size_t n);
 
 #endif	// _BASE_SYS__
