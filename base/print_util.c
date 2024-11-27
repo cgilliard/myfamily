@@ -24,59 +24,25 @@ int printf(const char *fmt, ...);
 #define va_start(...) __builtin_va_start(__VA_ARGS__)
 #define va_arg(...) __builtin_va_arg(__VA_ARGS__)
 
-int _debug_print_util_disable__ = 0;
-
-long long prot_send(char *buf, long long len) {
-	return printf("%s", buf);
-}
-
-void panic(const char *fmt, ...) {
-	prot_send("Panic: ", 7);
+long long print_impl(Channel *channel, char *buffer, long long capacity,
+					 int newline, int exit, const char *prefix, const char *fmt,
+					 ...) {
 	va_list args;
 	va_start(args, fmt);
-	vprint(fmt, args);
+	Printable p;
+
+	do {
+		p = va_arg(args, Printable);
+		printf("p.type=%i,", p.type);
+		if (p.type == PrintTypeInt) printf("intv=%lli", p.value.int_value);
+		if (p.type == PrintTypeUInt) printf("uintv=%llu", p.value.uint_value);
+		if (p.type == PrintTypeFloat) printf("floatv=%f", p.value.float_value);
+		if (p.type == PrintTypeString)
+			printf("stringv=%s", p.value.string_value);
+		printf("\n");
+
+	} while (p.type != PrintTypeTerm);
+
 	va_end(args);
-	prot_send("\n", 1);
-	if (!_debug_print_util_disable__) halt(-1);
-}
-
-int println(const char *fmt, ...) {
-	va_list args;
-	va_start(args, fmt);
-	int ret = vprint(fmt, args);
-	va_end(args);
-	prot_send("\n", 1);
-	return ret;
-}
-
-int print(const char *fmt, ...) {
-	va_list args;
-	va_start(args, fmt);
-	int ret = vprint(fmt, args);
-	va_end(args);
-	return ret;
-}
-
-int vprint(const char *fmt, va_list args) {
-	va_list args2;
-	__builtin_va_copy(args2, args);
-	int reqd = vsprint(0, 0, fmt, args);
-	if (reqd < 0) return reqd;
-	char buf[reqd + 1];
-	int len = vsprint(buf, reqd + 1, fmt, args2);
-	va_end(args2);
-	return prot_send(buf, len);
-}
-
-int sprint(char *str, unsigned long long capacity, const char *fmt, ...) {
-	va_list args;
-	va_start(args, fmt);
-	int ret = vsprint(str, capacity, fmt, args);
-	va_end(args);
-	return ret;
-}
-
-int vsprint(char *str, unsigned long long capacity, const char *fmt,
-			va_list args) {
-	return __builtin_vsnprintf(str, capacity, fmt, args);
+	return 0;
 }

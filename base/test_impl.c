@@ -182,7 +182,7 @@ void fail_assert() {
 					n = 0;
 			}
 			if (strstr(output, "_tfwork_"))
-				print("Assertion failure: %s", output);
+				printf("Assertion failure: %s", output);
 			pclose(fp);
 		}
 #else	// MACOS
@@ -203,9 +203,9 @@ void fail_assert() {
 
 			FILE *fp = popen(command, "r");
 			char buffer[128];
-			print("Assertion failure: ");
+			printf("Assertion failure: ");
 			while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-				print("%s", buffer);  // Print each line from atos output
+				printf("%s", buffer);  // Print each line from atos output
 			}
 
 			pclose(fp);

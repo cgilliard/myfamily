@@ -15,6 +15,21 @@
 #ifndef _BASE_CHANNEL__
 #define _BASE_CHANNEL__
 
+#define STDIN          \
+	(Channel) {        \
+		.value = { 0 } \
+	}
+
+#define STDOUT         \
+	(Channel) {        \
+		.value = { 1 } \
+	}
+
+#define STDERR         \
+	(Channel) {        \
+		.value = { 2 } \
+	}
+
 typedef struct Channel {
 	unsigned char value[32];
 } Channel;

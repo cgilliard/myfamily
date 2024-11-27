@@ -147,6 +147,10 @@ Test(util) {
 	assert(!cstring_compare("40", s4));
 }
 
+Test(print_util) {
+	// println("test {} {} {} {}", 1, 20LL, 30ULL, "ok", 1.2);
+}
+
 #pragma GCC diagnostic ignored "-Woverflow"
 #pragma clang diagnostic ignored "-Winteger-overflow"
 

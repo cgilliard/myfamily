@@ -35,14 +35,12 @@ typedef enum ObjectType {
 		unsigned long long: object_uint(                                       \
 				 _Generic((v), unsigned long long: v, default: 0)),            \
 		unsigned int: object_uint(_Generic((v), unsigned int: v, default: 0)), \
-		default: ({                                                            \
-				 object_function(_Generic((v),                                 \
-					 double: 0,                                                \
-					 int: 0,                                                   \
-					 long long: 0,                                             \
-					 unsigned long long: 0,                                    \
-					 default: v));                                             \
-			 }))
+		default: object_function(_Generic((v),                                 \
+		double: 0,                                                             \
+		int: 0,                                                                \
+		long long: 0,                                                          \
+		unsigned long long: 0,                                                 \
+		default: v)))
 
 #define $fn(v) value_of(v)
 #define $int(obj) (*(long long *)value_of(&obj))
