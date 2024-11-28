@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/bitmap.h>
-#include <base/channel.h>
-#include <base/fam.h>
-#include <base/limits.h>
-#include <base/lock.h>
+#ifndef _BASE_SLABS__
+#define _BASE_SLABS__
+
 #include <base/object.h>
-#include <base/print_util.h>
-#include <base/slabs.h>
-#include <base/util.h>
+
+#define SLAB_ALLOCATOR_IMPL_SIZE 128
+typedef struct SlabAllocator {
+	unsigned char impl[SLAB_ALLOCATOR_IMPL_SIZE];
+} SlabAllocator;
+
+#define SLAB_LIST_SIZE 32
+
+Object slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
+						   unsigned int max_free_slabs,
+						   unsigned int max_total_slabs);
+void slab_allocator_cleanup(SlabAllocator *sa);
+void *slab_allocator_allocate(SlabAllocator *sa);
+void slab_allocator_free(SlabAllocator *sa, void *slab);
+
+#endif	// _BASE_SLABS__

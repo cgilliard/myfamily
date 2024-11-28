@@ -72,6 +72,7 @@ Object bitmap_allocate(BitMap *m) {
 	int found;
 	unsigned long long updated, initial, x;
 	long long *cur = impl->ptrs[ctx->index / BITS_LEN];
+	long long *first = cur;
 	while (cur) {
 		do {
 			initial = ALOAD(&cur[ctx->index % BITS_LEN]);
@@ -83,8 +84,14 @@ Object bitmap_allocate(BitMap *m) {
 		if (found) {
 			return $((ctx->index << 6) | x);
 		}
-		if (++(ctx->index) % BITS_LEN == 0)
+		if (++(ctx->index) % BITS_LEN == 0) {
 			cur = impl->ptrs[ctx->index / BITS_LEN];
+			if (cur == 0) {
+				ctx->index = 0;
+				cur = impl->ptrs[ctx->index / BITS_LEN];
+			}
+			if (cur == first) break;
+		}
 	}
 	return Err(CapacityExceeded);
 }

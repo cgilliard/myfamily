@@ -174,6 +174,63 @@ Test(bitmap) {
 	munmap(addr, getpagesize() * 1);
 }
 
+#define PAGE_SIZE (getpagesize())
+int count = 1000;
+int size = 500;
+int alloc_size = 64 - SLAB_LIST_SIZE;
+
+Test(slab_allocator) {
+	SlabAllocator sa1;
+	Object res = slab_allocator_init(&sa1, alloc_size, size + 5, size + 5);
+	assert(object_type(&res) != Err);
+	unsigned char **arr =
+		mmap(0, (1 + (size * sizeof(unsigned char *)) / PAGE_SIZE) * PAGE_SIZE,
+			 PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+	for (long long i = 0; i < count; i++) {
+		for (long long j = 0; j < size; j++) {
+			arr[j] = slab_allocator_allocate(&sa1);
+			for (int k = 0; k < alloc_size; k++)
+				arr[j][k] = ((i + j + k) % 26) + 'a';
+		}
+
+		for (long long j = 0; j < size; j++) {
+			for (int k = 0; k < alloc_size; k++) {
+				assert_eq(arr[j][k], ((i + j + k) % 26) + 'a');
+			}
+			slab_allocator_free(&sa1, arr[j]);
+		}
+	}
+
+	slab_allocator_cleanup(&sa1);
+	munmap(arr, (1 + (size * sizeof(unsigned char *)) / PAGE_SIZE) * PAGE_SIZE);
+}
+
+#include <stdlib.h>
+
+Test(malloc) {
+	unsigned char **arr =
+		mmap(0, (1 + (size * sizeof(unsigned char *)) / PAGE_SIZE) * PAGE_SIZE,
+			 PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+	for (long long i = 0; i < count; i++) {
+		for (long long j = 0; j < size; j++) {
+			arr[j] = malloc(alloc_size);
+			for (int k = 0; k < alloc_size; k++)
+				arr[j][k] = ((i + j + k) % 26) + 'a';
+		}
+
+		for (long long j = 0; j < size; j++) {
+			for (int k = 0; k < alloc_size; k++) {
+				assert_eq(arr[j][k], ((i + j + k) % 26) + 'a');
+			}
+			free(arr[j]);
+		}
+	}
+
+	munmap(arr, (1 + (size * sizeof(unsigned char *)) / PAGE_SIZE) * PAGE_SIZE);
+}
+
 Test(print_util) {
 	/*
 		let obj = $(123);

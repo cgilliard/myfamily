@@ -27,6 +27,7 @@
 #define ERR_VALUES                                                                              \
         NoErrors, \
         IllegalArgument, \
+	AllocErr, \
         Overflow, \
         CapacityExceeded, \
         NotYetImplemented

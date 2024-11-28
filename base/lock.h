@@ -23,6 +23,7 @@ typedef long long Lock;
 #define lockw(l) lock_write(l)
 #define locku(l) lock_upgrade(l)
 #define lockd(l) lock_downgrade(l)
+#define unlock(l) lock_unlock(l)
 
 Lock lock_create();
 void lock_read(Lock *lock);
