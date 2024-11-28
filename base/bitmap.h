@@ -24,7 +24,7 @@ typedef struct BitMap {
 
 Object bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs);
 Object bitmap_allocate(BitMap *m);
-void bitmap_free(BitMap *m, unsigned long long index);
+void bitmap_free(BitMap *m, Object index);
 
 void bitmap_cleanup(BitMap *m);
 Object bitmap_ptr_count(BitMap *m);

@@ -18,10 +18,6 @@
 #include <base/sys.h>
 #include <base/util.h>
 
-int snprintf(char *buf, unsigned long capacity, const char *fmt, ...);
-void __attribute__((noreturn)) _exit(int code);
-ssize_t write(int fd, const void *buf, size_t count);
-
 #define va_end(...) __builtin_va_end(__VA_ARGS__)
 #define va_start(...) __builtin_va_start(__VA_ARGS__)
 #define va_arg(...) __builtin_va_arg(__VA_ARGS__)
@@ -109,6 +105,6 @@ long long print_impl(Channel *channel, char *buffer, long long capacity,
 		write_data(fmt + itt, fmt_len - itt);
 	}
 	if (newline) write_data("\n", 1);
-	if (exit) _exit(-1);
+	if (exit) halt(-1);
 	return 0;
 }

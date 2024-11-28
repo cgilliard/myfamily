@@ -147,11 +147,38 @@ Test(util) {
 	assert(!cstring_compare("40", s4));
 }
 
+#include <sys/mman.h>
+int getpagesize();
+
+Test(bitmap) {
+	BitMap bm1;
+	void *addr = mmap(NULL, getpagesize() * 1, PROT_READ | PROT_WRITE,
+					  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	let bm = bitmap_init(&bm1, 1, addr);
+	void *addr2 = mmap(NULL, getpagesize() * 1, PROT_READ | PROT_WRITE,
+					   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	bitmap_extend(&bm1, addr2);
+	int size = 10;
+
+	for (int i = 0; i < size; i++) {
+		Object obj = bitmap_allocate(&bm1);
+		assert_eq(object_type(&obj), UInt);
+		assert_eq($int(obj), i);
+	}
+
+	for (unsigned long long i = 0; i < size; i++) {
+		Object obj = $(i);
+		bitmap_free(&bm1, obj);
+	}
+
+	munmap(addr, getpagesize() * 1);
+}
+
 Test(print_util) {
 	/*
 		let obj = $(123);
 		println("test 0={} 1={} 2={} 3={} 4={} 5={} 6={} ok done", 1, -20LL,
-	   30ULL, "ok", 1.2, obj, $(1.5));
+	   30ULL, "ok", 1.2, obj, $(1.5)); println("test");
 	*/
 }
 

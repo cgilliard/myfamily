@@ -15,12 +15,18 @@
 #ifndef _BASE_SYS__
 #define _BASE_SYS__
 
+#define _FILE_OFFSET_BITS 64
+
 typedef unsigned long size_t;
+typedef long long off_t;
 typedef long long ssize_t;
 
 int getpagesize();
 void sched_yield();
+void *mmap(void *addr, size_t length, int prot, int flags, int fd,
+		   off_t offset);
 int munmap(void *addr, size_t n);
 ssize_t write(int fd, const void *buf, size_t count);
+int snprintf(char *buf, unsigned long capacity, const char *fmt, ...);
 
 #endif	// _BASE_SYS__

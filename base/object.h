@@ -24,6 +24,7 @@ typedef enum ObjectType {
 	Box,
 	Function,
 	Err,
+	Unit,
 } ObjectType;
 
 #define $(v)                                                                   \
@@ -42,6 +43,7 @@ typedef enum ObjectType {
 		unsigned long long: 0,                                                 \
 		default: v)))
 
+#define Err(code) object_err(code)
 #define $fn(v) value_of(v)
 #define $int(obj) (*(long long *)value_of(&obj))
 #define $float(obj) (*(double *)value_of(&obj))

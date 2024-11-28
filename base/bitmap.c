@@ -14,6 +14,7 @@
 
 #include <base/atomic.h>
 #include <base/bitmap.h>
+#include <base/err.h>
 #include <base/lock.h>
 #include <base/print_util.h>
 #include <base/sys.h>
@@ -56,13 +57,12 @@ Object bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs) {
 	impl->index = AADD(&bitmap_index, 1);
 
 	if (impl->index >= MAX_BITMAPS) {
-		// SetErr(CapacityExceeded);
-		return -1;
+		return Err(CapacityExceeded);
 	}
 
 	bitmap_ctx[impl->index].index = 0;
 
-	return 0;
+	return $(0);
 }
 
 Object bitmap_allocate(BitMap *m) {
@@ -81,16 +81,16 @@ Object bitmap_allocate(BitMap *m) {
 			updated = initial | (0x1ULL << x);
 		} while (!CAS_SEQ(&cur[ctx->index % BITS_LEN], &initial, updated));
 		if (found) {
-			// return (ctx->index << 6) | x;
 			return $((ctx->index << 6) | x);
 		}
 		if (++(ctx->index) % BITS_LEN == 0)
 			cur = impl->ptrs[ctx->index / BITS_LEN];
 	}
-	return -1;
+	return Err(CapacityExceeded);
 }
 
-void bitmap_free(BitMap *m, unsigned long long index) {
+void bitmap_free(BitMap *m, Object obj) {
+	unsigned long long index = $uint(obj);
 	BitMapImpl *impl = (BitMapImpl *)m;
 	BitMapCtx *ctx = &bitmap_ctx[impl->index];
 
@@ -124,17 +124,17 @@ void bitmap_cleanup(BitMap *m) {
 }
 
 Object bitmap_ptr_count(BitMap *m) {
-	return ((BitMapImpl *)m)->ptr_count;
+	return $(((BitMapImpl *)m)->ptr_count);
 }
 
 Object bitmap_extend(BitMap *m, void *ptr) {
 	BitMapImpl *impl = (BitMapImpl *)m;
 	BitMapCtx *ctx = &bitmap_ctx[impl->index];
 	if (impl->ptr_count + 1 >= (PAGE_SIZE / 8) * impl->bitmap_ptr_pages)
-		return -1;
+		return Err(CapacityExceeded);
 
 	impl->ptrs[impl->ptr_count] = ptr;
 	impl->ptr_count++;
 
-	return 0;
+	return $(0);
 }

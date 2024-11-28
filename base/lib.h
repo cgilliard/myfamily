@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/bitmap.h>
 #include <base/channel.h>
 #include <base/fam.h>
 #include <base/limits.h>

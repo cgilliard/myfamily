@@ -65,7 +65,6 @@ const char *cstring_strstr(const char *X, const char *Y) {
 	}
 	return 0;
 }
-#include <stdio.h>
 
 void swap(unsigned char *X, unsigned long long x, unsigned long long y) {
 	unsigned char t = X[x];
@@ -83,10 +82,11 @@ unsigned long long cstring_itoau64(unsigned long long num, char *X, int base,
 	unsigned long long length = 0, i = 1;
 	for (unsigned long long num_copy = num; num_copy; num_copy /= base)
 		length++;
-	while (capacity-- && num) {
+	while (capacity && num) {
 		unsigned long long rem = num % base;
 		X[length - i++] = (rem > 9) ? (rem - 10) + 'A' : rem + '0';
 		num /= base;
+		capacity--;
 	}
 	if (length == 0 && capacity) X[length++] = '0';
 	if (length == 0) length++;
