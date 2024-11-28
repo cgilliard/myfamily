@@ -13,7 +13,17 @@
 // limitations under the License.
 
 #include <base/print_util.h>
-#include <base/sys.h>
+#include <sys/mman.h>
+
+int getpagesize();
+#define PAGE_SIZE (getpagesize())
+
+void *map(long long pages) {
+	if (pages == 0) return 0;
+	void *ret = mmap(0, pages * PAGE_SIZE, PROT_READ | PROT_WRITE,
+					 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	return ret;
+}
 
 static void check_arch(char *type, int actual, int expected) {
 	if (actual != expected)

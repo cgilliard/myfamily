@@ -19,7 +19,6 @@
 #include <base/print_util.h>
 #include <base/slabs.h>
 #include <base/sys.h>
-#include <sys/mman.h>
 
 #define PAGE_SIZE (getpagesize())
 
@@ -73,8 +72,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 	let bobj = bitmap_allocate(&impl->bm);
 	int id = $int(bobj);
 	if (id == -1) {
-		void *addr = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE,
-						  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+		void *addr = map(1);
 		if (addr == 0) return 0;
 		bitmap_extend(&impl->bm, addr);
 		id = bitmap_allocate(&impl->bm);
@@ -96,9 +94,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		unlock(&impl->lock);
 		lockw(&impl->lock);
 		if (impl->data == 0) {
-			impl->data =
-				(unsigned char ****)mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE,
-										 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			impl->data = (unsigned char ****)map(1);
 			if (impl->data == 0) alloc_err = 1;
 		}
 		unlock(&impl->lock);
@@ -109,9 +105,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		unlock(&impl->lock);
 		lockw(&impl->lock);
 		if (impl->data[i] == 0) {
-			impl->data[i] =
-				(unsigned char ***)mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE,
-										MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			impl->data[i] = (unsigned char ***)map(1);
 			if (impl->data[i] == 0) alloc_err = 1;
 		}
 		unlock(&impl->lock);
@@ -122,9 +116,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		unlock(&impl->lock);
 		lockw(&impl->lock);
 		if (impl->data[i][j] == 0) {
-			impl->data[i][j] =
-				(unsigned char **)mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE,
-									   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			impl->data[i][j] = (unsigned char **)map(1);
 			if (impl->data[i][j] == 0) alloc_err = 1;
 		}
 		unlock(&impl->lock);
@@ -135,9 +127,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		unlock(&impl->lock);
 		lockw(&impl->lock);
 		if (impl->data[i][j][k] == 0) {
-			impl->data[i][j][k] =
-				(unsigned char *)mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE,
-									  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			impl->data[i][j][k] = (unsigned char *)map(1);
 			if (impl->data[i][j][k] == 0) alloc_err = 1;
 		}
 		unlock(&impl->lock);
@@ -178,8 +168,7 @@ Object slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 	ASTORE(&impl->free_slabs, 0);
 	ASTORE(&impl->total_slabs, 0);
 
-	impl->bitmap_pages = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE,
-							  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	impl->bitmap_pages = map(1);
 	if (impl->bitmap_pages == 0) {
 		return Err(AllocErr);
 	}
@@ -189,8 +178,7 @@ Object slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 		munmap(impl->bitmap_pages, PAGE_SIZE);
 		return bm_status;
 	}
-	void *page0 = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE,
-					   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	void *page0 = map(1);
 	if (page0 == 0) {
 		munmap(impl->bitmap_pages, PAGE_SIZE);
 		return Err(AllocErr);
