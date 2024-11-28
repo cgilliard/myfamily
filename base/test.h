@@ -16,7 +16,6 @@
 #define MAX_TEST_NAME 1024
 
 #include <base/lib.h>
-#include <string.h>
 
 extern int test_count;
 extern int fail_count;
@@ -67,11 +66,11 @@ void fail_assert();
 	static void __attribute__((constructor)) __test_init_##name() { \
 		if (test_count > MAX_TESTS)                                 \
 			panic("Too many tests (MAX=%i)", MAX_TESTS);            \
-		int name_len = strlen(#name);                               \
+		int name_len = cstring_len(#name);                          \
 		if (name_len > MAX_TEST_NAME)                               \
 			panic("test name: '%s' too long!", #name);              \
 		test_arr[test_count] = &_tfwork_##name;                     \
-		strncpy(test_names[test_count], #name, name_len);           \
+		copy_bytes(test_names[test_count], #name, name_len);        \
 		test_names[test_count][name_len] = 0;                       \
 		test_count++;                                               \
 	}                                                               \

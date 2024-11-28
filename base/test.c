@@ -121,7 +121,7 @@ Test(util) {
 	for (int i = 0; i < 10; i++) assert_eq(arr1[i], 0);
 
 	char s1[10];
-	strcpy(s1, "abcdefghi");
+	copy_bytes(s1, "abcdefghi", 9);
 	reverse(s1, cstring_len(s1));
 
 	char s2[10];
@@ -152,10 +152,10 @@ int getpagesize();
 
 Test(bitmap) {
 	BitMap bm1;
-	void *addr = mmap(NULL, getpagesize() * 1, PROT_READ | PROT_WRITE,
+	void *addr = mmap(0, getpagesize() * 1, PROT_READ | PROT_WRITE,
 					  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	let bm = bitmap_init(&bm1, 1, addr);
-	void *addr2 = mmap(NULL, getpagesize() * 1, PROT_READ | PROT_WRITE,
+	void *addr2 = mmap(0, getpagesize() * 1, PROT_READ | PROT_WRITE,
 					   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	bitmap_extend(&bm1, addr2);
 	int size = 10;
