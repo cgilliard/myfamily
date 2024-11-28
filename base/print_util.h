@@ -17,6 +17,7 @@
 
 #include <base/channel.h>
 #include <base/macro_util.h>
+#include <base/object.h>
 
 #define va_list __builtin_va_list
 
@@ -25,7 +26,7 @@ typedef enum PrintType {
 	PrintTypeUInt,
 	PrintTypeFloat,
 	PrintTypeString,
-	PrintTypeUnknown,
+	PrintTypeObject,
 	PrintTypeTerm,
 } PrintType;
 
@@ -35,8 +36,8 @@ typedef struct Printable {
 		long long int_value;
 		unsigned long long uint_value;
 		double float_value;
+		Object object_value;
 		char *string_value;
-		void *ptr_value;
 	} value;
 } Printable;
 
@@ -44,6 +45,8 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 
 #define BUILD_PRINTABLE(ignore, v)                                             \
 	_Generic((v),                                                              \
+		Object: (const Printable){.type = PrintTypeObject,                     \
+								  .value.object_value = (__int128_t)(v)},      \
 		int: (const Printable){.type = PrintTypeInt,                           \
 							   .value.int_value = (long long)(v)},             \
 		long long: (const Printable){.type = PrintTypeInt,                     \
@@ -60,14 +63,10 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 		float: (const Printable){.type = PrintTypeFloat,                       \
 								 .value.float_value =                          \
 									 _Generic((v), float: v, default: 0.0)},   \
-		default: ({                                                            \
-				 void *tmp = _Generic((v),                                     \
-					 char *: (v),                                              \
-					 const char *: (v),                                        \
-					 default: 0);                                              \
-				 (const Printable){.type = PrintTypeString,                    \
-								   .value.ptr_value = tmp};                    \
-			 }))
+		default: (const Printable){                                            \
+			.type = PrintTypeString,                                           \
+			.value.string_value =                                              \
+				_Generic((v), char *: (v), const char *: (v), default: 0)})
 
 long long print_impl(Channel *channel, char *buffer, long long capacity,
 					 int newline, int exit, const char *prefix, const char *fmt,
@@ -80,7 +79,7 @@ long long print_impl(Channel *channel, char *buffer, long long capacity,
 			   __termination_print_pair__)
 
 #define println(fmt, ...)                                                \
-	print_impl(&STDOUT, 0, 0, 0, 0, 0,                                   \
+	print_impl(&STDOUT, 0, 0, 1, 0, 0,                                   \
 			   fmt __VA_OPT__(, )                                        \
 				   FOR_EACH(BUILD_PRINTABLE, ignore, (, ), __VA_ARGS__), \
 			   __termination_print_pair__)

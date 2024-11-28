@@ -148,7 +148,11 @@ Test(util) {
 }
 
 Test(print_util) {
-	// println("test {} {} {} {}", 1, 20LL, 30ULL, "ok", 1.2);
+	/*
+		let obj = $(123);
+		println("test 0={} 1={} 2={} 3={} 4={} 5={} 6={} ok done", 1, -20LL,
+	   30ULL, "ok", 1.2, obj, $(1.5));
+	*/
 }
 
 #pragma GCC diagnostic ignored "-Woverflow"

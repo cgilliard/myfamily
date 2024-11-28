@@ -16,9 +16,11 @@
 #define _BASE_SYS__
 
 typedef unsigned long size_t;
+typedef long long ssize_t;
 
 int getpagesize();
 void sched_yield();
 int munmap(void *addr, size_t n);
+ssize_t write(int fd, const void *buf, size_t count);
 
 #endif	// _BASE_SYS__
