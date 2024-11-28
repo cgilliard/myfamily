@@ -43,6 +43,8 @@ typedef struct Printable {
 
 static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+
 #define BUILD_PRINTABLE(ignore, v)                                             \
 	_Generic((v),                                                              \
 		Object: (const Printable){.type = PrintTypeObject,                     \
