@@ -25,7 +25,7 @@ typedef long long ssize_t;
 void *map(long long pages);
 void unmap(void *addr, long long pages);
 
-int getpagesize();
+long unsigned int getpagesize();
 void sched_yield();
 void *mmap(void *addr, size_t length, int prot, int flags, int fd,
 		   off_t offset);
