@@ -349,3 +349,27 @@ Test(test_box) {
 
 	{ let x = box(300); }
 }
+
+Object my_fun(int x) {
+	if (x > 100) return Err(CapacityExceeded);
+	return $((int)(x * 3));
+}
+
+Object my_fun2(int x) {
+	if (x < 50) return Err(IllegalArgument);
+	let v = my_fun(x);
+	return match(v, (Err, v), (Int, $($int(v) + 5)), (Err(IllegalState)));
+}
+
+Test(fn_calls) {
+	let x1 = my_fun2(50);
+	assert_eq($int(x1), 155);
+
+	let x2 = my_fun2(40);
+	assert($is_err(x2));
+	assert_eq($kind(x2), IllegalArgument);
+
+	let x3 = my_fun2(200);
+	assert($is_err(x3));
+	assert_eq($kind(x3), CapacityExceeded);
+}

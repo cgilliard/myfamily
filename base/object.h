@@ -80,6 +80,8 @@ typedef enum ObjectType {
 #define Err(code) object_err(code)
 #define $fn(v) value_of_checked(v, Function)
 #define $int(obj) (*(long long *)value_of_checked(&obj, Int))
+#define $is_err(obj) (object_type(&obj) == Err)
+#define $kind(obj) (*(int *)value_of_checked(&obj, Err))
 #define $float(obj) (*(double *)value_of_checked(&obj, Float))
 #define $uint(obj) (*(unsigned long long *)value_of_checked(&obj, UInt))
 #define let const Object
