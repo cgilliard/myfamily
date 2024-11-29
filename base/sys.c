@@ -13,8 +13,10 @@
 // limitations under the License.
 
 #include <base/print_util.h>
-#include <base/sys.h>
 #include <sys/mman.h>
+
+unsigned long getpagesize();
+#define PAGE_SIZE (getpagesize())
 
 void *map(long long pages) {
 	if (pages == 0) return 0;

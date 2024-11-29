@@ -16,6 +16,10 @@
 #include <base/macro_util.h>
 #include <base/test.h>
 
+// for malloc test
+void *malloc(size_t);
+void free(void *);
+
 Suite(base);
 
 Object test_fun1(int y) {
@@ -199,8 +203,6 @@ Test(slab_allocator) {
 	slab_allocator_cleanup(&sa1);
 	unmap(arr, 1 + (size * sizeof(unsigned char *)) / PAGE_SIZE);
 }
-
-#include <stdlib.h>
 
 Test(malloc) {
 	unsigned char **arr = map(1 + (size * sizeof(unsigned char *)) / PAGE_SIZE);

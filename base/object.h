@@ -63,7 +63,6 @@ typedef enum ObjectType {
 #define PROC_MATCH_(...) PROC_MATCH__(__VA_ARGS__)
 #define PROC_MATCH(ignore, v) PROC_MATCH_(EXPAND_ALL v)
 
-#pragma GCC diagnostic ignored "-Wcompound-token-split-by-macro"
 #pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
 
 #define match(obj, ...)                                                   \
