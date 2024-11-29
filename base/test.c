@@ -292,35 +292,51 @@ Test(match) {
 	assert_eq($int(r1), 10);
 
 	let m2 = $(0ULL);
-	/*
-		let r2 = match(m2,
-					   (Int,
-						{
-							println("int");
-							$(10);
-						}),
-					   (UInt,
-						{
-							println("uint");
-							$(20);
-						}),
-					   (Err,
-						{
-							println("err");
-							$(30);
-						}),
-					   (Function,
-						{
-							println("function");
-							$(40);
-						}),
-					   (Float,
-						{
-							println("float");
-							$(50);
-						}),
-					   ({ println("def"); })
+	let r2 = match(m2,
+				   (Int,
+					{
+						println("int");
+						$(10);
+					}),
+				   (UInt,
+					{
+						/*println("uint");*/
+						$(20);
+					}),
+				   (Err,
+					{
+						println("err");
+						$(30);
+					}),
+				   ({
+					   println("def");
+					   $(40);
+				   })
 
-		);
-	*/
+	);
+	assert_eq($int(r2), 20);
+	let m3 = $(1.5);
+	let r3 = match(m3,
+				   (Int,
+					{
+						println("int");
+						$(10);
+					}),
+				   (UInt,
+					{
+						println("uint");
+						$(20);
+					}),
+				   (Err,
+					{
+						println("err");
+						$(30);
+					}),
+				   ({
+					   /*println("def");*/
+					   $(40);
+				   })
+
+	);
+	assert_eq($int(r3), 40);
 }

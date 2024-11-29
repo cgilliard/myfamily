@@ -56,10 +56,16 @@ typedef enum ObjectType {
 
 #define _(type, ...)
 
-#define PROC_MATCH__(cond, ...)        \
-	case cond:                         \
-		({ _ret__ = (__VA_ARGS__); }); \
-		break;
+#define PROC_DEFAULT(code)   \
+	{                        \
+		default: {           \
+			_ret__ = (code); \
+		} break;             \
+	}
+
+#define PROC_MATCH__(cond, ...)                                        \
+	__VA_OPT__(case cond : ({ _ret__ = (__VA_ARGS__); }); break; NONE) \
+	(PROC_DEFAULT(cond))
 #define PROC_MATCH_(...) PROC_MATCH__(__VA_ARGS__)
 #define PROC_MATCH(ignore, v) PROC_MATCH_(EXPAND_ALL v)
 
@@ -68,7 +74,7 @@ typedef enum ObjectType {
 #define match(obj, ...)                                                   \
 	({                                                                    \
 		ObjectType _t__ = object_type(&obj);                              \
-		var _ret__ = $(0);                                                \
+		var _ret__;                                                       \
 		switch (_t__) { FOR_EACH(PROC_MATCH, ignore, (), __VA_ARGS__); }; \
 		_ret__;                                                           \
 	})
