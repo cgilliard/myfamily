@@ -13,9 +13,15 @@
 // limitations under the License.
 
 #include <base/err.h>
+#include <base/limits.h>
 #include <base/object.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
+#include <base/sys.h>
+#include <base/util.h>
+
+#define OBJ_SLAB_SIZE (128 - SLAB_LIST_SIZE)
+#define OBJ_SLAB_FREE_LIST_SIZE 1024
 
 SlabAllocator object_slabs;
 
@@ -31,13 +37,21 @@ typedef struct ObjectImpl {
 	unsigned long long type;
 } ObjectImpl;
 
+typedef struct BoxSlabData {
+	void *extended;
+	unsigned long long pages;
+} BoxSlabData;
+
+#define OBJ_BOX_USER_DATA_SIZE (OBJ_SLAB_SIZE - sizeof(BoxSlabData))
+
 void __attribute__((constructor)) __setup_object_impl() {
 	if (sizeof(ObjectImpl) != sizeof(__int128_t)) {
 		panic("sizeof(ObjectImpl) ({}) != sizeof(Object) ({})",
 			  sizeof(ObjectImpl), sizeof(Object));
 	}
 
-	let res = slab_allocator_init(&object_slabs, 100, 100, 100);
+	let res = slab_allocator_init(&object_slabs, OBJ_SLAB_SIZE, UINT32_MAX,
+								  OBJ_SLAB_FREE_LIST_SIZE);
 }
 
 Object object_int(long long value) {
@@ -71,8 +85,25 @@ Object object_string(const char *s) {
 }
 
 Object box(long long size) {
-	ObjectImpl ret = {.type = Box, .value.code_value = NotYetImplemented};
-	return *((Object *)&ret);
+	void *slab = slab_allocator_allocate(&object_slabs);
+	if (slab == 0)
+		return Err(AllocErr);
+	else {
+		if (size > OBJ_BOX_USER_DATA_SIZE) {
+			set_bytes(slab + sizeof(BoxSlabData), '\0', OBJ_BOX_USER_DATA_SIZE);
+			BoxSlabData *bsd = slab;
+			long long needed = size - OBJ_BOX_USER_DATA_SIZE;
+			bsd->pages = (needed + PAGE_SIZE - 1) / PAGE_SIZE;
+			bsd->extended = map(bsd->pages);
+			if (bsd->extended == 0) {
+				slab_allocator_free(&object_slabs, slab);
+				return Err(AllocErr);
+			}
+		} else
+			set_bytes(slab, '\0', OBJ_SLAB_SIZE);
+		ObjectImpl ret = {.type = Box, .value.ptr_value = slab};
+		return *((Object *)&ret);
+	}
 }
 
 const void *value_of(const Object *obj) {
@@ -93,4 +124,10 @@ ObjectType object_type(const Object *obj) {
 }
 
 void object_cleanup(const Object *obj) {
+	if (object_type(obj) == Box) {
+		ObjectImpl *impl = (ObjectImpl *)obj;
+		BoxSlabData *bsd = impl->value.ptr_value;
+		if (bsd->pages) unmap(bsd->extended, bsd->pages);
+		slab_allocator_free(&object_slabs, impl->value.ptr_value);
+	}
 }

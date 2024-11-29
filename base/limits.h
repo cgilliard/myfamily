@@ -17,3 +17,6 @@
 
 #define INT32_MAX ((int)0x7FFFFFFF)
 #define INT32_MIN (-INT32_MAX - 1)
+
+#define UINT64_MAX ((unsigned int)0xFFFFFFFFFFFFFFFFULL)
+#define UINT32_MAX ((unsigned int)0xFFFFFFFFULL)

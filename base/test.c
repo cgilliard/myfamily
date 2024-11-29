@@ -340,3 +340,12 @@ Test(match) {
 	);
 	assert_eq($int(r3), 40);
 }
+
+Test(test_box) {
+	{
+		let x = box(10);
+		match(x, (Box, { $(0); }), ({ $(0); }));
+	}
+
+	{ let x = box(300); }
+}
