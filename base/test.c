@@ -397,3 +397,39 @@ Test(fn_calls) {
 	assert($is_err(x3));
 	assert_eq($kind(x3), CapacityExceeded);
 }
+
+Test(box_resize) {
+	var box1 = box(OBJ_BOX_USER_DATA_SIZE + PAGE_SIZE);
+	assert_eq(box_get_page_count(&box1), 1);
+
+	unsigned char *shortb = box_get_short_bytes(&box1);
+	for (int i = 0; i < OBJ_BOX_USER_DATA_SIZE; i++) shortb[i] = 'a' + (i % 26);
+
+	unsigned char *longb = box_get_long_bytes(&box1);
+	for (int i = 0; i < PAGE_SIZE; i++)
+		longb[i] = 'a' + ((i + OBJ_BOX_USER_DATA_SIZE) % 26);
+
+	let res = box_resize(&box1, OBJ_BOX_USER_DATA_SIZE + PAGE_SIZE * 2);
+	assert(!$is_err(res));
+	assert_eq(box_get_page_count(&box1), 2);
+
+	shortb = box_get_short_bytes(&box1);
+	for (int i = 0; i < OBJ_BOX_USER_DATA_SIZE; i++) {
+		assert_eq(shortb[i], 'a' + (i % 26));
+	}
+
+	longb = box_get_long_bytes(&box1);
+	for (int i = 0; i < PAGE_SIZE; i++)
+		assert_eq(longb[i], 'a' + ((i + OBJ_BOX_USER_DATA_SIZE) % 26));
+	for (int i = PAGE_SIZE; i < PAGE_SIZE * 2; i++)
+		longb[i] = 'a' + ((i + OBJ_BOX_USER_DATA_SIZE) % 26);
+
+	for (int i = 0; i < PAGE_SIZE * 2; i++) {
+		assert_eq(longb[i], 'a' + ((i + OBJ_BOX_USER_DATA_SIZE) % 26));
+	}
+
+	let res2 = box_resize(&box1, 10);
+	assert(!$is_err(res2));
+	assert_eq(box_get_page_count(&box1), 0);
+	assert(!box_get_long_bytes(&box1));
+}

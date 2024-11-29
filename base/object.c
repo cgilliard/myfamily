@@ -96,6 +96,37 @@ Object box(long long size) {
 	}
 }
 
+Object box_resize(Object *obj, long long size) {
+	ObjectType type = object_type(obj);
+	if (type != Box) panic("Expected box found type: {}", type);
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	BoxSlabData *bsd = impl->value.ptr_value;
+	if (size <= OBJ_BOX_USER_DATA_SIZE) {
+		if (bsd->pages) {
+			unmap(bsd->extended, bsd->pages);
+			bsd->pages = 0;
+			bsd->extended = 0;
+		}
+	} else {
+		long long needed = size - OBJ_BOX_USER_DATA_SIZE;
+		long long pages = (needed + PAGE_SIZE - 1) / PAGE_SIZE;
+		if (pages > bsd->pages) {
+			void *naddr = map(pages);
+			if (naddr == 0) return Err(AllocErr);
+			if (bsd->pages) {
+				copy_bytes(naddr, bsd->extended, bsd->pages * PAGE_SIZE);
+			}
+			bsd->extended = naddr;
+			bsd->pages = pages;
+		} else if (pages < bsd->pages) {
+			unmap(((unsigned char *)bsd->extended) + pages * PAGE_SIZE,
+				  bsd->pages - pages);
+		}
+	}
+
+	return $(0);
+}
+
 void *box_get_long_bytes(const Object *obj) {
 	ObjectType type = object_type(obj);
 	if (type != Box) panic("Expected box found type: {}", type);
