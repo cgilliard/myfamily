@@ -15,16 +15,20 @@
 #ifndef _BASE_OBJECT__
 #define _BASE_OBJECT__
 
-typedef __int128_t Object;
+#include <base/macro_util.h>
+
+typedef __int128_t ObjectNc;
+void object_cleanup(const ObjectNc *obj);
+#define Object \
+	ObjectNc __attribute((warn_unused_result, cleanup(object_cleanup)))
 
 typedef enum ObjectType {
-	Int,
 	UInt,
+	Int,
 	Float,
 	Box,
 	Function,
 	Err,
-	Unit,
 } ObjectType;
 
 #define $(v)                                                                   \
@@ -36,6 +40,13 @@ typedef enum ObjectType {
 		unsigned long long: object_uint(                                       \
 				 _Generic((v), unsigned long long: v, default: 0)),            \
 		unsigned int: object_uint(_Generic((v), unsigned int: v, default: 0)), \
+		char *: object_string(_Generic((v), char *: v, default: 0)),           \
+		const char *: object_string(                                           \
+				 _Generic((v), const char *: v, default: 0)),                  \
+		unsigned char *: object_string(                                        \
+				 _Generic((v), unsigned char *: v, default: 0)),               \
+		const unsigned char *: object_string(                                  \
+				 _Generic((v), const unsigned char *: v, default: 0)),         \
 		default: object_function(_Generic((v),                                 \
 		double: 0,                                                             \
 		int: 0,                                                                \
@@ -43,11 +54,31 @@ typedef enum ObjectType {
 		unsigned long long: 0,                                                 \
 		default: v)))
 
+#define _(type, ...)
+
+#define PROC_MATCH__(cond, ...)        \
+	case cond:                         \
+		({ _ret__ = (__VA_ARGS__); }); \
+		break;
+#define PROC_MATCH_(...) PROC_MATCH__(__VA_ARGS__)
+#define PROC_MATCH(ignore, v) PROC_MATCH_(EXPAND_ALL v)
+
+#pragma GCC diagnostic ignored "-Wcompound-token-split-by-macro"
+#pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
+
+#define match(obj, ...)                                                   \
+	({                                                                    \
+		ObjectType _t__ = object_type(&obj);                              \
+		var _ret__ = $(0);                                                \
+		switch (_t__) { FOR_EACH(PROC_MATCH, ignore, (), __VA_ARGS__); }; \
+		_ret__;                                                           \
+	})
+
 #define Err(code) object_err(code)
-#define $fn(v) value_of(v)
-#define $int(obj) (*(long long *)value_of(&obj))
-#define $float(obj) (*(double *)value_of(&obj))
-#define $uint(obj) (*(unsigned long long *)value_of(&obj))
+#define $fn(v) value_of_checked(v, Function)
+#define $int(obj) (*(long long *)value_of_checked(&obj, Int))
+#define $float(obj) (*(double *)value_of_checked(&obj, Float))
+#define $uint(obj) (*(unsigned long long *)value_of_checked(&obj, UInt))
 #define let const Object
 #define var Object
 
@@ -55,9 +86,14 @@ Object object_int(long long value);
 Object object_uint(unsigned long long value);
 Object object_float(double value);
 Object object_function(void *fn);
+Object object_string(const char *v);
 Object object_err(int code);
 Object box(long long size);
+Object box_resize(Object *obj, long long size);
+void *box_get_long_bytes(const Object *obj);
+void *box_get_short_bytes(const Object *obj);
 const void *value_of(const Object *obj);
+const void *value_of_checked(const Object *obj, ObjectType expect);
 const void *value_of_fn(const Object *obj);
 ObjectType object_type(const Object *obj);
 

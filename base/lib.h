@@ -14,10 +14,13 @@
 
 #include <base/bitmap.h>
 #include <base/channel.h>
+#include <base/err.h>
 #include <base/fam.h>
 #include <base/limits.h>
 #include <base/lock.h>
+#include <base/macro_util.h>
 #include <base/object.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
+#include <base/sys.h>
 #include <base/util.h>

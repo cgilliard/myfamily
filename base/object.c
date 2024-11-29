@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/err.h>
 #include <base/object.h>
 #include <base/print_util.h>
+#include <base/slabs.h>
+
+SlabAllocator object_slabs;
 
 typedef struct ObjectImpl {
-	unsigned long long type;
 	union {
 		unsigned char bytes[8];
 		long long int_value;
@@ -25,47 +28,51 @@ typedef struct ObjectImpl {
 		int code_value;
 		void *ptr_value;
 	} value;
+	unsigned long long type;
 } ObjectImpl;
 
-void __attribute__((constructor)) __confirm_object_impl() {
+void __attribute__((constructor)) __setup_object_impl() {
 	if (sizeof(ObjectImpl) != sizeof(__int128_t)) {
-		panic("sizeof(ObjectImpl) (%lu) != sizeof(Object) (%lu)",
+		panic("sizeof(ObjectImpl) ({}) != sizeof(Object) ({})",
 			  sizeof(ObjectImpl), sizeof(Object));
 	}
+
+	let res = slab_allocator_init(&object_slabs, 100, 100, 100);
 }
 
 Object object_int(long long value) {
-	ObjectImpl ret = {.type = Int};
-	ret.value.int_value = value;
+	ObjectImpl ret = {.type = Int, .value.int_value = value};
 	return *((Object *)&ret);
 }
 
 Object object_uint(unsigned long long value) {
-	ObjectImpl ret = {.type = UInt};
-	ret.value.uint_value = value;
+	ObjectImpl ret = {.type = UInt, .value.uint_value = value};
 	return *((Object *)&ret);
 }
 
 Object object_float(double value) {
-	ObjectImpl ret = {.type = Float};
-	ret.value.float_value = value;
+	ObjectImpl ret = {.type = Float, .value.float_value = value};
 	return *((Object *)&ret);
 }
 
 Object object_function(void *fn) {
-	ObjectImpl ret = {.type = Function};
-	ret.value.ptr_value = fn;
+	ObjectImpl ret = {.type = Function, .value.ptr_value = fn};
 	return *((Object *)&ret);
 }
 
 Object object_err(int code) {
-	ObjectImpl ret = {.type = Err};
-	ret.value.code_value = code;
+	ObjectImpl ret = {.type = Err, .value.code_value = code};
+	return *((Object *)&ret);
+}
+
+Object object_string(const char *s) {
+	ObjectImpl ret = {.type = Err, .value.code_value = NotYetImplemented};
 	return *((Object *)&ret);
 }
 
 Object box(long long size) {
-	return 0;
+	ObjectImpl ret = {.type = Box, .value.code_value = NotYetImplemented};
+	return *((Object *)&ret);
 }
 
 const void *value_of(const Object *obj) {
@@ -74,6 +81,16 @@ const void *value_of(const Object *obj) {
 	return &impl->value.bytes;
 }
 
+const void *value_of_checked(const Object *obj, ObjectType expect) {
+	ObjectType type = object_type(obj);
+	if (type != expect)
+		panic("Expected Object type {}. Found {}!", (int)expect, (int)type);
+	return value_of(obj);
+}
+
 ObjectType object_type(const Object *obj) {
 	return ((ObjectImpl *)obj)->type;
+}
+
+void object_cleanup(const Object *obj) {
 }

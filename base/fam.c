@@ -21,17 +21,20 @@
 void __attribute__((noreturn)) _exit(int code);
 
 Object send(Channel channel, Object object) {
-	return 0;
+	Object ret = 0;
+	return ret;
 }
 Channel run(Object (*task)(Channel channel)) {
 	Channel channel;
 	return channel;
 }
 Object recv(Channel channel, int timeout_millis) {
-	return 0;
+	Object ret = 0;
+	return ret;
 }
 Object init(Object (*init)(Channel channel), int threads) {
-	return 0;
+	Object ret = 0;
+	return ret;
 }
 
 void __attribute__((noreturn)) halt(int code) {

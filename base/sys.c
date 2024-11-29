@@ -13,10 +13,8 @@
 // limitations under the License.
 
 #include <base/print_util.h>
+#include <base/sys.h>
 #include <sys/mman.h>
-
-int getpagesize();
-#define PAGE_SIZE (getpagesize())
 
 void *map(long long pages) {
 	if (pages == 0) return 0;
@@ -25,9 +23,14 @@ void *map(long long pages) {
 	return ret;
 }
 
+void unmap(void *addr, long long pages) {
+	if (pages == 0) return;
+	munmap(addr, pages * PAGE_SIZE);
+}
+
 static void check_arch(char *type, int actual, int expected) {
 	if (actual != expected)
-		panic("%s must be %i bytes. It is %i bytes. Arch invalid.", type,
+		panic("{} must be {} bytes. It is {} bytes. Arch invalid.", type,
 			  expected, actual);
 }
 
@@ -44,7 +47,7 @@ void __attribute__((constructor)) __check_sizes() {
 	arch(float, 4);
 	arch(double, 8);
 	if (__SIZEOF_SIZE_T__ != 8)
-		panic("size_t must be 8 bytes. It is %i bytes. Arch invalid.",
+		panic("size_t must be 8 bytes. It is {} bytes. Arch invalid.",
 			  __SIZEOF_SIZE_T__);
 
 	// little endian check

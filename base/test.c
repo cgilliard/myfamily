@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/lib.h>
+#include <base/macro_util.h>
 #include <base/test.h>
 
 Suite(base);
@@ -21,26 +23,26 @@ Object test_fun1(int y) {
 }
 
 Object test_th1(Channel channel) {
-	return 0;
+	return $(0);
 }
 
 Object test_th2(Channel channel) {
-	return 0;
+	return $(0);
 }
 
 Object test_th3(Channel channel) {
-	return 0;
+	return $(0);
 }
 
 Object test_init(Channel channel) {
 	run(test_th1);
 	run(test_th2);
 	run(test_th3);
-	return 0;
+	return $(0);
 }
 
 Test(fam_init) {
-	init(test_init, 4);
+	let x = init(test_init, 4);
 	assert(1);
 }
 
@@ -81,7 +83,7 @@ Test(object) {
 	assert_eq($uint(obj6), 1234);
 
 	let obj7 = $(test_fun1);
-	const Object (*v7_fn)(int) = $fn(&obj7);
+	const ObjectNc (*v7_fn)(int) = $fn(&obj7);
 	Object v7 = v7_fn(3);
 	assert_eq($int(v7), 13);
 }
@@ -147,23 +149,18 @@ Test(util) {
 	assert(!cstring_compare("40", s4));
 }
 
-#include <sys/mman.h>
-int getpagesize();
-
 Test(bitmap) {
 	BitMap bm1;
-	void *addr = mmap(0, getpagesize() * 1, PROT_READ | PROT_WRITE,
-					  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	void *addr = map(1);
 	let bm = bitmap_init(&bm1, 1, addr);
-	void *addr2 = mmap(0, getpagesize() * 1, PROT_READ | PROT_WRITE,
-					   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	bitmap_extend(&bm1, addr2);
+	void *addr2 = map(1);
+	let x = bitmap_extend(&bm1, addr2);
 	int size = 10;
 
-	for (int i = 0; i < size; i++) {
+	for (unsigned long long i = 0; i < size; i++) {
 		Object obj = bitmap_allocate(&bm1);
 		assert_eq(object_type(&obj), UInt);
-		assert_eq($int(obj), i);
+		assert_eq($uint(obj), i);
 	}
 
 	for (unsigned long long i = 0; i < size; i++) {
@@ -171,10 +168,9 @@ Test(bitmap) {
 		bitmap_free(&bm1, obj);
 	}
 
-	munmap(addr, getpagesize() * 1);
+	unmap(addr, 1);
 }
 
-#define PAGE_SIZE (getpagesize())
 int count = 1000;
 int size = 500;
 int alloc_size = 64 - SLAB_LIST_SIZE;
@@ -183,9 +179,7 @@ Test(slab_allocator) {
 	SlabAllocator sa1;
 	Object res = slab_allocator_init(&sa1, alloc_size, size + 5, size + 5);
 	assert(object_type(&res) != Err);
-	unsigned char **arr =
-		mmap(0, (1 + (size * sizeof(unsigned char *)) / PAGE_SIZE) * PAGE_SIZE,
-			 PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	unsigned char **arr = map(1 + (size * sizeof(unsigned char *)) / PAGE_SIZE);
 
 	for (long long i = 0; i < count; i++) {
 		for (long long j = 0; j < size; j++) {
@@ -203,15 +197,13 @@ Test(slab_allocator) {
 	}
 
 	slab_allocator_cleanup(&sa1);
-	munmap(arr, (1 + (size * sizeof(unsigned char *)) / PAGE_SIZE) * PAGE_SIZE);
+	unmap(arr, 1 + (size * sizeof(unsigned char *)) / PAGE_SIZE);
 }
 
 #include <stdlib.h>
 
 Test(malloc) {
-	unsigned char **arr =
-		mmap(0, (1 + (size * sizeof(unsigned char *)) / PAGE_SIZE) * PAGE_SIZE,
-			 PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	unsigned char **arr = map(1 + (size * sizeof(unsigned char *)) / PAGE_SIZE);
 
 	for (long long i = 0; i < count; i++) {
 		for (long long j = 0; j < size; j++) {
@@ -228,7 +220,18 @@ Test(malloc) {
 		}
 	}
 
-	munmap(arr, (1 + (size * sizeof(unsigned char *)) / PAGE_SIZE) * PAGE_SIZE);
+	unmap(arr, 1 + (size * sizeof(unsigned char *)) / PAGE_SIZE);
+}
+
+Test(default_type) {
+	// types default to unsigned int (uint64) (negative value doesn't work the
+	// same due to the way they are represented)
+	let x = 123ULL;
+	assert_eq(object_type(&x), UInt);
+	assert_eq($uint(x), 123);
+
+	let y = $("test");
+	assert_eq(object_type(&y), Err);
 }
 
 Test(print_util) {
@@ -247,4 +250,75 @@ Test(limits) {
 	assert_eq(INT64_MAX + 1, INT64_MIN);
 	assert_eq(INT32_MIN - 1, INT32_MAX);
 	assert_eq(INT32_MAX + 1, INT32_MIN);
+}
+
+Test(match) {
+	let m1 = $(1);
+	let r1 = match(m1,
+				   (Int,
+					{
+						/*println("int"); */
+						$(10);
+					}),
+				   (UInt,
+					{
+						println("uint");
+						$(20);
+					}),
+				   (Err,
+					{
+						println("err");
+						$(30);
+					}),
+				   (Function,
+					{
+						println("function");
+						$(40);
+					}),
+				   (Float,
+					{
+						println("float");
+						$(50);
+					}),
+				   (Box,
+					{
+						println("box");
+						$(60);
+					})
+
+	);
+	assert_eq($int(r1), 10);
+
+	let m2 = $(0ULL);
+	/*
+		let r2 = match(m2,
+					   (Int,
+						{
+							println("int");
+							$(10);
+						}),
+					   (UInt,
+						{
+							println("uint");
+							$(20);
+						}),
+					   (Err,
+						{
+							println("err");
+							$(30);
+						}),
+					   (Function,
+						{
+							println("function");
+							$(40);
+						}),
+					   (Float,
+						{
+							println("float");
+							$(50);
+						}),
+					   ({ println("def"); })
+
+		);
+	*/
 }

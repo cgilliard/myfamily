@@ -56,10 +56,10 @@ typedef struct SlabAllocatorImpl {
 
 void __attribute__((constructor)) __check_slabs_sizes() {
 	if (sizeof(SlabAllocatorImpl) != sizeof(SlabAllocator))
-		panic("sizeof(SlabAllocatorImpl) (%i) != sizeof(SlabAllocator) (%i)",
+		panic("sizeof(SlabAllocatorImpl) ({}) != sizeof(SlabAllocator) ({})",
 			  sizeof(SlabAllocatorImpl), sizeof(SlabAllocator));
 	if (sizeof(SlabList) != SLAB_LIST_SIZE)
-		panic("sizeof(SlabList) (%i) != SLAB_LIST_SIZE (%i)", sizeof(SlabList),
+		panic("sizeof(SlabList) ({}) != SLAB_LIST_SIZE ({})", sizeof(SlabList),
 			  SLAB_LIST_SIZE);
 }
 
@@ -70,12 +70,14 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 	}
 
 	let bobj = bitmap_allocate(&impl->bm);
-	int id = $int(bobj);
+	unsigned long long id = $uint(bobj);
 	if (id == -1) {
 		void *addr = map(1);
 		if (addr == 0) return 0;
-		bitmap_extend(&impl->bm, addr);
-		id = bitmap_allocate(&impl->bm);
+		let x = bitmap_extend(&impl->bm, addr);
+		if (object_type(&x) == Err) return 0;
+		let v = bitmap_allocate(&impl->bm);
+		id = $uint(v);
 	}
 	if (id < 0) return 0;
 	long long next = id >> (__builtin_ctz(PAGE_SIZE / impl->sl_size));
@@ -181,7 +183,8 @@ Object slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 		munmap(impl->bitmap_pages, PAGE_SIZE);
 		return Err(AllocErr);
 	}
-	bitmap_extend(&impl->bm, page0);
+	let res = bitmap_extend(&impl->bm, page0);
+	if (object_type(&res) == Err) return res;
 
 	impl->head = impl->tail = slab_allocator_grow(impl);
 
@@ -236,12 +239,12 @@ void slab_allocator_free(SlabAllocator *sa, void *ptr) {
 	SlabList *slptr = (SlabList *)((unsigned char *)ptr - sizeof(SlabList)),
 			 *tail, *next;
 	if (!CAS(&slptr->next, &sl_reserved, 0)) {
-		panic("Double free attempt! id=%lli", slptr->id);
+		panic("Double free attempt! id={}", slptr->id);
 	}
 
 	if (AADD(&impl->free_slabs, 1) >= impl->max_free_slabs) {
 		ASUB(&impl->free_slabs, 1);
-		bitmap_free(&impl->bm, slptr->id);
+		bitmap_free(&impl->bm, $(slptr->id));
 	}
 	while (1) {
 		tail = impl->tail;

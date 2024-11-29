@@ -86,7 +86,11 @@ long long print_impl(Channel *channel, char *buffer, long long capacity,
 				   FOR_EACH(BUILD_PRINTABLE, ignore, (, ), __VA_ARGS__), \
 			   __termination_print_pair__)
 
-#define print(fmt, ...) print_impl(&STDOUT, 0, 0, 1, 0, 0, fmt, ##__VA_ARGS__)
+#define print(fmt, ...)                                                  \
+	print_impl(&STDOUT, 0, 0, 0, 0, 0,                                   \
+			   fmt __VA_OPT__(, )                                        \
+				   FOR_EACH(BUILD_PRINTABLE, ignore, (, ), __VA_ARGS__), \
+			   __termination_print_pair__)
 
 #define sprint(buffer, capacity, fmt, ...) \
 	print_impl(0, buffer, capacity, 0, 0, 0, fmt, ##__VA_ARGS__)

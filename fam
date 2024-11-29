@@ -4,7 +4,7 @@
 . ./scripts/color.sh
 
 extra="-O3 -flto"
-cc_flags='-Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -I..';
+cc_flags='-Werror=switch -Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -I..';
 cc=cc
 update_docs=0
 skip_final=0

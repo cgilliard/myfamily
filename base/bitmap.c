@@ -43,7 +43,7 @@ typedef struct BitMapImpl {
 void __attribute__((constructor)) __check_bitmap_sizes() {
 	ASTORE(&bitmap_index, 0);
 	if (sizeof(BitMapImpl) != sizeof(BitMap))
-		panic("sizeof(BitMapImpl) (%i) != sizeof(BitMap) (%i)",
+		panic("sizeof(BitMapImpl) ({}) != sizeof(BitMap) ({})",
 			  sizeof(BitMapImpl), sizeof(BitMap));
 }
 
@@ -113,8 +113,8 @@ void bitmap_free(BitMap *m, Object obj) {
 		initial = ALOAD(&cur[index % BITS_LEN]);
 		updated = initial & ~x;
 		if (updated == initial)
-			panic("Double free attempt on index=%lli! [%llx %llx]", index,
-				  initial, updated);
+			panic("Double free attempt on index={}! [{} {}]", index, initial,
+				  updated);
 
 	} while (!CAS_SEQ(&cur[index % BITS_LEN], &initial, updated));
 }

@@ -35,7 +35,7 @@ Lock lock_create() {
 }
 void lock_read(Lock *lock) {
 	if (stack_level >= MAX_LOCK_LEVEL)
-		panic("too many lock levels: MAX=%i", MAX_LOCK_LEVEL);
+		panic("too many lock levels: MAX={}", MAX_LOCK_LEVEL);
 	_lock_is_write__[stack_level++] = 0;
 	unsigned long long state;
 	unsigned long long state_update;
@@ -51,7 +51,7 @@ void lock_read(Lock *lock) {
 }
 void lock_write(Lock *lock) {
 	if (stack_level >= MAX_LOCK_LEVEL)
-		panic("too many lock levels: MAX=%i", MAX_LOCK_LEVEL);
+		panic("too many lock levels: MAX={}", MAX_LOCK_LEVEL);
 	_lock_is_write__[stack_level++] = 1;
 	unsigned long long state;
 	unsigned long long state_update;
