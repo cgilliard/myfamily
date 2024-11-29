@@ -345,14 +345,38 @@ Test(test_box) {
 	{
 		let x = box(10);
 		match(x, (Box, { $(0); }), ({ $(0); }));
+		assert(box_get_long_bytes(&x) == 0);
+		assert(box_get_short_bytes(&x) != 0);
+		assert_eq(box_get_page_count(&x), 0);
+
+		char *ptr = box_get_short_bytes(&x);
+		for (int i = 0; i < OBJ_BOX_USER_DATA_SIZE; i++) {
+			ptr[i] = 'a' + (i % 26);
+		}
+
+		for (int i = 0; i < OBJ_BOX_USER_DATA_SIZE; i++) {
+			assert_eq(ptr[i], 'a' + (i % 26));
+		}
 	}
 
-	{ let x = box(300); }
+	{
+		let x = box(300);
+		assert(box_get_long_bytes(&x) != 0);
+		assert(box_get_short_bytes(&x) != 0);
+		assert_eq(box_get_page_count(&x), 1);
+		char *ptr = box_get_long_bytes(&x);
+		for (int i = 0; i < PAGE_SIZE; i++) {
+			ptr[i] = 'a' + (i % 26);
+		}
+		for (int i = 0; i < PAGE_SIZE; i++) {
+			assert_eq(ptr[i], 'a' + (i % 26));
+		}
+	}
 }
 
 Object my_fun(int x) {
 	if (x > 100) return Err(CapacityExceeded);
-	return $((int)(x * 3));
+	return $(x * 3);
 }
 
 Object my_fun2(int x) {

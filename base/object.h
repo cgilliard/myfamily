@@ -31,6 +31,15 @@ typedef enum ObjectType {
 	Err,
 } ObjectType;
 
+typedef struct BoxSlabData {
+	void *extended;
+	unsigned long long pages;
+} BoxSlabData;
+
+#define OBJ_SLAB_SIZE (128 - SLAB_LIST_SIZE)
+#define OBJ_SLAB_FREE_LIST_SIZE 1024
+#define OBJ_BOX_USER_DATA_SIZE (OBJ_SLAB_SIZE - sizeof(BoxSlabData))
+
 #define $(v)                                                                   \
 	_Generic((v),                                                              \
 		double: object_float(_Generic((v), double: v, default: 0)),            \
@@ -97,6 +106,7 @@ Object box(long long size);
 Object box_resize(Object *obj, long long size);
 void *box_get_long_bytes(const Object *obj);
 void *box_get_short_bytes(const Object *obj);
+unsigned long long box_get_page_count(const Object *obj);
 const void *value_of(const Object *obj);
 const void *value_of_checked(const Object *obj, ObjectType expect);
 const void *value_of_fn(const Object *obj);

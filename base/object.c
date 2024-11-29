@@ -20,9 +20,6 @@
 #include <base/sys.h>
 #include <base/util.h>
 
-#define OBJ_SLAB_SIZE (128 - SLAB_LIST_SIZE)
-#define OBJ_SLAB_FREE_LIST_SIZE 1024
-
 SlabAllocator object_slabs;
 
 typedef struct ObjectImpl {
@@ -36,13 +33,6 @@ typedef struct ObjectImpl {
 	} value;
 	unsigned long long type;
 } ObjectImpl;
-
-typedef struct BoxSlabData {
-	void *extended;
-	unsigned long long pages;
-} BoxSlabData;
-
-#define OBJ_BOX_USER_DATA_SIZE (OBJ_SLAB_SIZE - sizeof(BoxSlabData))
 
 void __attribute__((constructor)) __setup_object_impl() {
 	if (sizeof(ObjectImpl) != sizeof(__int128_t)) {
@@ -104,6 +94,30 @@ Object box(long long size) {
 		ObjectImpl ret = {.type = Box, .value.ptr_value = slab};
 		return *((Object *)&ret);
 	}
+}
+
+void *box_get_long_bytes(const Object *obj) {
+	ObjectType type = object_type(obj);
+	if (type != Box) panic("Expected box found type: {}", type);
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	BoxSlabData *bsd = impl->value.ptr_value;
+	return bsd->extended;
+}
+
+void *box_get_short_bytes(const Object *obj) {
+	ObjectType type = object_type(obj);
+	if (type != Box) panic("Expected box found type: {}", type);
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	void *ptr = impl->value.ptr_value;
+	return (unsigned char *)ptr + sizeof(BoxSlabData);
+}
+
+unsigned long long box_get_page_count(const Object *obj) {
+	ObjectType type = object_type(obj);
+	if (type != Box) panic("Expected box found type: {}", type);
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	BoxSlabData *bsd = impl->value.ptr_value;
+	return bsd->pages;
 }
 
 const void *value_of(const Object *obj) {
