@@ -16,6 +16,7 @@
 #define _BASE_OBJECT__
 
 #include <base/macro_util.h>
+#include <base/orbtree.h>
 
 typedef __int128_t ObjectNc;
 void object_cleanup(const ObjectNc *obj);
@@ -34,6 +35,8 @@ typedef enum ObjectType {
 typedef struct BoxSlabData {
 	void *extended;
 	unsigned long long pages;
+	OrbTree ordered;
+	OrbTree seq;
 } BoxSlabData;
 
 #define OBJ_SLAB_SIZE (128 - SLAB_LIST_SIZE)
@@ -45,7 +48,7 @@ typedef struct BoxSlabData {
 		double: object_float(_Generic((v), double: v, default: 0)),            \
 		float: object_float(_Generic((v), float: v, default: 0)),              \
 		long long: object_int(_Generic((v), long long: v, default: 0)),        \
-		int: object_int(_Generic((v), int: v, default: 0)),                    \
+		int: object_int(_Generic((v), int: (v), default: 0)),                  \
 		unsigned long long: object_uint(                                       \
 				 _Generic((v), unsigned long long: v, default: 0)),            \
 		unsigned int: object_uint(_Generic((v), unsigned int: v, default: 0)), \
@@ -111,5 +114,8 @@ const void *value_of(const Object *obj);
 const void *value_of_checked(const Object *obj, ObjectType expect);
 const void *value_of_fn(const Object *obj);
 ObjectType object_type(const Object *obj);
+Object object_get_property(const Object *obj, const char *name);
+Object object_set_property(Object *obj, const char *name, const Object *value);
+Object object_remove_property(Object *obj, const char *name);
 
 #endif	// _BASE_OBJECT__

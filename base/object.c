@@ -20,6 +20,8 @@
 #include <base/sys.h>
 #include <base/util.h>
 
+#define OFFSET_ORDERED 0
+
 SlabAllocator object_slabs;
 
 typedef struct ObjectImpl {
@@ -31,17 +33,30 @@ typedef struct ObjectImpl {
 		int code_value;
 		void *ptr_value;
 	} value;
-	unsigned long long type;
+	unsigned long long type : 62;
+	unsigned int no_cleanup : 1;
+	unsigned int consumed : 1;
 } ObjectImpl;
 
+typedef struct ObjectProperty {
+	OrbTreeNode ordered;
+	const char *name;
+	unsigned long long seqno;
+	OrbTreeNode seq;
+	Object value;
+} ObjectProperty;
+
 void __attribute__((constructor)) __setup_object_impl() {
-	if (sizeof(ObjectImpl) != sizeof(__int128_t)) {
+	if (sizeof(ObjectImpl) != sizeof(Object)) {
 		panic("sizeof(ObjectImpl) ({}) != sizeof(Object) ({})",
 			  sizeof(ObjectImpl), sizeof(Object));
 	}
-
 	let res = slab_allocator_init(&object_slabs, OBJ_SLAB_SIZE, UINT32_MAX,
 								  OBJ_SLAB_FREE_LIST_SIZE);
+}
+
+void check_consumed(const Object *obj) {
+	if (((const ObjectImpl *)obj)->consumed) panic("Object consumed!");
 }
 
 Object object_int(long long value) {
@@ -89,6 +104,8 @@ Object box(long long size) {
 				slab_allocator_free(&object_slabs, slab);
 				return Err(AllocErr);
 			}
+			bsd->ordered = INIT_ORBTREE;
+			bsd->seq = INIT_ORBTREE;
 		} else
 			set_bytes(slab, '\0', OBJ_SLAB_SIZE);
 		ObjectImpl ret = {.type = Box, .value.ptr_value = slab};
@@ -97,6 +114,7 @@ Object box(long long size) {
 }
 
 Object box_resize(Object *obj, long long size) {
+	check_consumed(obj);
 	ObjectType type = object_type(obj);
 	if (type != Box) panic("Expected box found type: {}", type);
 	ObjectImpl *impl = (ObjectImpl *)obj;
@@ -128,6 +146,7 @@ Object box_resize(Object *obj, long long size) {
 }
 
 void *box_get_long_bytes(const Object *obj) {
+	check_consumed(obj);
 	ObjectType type = object_type(obj);
 	if (type != Box) panic("Expected box found type: {}", type);
 	ObjectImpl *impl = (ObjectImpl *)obj;
@@ -136,6 +155,7 @@ void *box_get_long_bytes(const Object *obj) {
 }
 
 void *box_get_short_bytes(const Object *obj) {
+	check_consumed(obj);
 	ObjectType type = object_type(obj);
 	if (type != Box) panic("Expected box found type: {}", type);
 	ObjectImpl *impl = (ObjectImpl *)obj;
@@ -144,6 +164,7 @@ void *box_get_short_bytes(const Object *obj) {
 }
 
 unsigned long long box_get_page_count(const Object *obj) {
+	check_consumed(obj);
 	ObjectType type = object_type(obj);
 	if (type != Box) panic("Expected box found type: {}", type);
 	ObjectImpl *impl = (ObjectImpl *)obj;
@@ -152,12 +173,14 @@ unsigned long long box_get_page_count(const Object *obj) {
 }
 
 const void *value_of(const Object *obj) {
+	check_consumed(obj);
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	if (impl->type == Function) return impl->value.ptr_value;
 	return &impl->value.bytes;
 }
 
 const void *value_of_checked(const Object *obj, ObjectType expect) {
+	check_consumed(obj);
 	ObjectType type = object_type(obj);
 	if (type != expect)
 		panic("Expected Object type {}. Found {}!", (int)expect, (int)type);
@@ -165,14 +188,83 @@ const void *value_of_checked(const Object *obj, ObjectType expect) {
 }
 
 ObjectType object_type(const Object *obj) {
+	check_consumed(obj);
 	return ((ObjectImpl *)obj)->type;
+}
+
+void object_cleanup_node(OrbTreeNode *node) {
+	if (node->right) object_cleanup_node(node->right);
+	if (node->left) object_cleanup_node(node->left);
+	slab_allocator_free(&object_slabs, (node - OFFSET_ORDERED));
 }
 
 void object_cleanup(const Object *obj) {
 	if (object_type(obj) == Box) {
 		ObjectImpl *impl = (ObjectImpl *)obj;
+		if (impl->no_cleanup) return;
 		BoxSlabData *bsd = impl->value.ptr_value;
 		if (bsd->pages) unmap(bsd->extended, bsd->pages);
+		if (bsd->ordered.root) object_cleanup_node(bsd->ordered.root);
 		slab_allocator_free(&object_slabs, impl->value.ptr_value);
 	}
+}
+
+int object_search_ordered(OrbTreeNode *cur, const OrbTreeNode *value,
+						  OrbTreeNodePair *retval) {
+	while (cur) {
+		const char *v1 =
+			((ObjectProperty *)((unsigned char *)cur - OFFSET_ORDERED))->name;
+		const char *v2 =
+			((ObjectProperty *)((unsigned char *)value - OFFSET_ORDERED))->name;
+
+		int c = cstring_compare(v1, v2);
+		if (c == 0) {
+			retval->self = cur;
+			break;
+		} else if (c < 0) {
+			retval->parent = cur;
+			retval->is_right = 1;
+			cur = cur->right;
+		} else {
+			retval->parent = cur;
+			retval->is_right = 0;
+			cur = cur->left;
+		}
+		retval->self = cur;
+	}
+	return 0;
+}
+
+Object object_get_property(const Object *obj, const char *name) {
+	check_consumed(obj);
+	ObjectProperty op = {.name = name};
+	OrbTreeNodePair retval = {};
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	BoxSlabData *bsd = impl->value.ptr_value;
+	object_search_ordered(bsd->ordered.root, &op.ordered, &retval);
+
+	if (retval.self)
+		return ((ObjectProperty *)(retval.self - OFFSET_ORDERED))->value;
+	else
+		return Err(NotFound);
+}
+
+Object object_set_property(Object *obj, const char *name, const Object *value) {
+	check_consumed(obj);
+	check_consumed(value);
+
+	ObjectProperty *opptr = slab_allocator_allocate(&object_slabs);
+	opptr->name = name;
+	opptr->value = *value;
+	((ObjectImpl *)&value)->no_cleanup = 1;
+	((ObjectImpl *)&value)->consumed = 1;
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	BoxSlabData *bsd = impl->value.ptr_value;
+	orbtree_put(&bsd->ordered, &opptr->ordered, object_search_ordered);
+	return $(0);
+}
+
+Object object_remove_property(Object *obj, const char *name) {
+	check_consumed(obj);
+	return Err(NotYetImplemented);
 }

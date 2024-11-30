@@ -374,26 +374,26 @@ Test(test_box) {
 	}
 }
 
-Object my_fun(int x) {
-	if (x > 100) return Err(CapacityExceeded);
-	return $(x * 3);
+Object my_fun(Object x) {
+	if ($int(x) > 100) return Err(CapacityExceeded);
+	return $($int(x) * 3);
 }
 
-Object my_fun2(int x) {
-	if (x < 50) return Err(IllegalArgument);
+Object my_fun2(Object x) {
+	if ($int(x) < 50) return Err(IllegalArgument);
 	let v = my_fun(x);
 	return match(v, (Err, v), (Int, $($int(v) + 5)), (Err(IllegalState)));
 }
 
 Test(fn_calls) {
-	let x1 = my_fun2(50);
+	let x1 = my_fun2($(50));
 	assert_eq($int(x1), 155);
 
-	let x2 = my_fun2(40);
+	let x2 = my_fun2($(40));
 	assert($is_err(x2));
 	assert_eq($kind(x2), IllegalArgument);
 
-	let x3 = my_fun2(200);
+	let x3 = my_fun2($(200));
 	assert($is_err(x3));
 	assert_eq($kind(x3), CapacityExceeded);
 }
@@ -432,4 +432,22 @@ Test(box_resize) {
 	assert(!$is_err(res2));
 	assert_eq(box_get_page_count(&box1), 0);
 	assert(!box_get_long_bytes(&box1));
+}
+
+Test(properties) {
+	var b1 = box(1);
+	let res0 = object_get_property(&b1, "test");
+	assert($is_err(res0));
+	let ins1 = $(123);
+	let res1 = object_set_property(&b1, "test", &ins1);
+	assert(!$is_err(res1));
+	let res2 = object_get_property(&b1, "test");
+	assert(!$is_err(res2));
+	assert_eq($int(res2), 123);
+
+	let ins2 = $(1234);
+	let res3 = object_set_property(&b1, "test2", &ins2);
+	let res4 = object_get_property(&b1, "test2");
+	assert(!$is_err(res4));
+	assert_eq($int(res4), 1234);
 }

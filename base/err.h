@@ -31,6 +31,7 @@
 	AllocErr, \
         Overflow, \
         CapacityExceeded, \
+	NotFound, \
         NotYetImplemented
 // clang-format on
 

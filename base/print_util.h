@@ -44,6 +44,8 @@ typedef struct Printable {
 static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+#pragma GCC diagnostic ignored \
+	"-Wincompatible-pointer-types-discards-qualifiers"
 
 #define BUILD_PRINTABLE(ignore, v)                                             \
 	_Generic((v),                                                              \
@@ -68,7 +70,7 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 		default: (const Printable){                                            \
 			.type = PrintTypeString,                                           \
 			.value.string_value =                                              \
-				_Generic((v), char *: (v), const char *: (v), default: 0)})
+				_Generic((v), const char *: (v), char *: (v), default: 0)})
 
 long long print_impl(Channel *channel, char *buffer, long long capacity,
 					 int newline, int exit, const char *prefix, const char *fmt,
