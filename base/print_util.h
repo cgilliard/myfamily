@@ -43,7 +43,7 @@ typedef struct Printable {
 
 static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 
-#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
 #pragma clang diagnostic ignored \
 	"-Wincompatible-pointer-types-discards-qualifiers"
