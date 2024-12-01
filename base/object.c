@@ -33,7 +33,7 @@ typedef struct ObjectImpl {
 		int code_value;
 		void *ptr_value;
 	} value;
-	unsigned long long type : 62;
+	unsigned int type : 4;
 	unsigned int no_cleanup : 1;
 	unsigned int consumed : 1;
 } ObjectImpl;
@@ -56,7 +56,23 @@ void __attribute__((constructor)) __setup_object_impl() {
 }
 
 void check_consumed(const Object *obj) {
+	if (obj == 0) panic("Object is NULL");
 	if (((const ObjectImpl *)obj)->consumed) panic("Object consumed!");
+}
+
+Object object_move(Object *obj) {
+	if (object_type(obj) != Box) return *obj;
+	Object ret = *obj;
+	(*(ObjectImpl *)obj).no_cleanup = (*(ObjectImpl *)obj).consumed = 1;
+	return ret;
+}
+
+Object object_ref(Object *obj) {
+	if (object_type(obj) != Box) return *obj;
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	BoxSlabData *bsd = impl->value.ptr_value;
+	bsd->ref_count++;
+	return *obj;
 }
 
 Object object_int(long long value) {
@@ -106,8 +122,12 @@ Object box(long long size) {
 			}
 			bsd->ordered = INIT_ORBTREE;
 			bsd->seq = INIT_ORBTREE;
-		} else
+			bsd->ref_count = 1;
+		} else {
 			set_bytes(slab, '\0', OBJ_SLAB_SIZE);
+			BoxSlabData *bsd = slab;
+			bsd->ref_count = 1;
+		}
 		ObjectImpl ret = {.type = Box, .value.ptr_value = slab};
 		return *((Object *)&ret);
 	}
@@ -195,14 +215,24 @@ ObjectType object_type(const Object *obj) {
 void object_cleanup_node(OrbTreeNode *node) {
 	if (node->right) object_cleanup_node(node->right);
 	if (node->left) object_cleanup_node(node->left);
-	slab_allocator_free(&object_slabs, (node - OFFSET_ORDERED));
+	ObjectProperty *op = (ObjectProperty *)(node - OFFSET_ORDERED);
+	object_cleanup(&op->value);
+	slab_allocator_free(&object_slabs, op);
 }
 
 void object_cleanup(const Object *obj) {
-	if (object_type(obj) == Box) {
+	if (((ObjectImpl *)obj)->type == Box) {
 		ObjectImpl *impl = (ObjectImpl *)obj;
 		if (impl->no_cleanup) return;
 		BoxSlabData *bsd = impl->value.ptr_value;
+		if (--bsd->ref_count != 0) return;
+
+		Object drop = object_get_property(obj, "drop");
+		if (!$is_err(drop)) {
+			void (*drop_impl)(Object *) = (void (*)(Object *))$fn(&drop);
+			drop_impl(obj);
+		}
+
 		if (bsd->pages) unmap(bsd->extended, bsd->pages);
 		if (bsd->ordered.root) object_cleanup_node(bsd->ordered.root);
 		slab_allocator_free(&object_slabs, impl->value.ptr_value);
@@ -255,9 +285,7 @@ Object object_set_property(Object *obj, const char *name, const Object *value) {
 
 	ObjectProperty *opptr = slab_allocator_allocate(&object_slabs);
 	opptr->name = name;
-	opptr->value = *value;
-	((ObjectImpl *)&value)->no_cleanup = 1;
-	((ObjectImpl *)&value)->consumed = 1;
+	opptr->value = object_ref(value);
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	BoxSlabData *bsd = impl->value.ptr_value;
 	orbtree_put(&bsd->ordered, &opptr->ordered, object_search_ordered);

@@ -33,10 +33,12 @@ typedef enum ObjectType {
 } ObjectType;
 
 typedef struct BoxSlabData {
-	void *extended;
-	unsigned long long pages;
 	OrbTree ordered;
 	OrbTree seq;
+	void *extended;
+	unsigned long long pages;
+	unsigned int ref_count;
+	unsigned int weak_count;
 } BoxSlabData;
 
 #define OBJ_SLAB_SIZE (128 - SLAB_LIST_SIZE)
@@ -65,8 +67,6 @@ typedef struct BoxSlabData {
 		long long: 0,                                                          \
 		unsigned long long: 0,                                                 \
 		default: v)))
-
-#define _(type, ...)
 
 #define PROC_DEFAULT(code) \
 	default: {             \
@@ -117,5 +117,7 @@ ObjectType object_type(const Object *obj);
 Object object_get_property(const Object *obj, const char *name);
 Object object_set_property(Object *obj, const char *name, const Object *value);
 Object object_remove_property(Object *obj, const char *name);
+Object object_move(Object *obj);
+Object object_ref(Object *obj);
 
 #endif	// _BASE_OBJECT__

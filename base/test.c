@@ -435,7 +435,7 @@ Test(box_resize) {
 }
 
 Test(properties) {
-	var b1 = box(1);
+	var b1 = box(20000);
 	let res0 = object_get_property(&b1, "test");
 	assert($is_err(res0));
 	let ins1 = $(123);
@@ -450,4 +450,30 @@ Test(properties) {
 	let res4 = object_get_property(&b1, "test2");
 	assert(!$is_err(res4));
 	assert_eq($int(res4), 1234);
+
+	let b2 = box(40000);
+	let res5 = object_set_property(&b1, "test3", &b2);
+	assert(!$is_err(res5));
+}
+
+static int drop_count = 0;
+
+void my_drop(Object *obj) {
+	char *data = box_get_short_bytes(obj);
+	assert_eq(data[0], 'g');
+	drop_count++;
+}
+
+Test(object_ref) {
+	{
+		var b1 = box(100);
+		char *data = box_get_short_bytes(&b1);
+		data[0] = 'g';
+		let fn = $(my_drop);
+		let res1 = object_set_property(&b1, "drop", &fn);
+		assert(!$is_err(res1));
+		let b2 = object_ref(&b1);
+		assert_eq(drop_count, 0);
+	}
+	assert_eq(drop_count, 1);
 }
