@@ -288,7 +288,9 @@ Object object_set_property(Object *obj, const char *name, const Object *value) {
 	opptr->value = object_ref(value);
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	BoxSlabData *bsd = impl->value.ptr_value;
-	orbtree_put(&bsd->ordered, &opptr->ordered, object_search_ordered);
+	OrbTreeNode *ret =
+		orbtree_put(&bsd->ordered, &opptr->ordered, object_search_ordered);
+	if (ret) slab_allocator_free(&object_slabs, ret - OFFSET_ORDERED);
 	return $(0);
 }
 
