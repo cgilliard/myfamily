@@ -12,16 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_FAM__
-#define _BASE_FAM__
+#ifndef _BASE_PROC__
+#define _BASE_PROC__
 
-#include <base/channel.h>
 #include <base/object.h>
 
-Object init(Object (*task)(Channel channel), int threads);
-Channel run(Object (*task)(Channel channel));
-Object send(Channel channel, Object object);
-Object recv(Channel channel, int timeout_millis);
-void __attribute__((noreturn)) halt(int code);
+typedef struct Process {
+	Channel channel;
+	Object (*task)(Channel channel);
+	unsigned int process_priority;
+	unsigned int state;
+	unsigned long long epoch_cpu_time;
+	ucontext_t context;
+	void *stack_base;
+	size_t stack_size;
+	char name[32];
+	struct Process *wait_process;
+	OrbTreeNode cpu_time;
+	OrbTreeNode lottery;
+	struct Process *next_link;	// singly linked list for hashtable.
+} Process;
 
-#endif	// _BASE_FAM__
+#define PROC_TABLE_SIZE 32
+typedef struct ProcTable {
+	unsigned char impl[PROC_TABLE_SIZE];
+} ProcTable;
+
+Object proctable_add_process(ProcTable *table, Process *proc);
+
+#endif	// _BASE_PROC__

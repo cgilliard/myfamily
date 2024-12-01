@@ -46,8 +46,7 @@ Object test_init(Channel channel) {
 }
 
 Test(fam_init) {
-	let x = init(test_init, 4);
-	assert(1);
+	let x = init(test_init, 1);
 }
 
 Test(object) {
