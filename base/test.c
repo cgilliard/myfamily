@@ -520,3 +520,16 @@ Test(object_overwrite) {
 	assert_eq(drop_props_count, 3);
 	let xvv = $(1);
 }
+
+Test(object_delete) {
+	var x = box(1);
+	let y = $(10);
+	let z = $(2);
+	let r1 = set(x, "a", y);
+	let y_out = get(x, "a");
+	assert_eq($int(y_out), 10);
+	let rem_out = remove(x, "a");
+	assert_eq($int(rem_out), 10);
+	let y_out2 = get(x, "a");
+	assert($is_err(y_out2));
+}
