@@ -67,23 +67,25 @@ long long print_impl(Channel *channel, char *buffer, long long capacity,
 				write_data(buf, len);
 			}
 		} else if (p.type == PrintTypeFloat) {
-			int len = snprintf(0, 0, "%f", p.value.float_value);
+			unsigned long long len = snprintf(0, 0, "%f", p.value.float_value);
 			if (len > 0) {
 				char buf[len + 1];
 				snprintf(buf, len + 1, "%f", p.value.float_value);
 				write_data(buf, len);
 			}
 		} else if (p.type == PrintTypeString) {
-			int len = cstring_len(p.value.string_value);
-			if (len > 0) write_data(p.value.string_value, len);
+			if (p.value.string_value != 0) {
+				unsigned long long len = cstring_len(p.value.string_value);
+				if (len > 0) write_data(p.value.string_value, len);
+			}
 		} else if (p.type == PrintTypeObject) {
 			ObjectType type = object_type(&p.value.object_value);
 			if (type == Int) {
 				long long v = $int(p.value.object_value);
-				unsigned long long len = cstring_itoau64(v, 0, 10, 0);
+				unsigned long long len = cstring_itoai64(v, 0, 10, 0);
 				if (len) {
 					char buf[len + 1];
-					cstring_itoau64(v, buf, 10, len);
+					cstring_itoai64(v, buf, 10, len);
 					write_data(buf, len);
 				}
 			} else if (type == Float) {
@@ -94,6 +96,18 @@ long long print_impl(Channel *channel, char *buffer, long long capacity,
 					snprintf(buf, len + 1, "%f", v);
 					write_data(buf, len);
 				}
+			} else if (type == UInt) {
+				unsigned long long v = $uint(p.value.object_value);
+				unsigned long long len = cstring_itoau64(v, 0, 10, 0);
+				if (len) {
+					char buf[len + 1];
+					cstring_itoau64(v, buf, 10, len);
+					write_data(buf, len);
+				}
+			} else if (type == Err) {
+				const char *err_text = $err(p.value.object_value);
+				unsigned long long len = cstring_len(err_text);
+				if (len > 0) write_data(err_text, len);
 			} else {
 			}  // TODO: handle other types
 		}

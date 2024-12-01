@@ -36,6 +36,7 @@ typedef struct ObjectImpl {
 	unsigned int type : 4;
 	unsigned int no_cleanup : 1;
 	unsigned int consumed : 1;
+	unsigned int aux;
 } ObjectImpl;
 
 typedef struct ObjectProperty {
@@ -96,7 +97,7 @@ Object object_function(void *fn) {
 }
 
 Object object_err(int code) {
-	ObjectImpl ret = {.type = Err, .value.code_value = code};
+	ObjectImpl ret = {.type = Err, .aux = code};
 	return *((Object *)&ret);
 }
 
@@ -209,6 +210,11 @@ const void *value_of_checked(const Object *obj, ObjectType expect) {
 ObjectType object_type(const Object *obj) {
 	check_consumed(obj);
 	return ((ObjectImpl *)obj)->type;
+}
+
+unsigned int object_aux(const Object *obj) {
+	check_consumed(obj);
+	return ((ObjectImpl *)obj)->aux;
 }
 
 void object_cleanup_node(OrbTreeNode *node) {

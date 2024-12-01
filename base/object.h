@@ -15,6 +15,7 @@
 #ifndef _BASE_OBJECT__
 #define _BASE_OBJECT__
 
+#include <base/err.h>
 #include <base/macro_util.h>
 #include <base/orbtree.h>
 
@@ -105,7 +106,8 @@ typedef struct BoxSlabData {
 #define $fn(v) value_of_checked(v, Function)
 #define $int(obj) (*(long long *)value_of_checked(&obj, Int))
 #define $is_err(obj) (object_type(&obj) == Err)
-#define $kind(obj) (*(int *)value_of_checked(&obj, Err))
+#define $err(obj) (FamErrText[(object_aux(&obj))])
+#define $kind(obj) (object_aux(&obj))
 #define $float(obj) (*(double *)value_of_checked(&obj, Float))
 #define $uint(obj) (*(unsigned long long *)value_of_checked(&obj, UInt))
 #define let const Object
@@ -119,6 +121,7 @@ Object object_string(const char *v);
 Object object_err(int code);
 Object box(long long size);
 Object box_resize(Object *obj, long long size);
+unsigned int object_aux(const Object *obj);
 void *box_get_long_bytes(const Object *obj);
 void *box_get_short_bytes(const Object *obj);
 unsigned long long box_get_page_count(const Object *obj);

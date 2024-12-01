@@ -236,11 +236,17 @@ Test(default_type) {
 }
 
 Test(print_util) {
-	/*
-		let obj = $(123);
-		println("test 0={} 1={} 2={} 3={} 4={} 5={} 6={} ok done", 1, -20LL,
-	   30ULL, "ok", 1.2, obj, $(1.5)); println("test");
-	*/
+	let obj = $(123);
+	println("test 0={} 1={} 2={} 3={} 4={} 5={} 6={} ok done", 1, -20LL, 30ULL,
+			"ok", 1.2, obj, $(1.5));
+	println("test");
+
+	ObjectType t = object_type(&obj);
+	unsigned char *test = "abc";
+	println("t={},s={},test={},negative={},ull={}", t, "ok ok ok", test, $(-3),
+			$(100ULL));
+	let x = Err(IllegalArgument);
+	println("err={}", x);
 }
 
 #pragma GCC diagnostic ignored "-Woverflow"

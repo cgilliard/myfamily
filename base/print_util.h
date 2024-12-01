@@ -57,6 +57,9 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 							   .value.int_value = (long long)(v)},             \
 		long long: (const Printable){.type = PrintTypeInt,                     \
 									 .value.int_value = (long long)(v)},       \
+		unsigned int: (const Printable){.type = PrintTypeUInt,                 \
+										.value.uint_value =                    \
+											(unsigned long long)(v)},          \
 		unsigned long: (const Printable){.type = PrintTypeUInt,                \
 										 .value.uint_value =                   \
 											 (unsigned long long)(v)},         \
@@ -69,10 +72,13 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 		float: (const Printable){.type = PrintTypeFloat,                       \
 								 .value.float_value =                          \
 									 _Generic((v), float: v, default: 0.0)},   \
-		default: (const Printable){                                            \
-			.type = PrintTypeString,                                           \
-			.value.string_value =                                              \
-				_Generic((v), const char *: (v), char *: (v), default: 0)})
+		default: (const Printable){.type = PrintTypeString,                    \
+								   .value.string_value = _Generic((v),         \
+								   const char *: (v),                          \
+								   char *: (v),                                \
+								   unsigned char *: (v),                       \
+								   const unsigned char *: (v),                 \
+								   default: 0)})
 
 long long print_impl(Channel *channel, char *buffer, long long capacity,
 					 int newline, int exit, const char *prefix, const char *fmt,
