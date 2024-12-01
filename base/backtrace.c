@@ -16,6 +16,6 @@
 
 char *backtrace_generate() {
 	void *array[MAX_BACKTRACE_ENTRIES];
-	int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
+	// int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
 	return 0;
 }
