@@ -44,8 +44,9 @@ typedef struct Printable {
 static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-#pragma GCC diagnostic ignored \
+#pragma clang diagnostic ignored \
 	"-Wincompatible-pointer-types-discards-qualifiers"
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 
 #define BUILD_PRINTABLE(ignore, v)                                             \
 	_Generic((v),                                                              \
