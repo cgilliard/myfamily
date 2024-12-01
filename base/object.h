@@ -23,14 +23,22 @@ void object_cleanup(const ObjectNc *obj);
 #define Object \
 	ObjectNc __attribute((warn_unused_result, cleanup(object_cleanup)))
 
-typedef enum ObjectType {
-	UInt,
-	Int,
-	Float,
-	Box,
-	Function,
-	Err,
-} ObjectType;
+#define DEFINE_OBJECT(e)                                                    \
+	typedef enum ObjectType { FOR_EACH(SECOND, none, (, ), e) } ObjectType; \
+	static const char *ObjectText[] = {                                     \
+		FOR_EACH(SECOND_STRINGIFY, none, (, ), e)};
+
+// clang-format off
+#define OBJECT_TYPES \
+	UInt, \
+	Int, \
+	Float, \
+	Box, \
+	Function, \
+	Err
+// clang-format on
+
+DEFINE_OBJECT(OBJECT_TYPES);
 
 typedef struct BoxSlabData {
 	OrbTree ordered;

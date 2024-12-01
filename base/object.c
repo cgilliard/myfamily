@@ -134,7 +134,7 @@ Object box(long long size) {
 Object box_resize(Object *obj, long long size) {
 	check_consumed(obj);
 	ObjectType type = object_type(obj);
-	if (type != Box) panic("Expected box found type: {}", type);
+	if (type != Box) panic("Expected box found type: {}", ObjectText[type]);
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	BoxSlabData *bsd = impl->value.ptr_value;
 	if (size <= OBJ_BOX_USER_DATA_SIZE) {
@@ -166,7 +166,7 @@ Object box_resize(Object *obj, long long size) {
 void *box_get_long_bytes(const Object *obj) {
 	check_consumed(obj);
 	ObjectType type = object_type(obj);
-	if (type != Box) panic("Expected box found type: {}", type);
+	if (type != Box) panic("Expected box found type: {}", ObjectText[type]);
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	BoxSlabData *bsd = impl->value.ptr_value;
 	return bsd->extended;
@@ -175,7 +175,7 @@ void *box_get_long_bytes(const Object *obj) {
 void *box_get_short_bytes(const Object *obj) {
 	check_consumed(obj);
 	ObjectType type = object_type(obj);
-	if (type != Box) panic("Expected box found type: {}", type);
+	if (type != Box) panic("Expected box found type: {}", ObjectText[type]);
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	void *ptr = impl->value.ptr_value;
 	return (unsigned char *)ptr + sizeof(BoxSlabData);
@@ -184,7 +184,7 @@ void *box_get_short_bytes(const Object *obj) {
 unsigned long long box_get_page_count(const Object *obj) {
 	check_consumed(obj);
 	ObjectType type = object_type(obj);
-	if (type != Box) panic("Expected box found type: {}", type);
+	if (type != Box) panic("Expected box found type: {}", ObjectText[type]);
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	BoxSlabData *bsd = impl->value.ptr_value;
 	return bsd->pages;
@@ -201,7 +201,8 @@ const void *value_of_checked(const Object *obj, ObjectType expect) {
 	check_consumed(obj);
 	ObjectType type = object_type(obj);
 	if (type != expect)
-		panic("Expected Object type {}. Found {}!", (int)expect, (int)type);
+		panic("Expected Object type {}. Found {}!", ObjectText[expect],
+			  ObjectText[type]);
 	return value_of(obj);
 }
 
@@ -298,5 +299,17 @@ Object object_set_property(Object *obj, const char *name, const Object *value) {
 
 Object object_remove_property(Object *obj, const char *name) {
 	check_consumed(obj);
-	return Err(NotYetImplemented);
+
+	ObjectProperty op = {.name = name};
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	BoxSlabData *bsd = impl->value.ptr_value;
+
+	OrbTreeNode *ret =
+		orbtree_remove(&bsd->ordered, &op.ordered, object_search_ordered);
+	if (ret) {
+		ObjectProperty *to_del = (ObjectProperty *)(ret - OFFSET_ORDERED);
+		return to_del->value;
+	}
+
+	return Err(NotFound);
 }

@@ -518,4 +518,5 @@ Test(object_overwrite) {
 	assert_eq(ydrops, 1);
 	assert_eq(zdrops, 1);
 	assert_eq(drop_props_count, 3);
+	let xvv = $(1);
 }

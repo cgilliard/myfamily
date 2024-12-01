@@ -46,12 +46,9 @@ int cstring_compare_n(const char *X, const char *Y, unsigned long long n) {
 		X++;
 		Y++;
 	}
-	if (n == 0)
-		return 0;
-	else if (*X > *Y)
-		return 1;
-	else
-		return -1;
+	if (n == 0) return 0;
+	if (*X > *Y) return 1;
+	return -1;
 }
 
 const char *cstring_strstr(const char *X, const char *Y) {
