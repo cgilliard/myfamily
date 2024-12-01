@@ -68,6 +68,9 @@ typedef struct BoxSlabData {
 		unsigned long long: 0,                                                 \
 		default: v)))
 
+#define set(obj, name, value) object_set_property(&obj, name, &value)
+#define get(obj, name) object_get_property(&obj, name)
+
 #define PROC_DEFAULT(code) \
 	default: {             \
 		_ret__ = (code);   \

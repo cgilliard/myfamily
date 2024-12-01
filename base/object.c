@@ -107,30 +107,28 @@ Object object_string(const char *s) {
 
 Object box(long long size) {
 	void *slab = slab_allocator_allocate(&object_slabs);
-	if (slab == 0)
-		return Err(AllocErr);
-	else {
-		if (size > OBJ_BOX_USER_DATA_SIZE) {
-			set_bytes(slab + sizeof(BoxSlabData), '\0', OBJ_BOX_USER_DATA_SIZE);
-			BoxSlabData *bsd = slab;
-			long long needed = size - OBJ_BOX_USER_DATA_SIZE;
-			bsd->pages = (needed + PAGE_SIZE - 1) / PAGE_SIZE;
-			bsd->extended = map(bsd->pages);
-			if (bsd->extended == 0) {
-				slab_allocator_free(&object_slabs, slab);
-				return Err(AllocErr);
-			}
-			bsd->ordered = INIT_ORBTREE;
-			bsd->seq = INIT_ORBTREE;
-			bsd->ref_count = 1;
-		} else {
-			set_bytes(slab, '\0', OBJ_SLAB_SIZE);
-			BoxSlabData *bsd = slab;
-			bsd->ref_count = 1;
+	if (slab == 0) return Err(AllocErr);
+
+	if (size > OBJ_BOX_USER_DATA_SIZE) {
+		set_bytes(slab + sizeof(BoxSlabData), '\0', OBJ_BOX_USER_DATA_SIZE);
+		BoxSlabData *bsd = slab;
+		long long needed = size - OBJ_BOX_USER_DATA_SIZE;
+		bsd->pages = (needed + PAGE_SIZE - 1) / PAGE_SIZE;
+		bsd->extended = map(bsd->pages);
+		if (bsd->extended == 0) {
+			slab_allocator_free(&object_slabs, slab);
+			return Err(AllocErr);
 		}
-		ObjectImpl ret = {.type = Box, .value.ptr_value = slab};
-		return *((Object *)&ret);
+		bsd->ordered = INIT_ORBTREE;
+		bsd->seq = INIT_ORBTREE;
+		bsd->ref_count = 1;
+	} else {
+		set_bytes(slab, '\0', OBJ_SLAB_SIZE);
+		BoxSlabData *bsd = slab;
+		bsd->ref_count = 1;
 	}
+	ObjectImpl ret = {.type = Box, .value.ptr_value = slab};
+	return *((Object *)&ret);
 }
 
 Object box_resize(Object *obj, long long size) {
@@ -227,6 +225,8 @@ void object_cleanup(const Object *obj) {
 		BoxSlabData *bsd = impl->value.ptr_value;
 		if (--bsd->ref_count != 0) return;
 
+		if (bsd->ordered.root) object_cleanup_node(bsd->ordered.root);
+
 		Object drop = object_get_property(obj, "drop");
 		if (!$is_err(drop)) {
 			void (*drop_impl)(Object *) = (void (*)(Object *))$fn(&drop);
@@ -234,7 +234,6 @@ void object_cleanup(const Object *obj) {
 		}
 
 		if (bsd->pages) unmap(bsd->extended, bsd->pages);
-		if (bsd->ordered.root) object_cleanup_node(bsd->ordered.root);
 		slab_allocator_free(&object_slabs, impl->value.ptr_value);
 	}
 }
@@ -290,7 +289,10 @@ Object object_set_property(Object *obj, const char *name, const Object *value) {
 	BoxSlabData *bsd = impl->value.ptr_value;
 	OrbTreeNode *ret =
 		orbtree_put(&bsd->ordered, &opptr->ordered, object_search_ordered);
-	if (ret) slab_allocator_free(&object_slabs, ret - OFFSET_ORDERED);
+	if (ret) {
+		ObjectProperty *to_del = (ObjectProperty *)(ret - OFFSET_ORDERED);
+		object_cleanup(&to_del->value);
+	}
 	return $(0);
 }
 

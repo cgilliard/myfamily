@@ -477,3 +477,45 @@ Test(object_ref) {
 	}
 	assert_eq(drop_count, 1);
 }
+
+static int drop_props_count = 0;
+static int zdrops = 0;
+static int ydrops = 0;
+static int xdrops = 0;
+
+void drop_props(Object *obj) {
+	drop_props_count++;
+	char *bytes = box_get_short_bytes(obj);
+	if (bytes[0] == 'z') zdrops++;
+	if (bytes[0] == 'y') ydrops++;
+	if (bytes[0] == 'x') xdrops++;
+}
+
+Test(object_overwrite) {
+	{
+		let x = box(3);
+		char *xbytes = box_get_short_bytes(&x);
+		xbytes[0] = 'x';
+		let y = box(2);
+		char *ybytes = box_get_short_bytes(&y);
+		ybytes[0] = 'y';
+		var z = box(1);
+		char *zbytes = box_get_short_bytes(&z);
+		zbytes[0] = 'z';
+		let r1 = set(z, "v", x);
+		let r01 = get(z, "v");
+		assert_eq(((char *)box_get_short_bytes(&r01))[0], 'x');
+		let r2 = set(z, "v", y);
+		let r02 = get(z, "v");
+		assert_eq(((char *)box_get_short_bytes(&r02))[0], 'y');
+		let fn = $(drop_props);
+		let r3 = set(x, "drop", fn);
+		let r4 = set(y, "drop", fn);
+		let r5 = set(z, "drop", fn);
+		assert_eq(drop_props_count, 0);
+	}
+	assert_eq(xdrops, 1);
+	assert_eq(ydrops, 1);
+	assert_eq(zdrops, 1);
+	assert_eq(drop_props_count, 3);
+}

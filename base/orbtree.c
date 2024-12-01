@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/orbtree.h>
+#include <base/print_util.h>
 #include <base/util.h>
 
 #define RED 1
@@ -142,6 +143,7 @@ OrbTreeNode *orbtree_insert(OrbTree *tree, OrbTreeNodePair *pair,
 	OrbTreeNode *ret = 0;
 	if (pair->self) {
 		orbtree_insert_transplant(pair->self, value, pair->is_right);
+		if (IS_ROOT(tree, pair->self)) SET_ROOT(tree, value);
 		ret = pair->self;
 	} else {
 		if (pair->parent == 0) {
