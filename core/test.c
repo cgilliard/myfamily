@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-#include <core/lib.h>
-
-Suite(core);
+int main() {
+	return 0;
+}

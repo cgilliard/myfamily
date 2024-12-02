@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <base/orbtree.h>
-#include <base/print_util.h>
 #include <base/util.h>
 
 #define RED 1

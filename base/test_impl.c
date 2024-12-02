@@ -20,38 +20,37 @@
 #include <base/util.h>
 #include <dlfcn.h>
 #include <execinfo.h>
-#include <fcntl.h>
 #include <ftw.h>
 #include <inttypes.h>
 #include <setjmp.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <time.h>
-#include <unistd.h>
 
 #define MAX_BACKTRACE_ENTRIES 128
 
+int remove(const char *pathname);
+void free(void *);
+
+jmp_buf test_jmp;
 int test_count = 0;
 int fail_count = 0;
 unsigned char test_names[MAX_TESTS][MAX_TEST_NAME + 1];
 int test_itt;
-jmp_buf test_jmp;
 unsigned char target_test[MAX_TEST_NAME + 1];
 extern char **environ;
 test_fn_ptr test_arr[MAX_TESTS + 1];
 
 static void __attribute__((constructor)) get_target_test() {
 	target_test[0] = 0;
-	for (int i = 0; environ[i] != NULL; i++) {
+	for (int i = 0; environ[i] != 0; i++) {
 		char *env_var = environ[i];
-		if (!strncmp("TEST_FILTER=", env_var, 12)) {
-			int env_var_len = strlen(env_var);
+		if (!cstring_compare_n("TEST_FILTER=", env_var, 12)) {
+			int env_var_len = cstring_len(env_var);
 			if (env_var_len > 12) {
 				int len = env_var_len + 12;
 				if (len > MAX_TEST_NAME) len = MAX_TEST_NAME;
-				strncpy(target_test, env_var + 12, len);
+				copy_bytes(target_test, env_var + 12, len);
 				break;
 			}
 		}
@@ -62,7 +61,7 @@ int unlink_cb(const char *fpath, const struct stat *sb, int typeflag,
 			  struct FTW *ftwbuf) {
 	int rv = remove(fpath);
 
-	if (rv) perror(fpath);
+	if (rv) println("Error removing files!");
 
 	return rv;
 }
@@ -80,9 +79,10 @@ int execute_tests(unsigned char *name) {
 	for (int i = 0; i < test_count; i++) {
 		test_itt = i;
 		if (setjmp(test_jmp) == 0) {
-			if (target_test[0] == 0 || !strcmp(target_test, test_names[i])) {
+			if (target_test[0] == 0 ||
+				!cstring_compare(target_test, test_names[i])) {
 				test_exe_count++;
-				int test_name_len = strlen(test_names[i]);
+				int test_name_len = cstring_len(test_names[i]);
 				char test_dir[test_name_len + 100];
 				copy_bytes(test_dir, "./.", 3);
 				copy_bytes(test_dir + 3, test_names[i], test_name_len);
@@ -98,8 +98,8 @@ int execute_tests(unsigned char *name) {
 				rmrf(test_dir);
 			}
 		} else {
-			printf("%sFAIL:%s test '%s%s%s' failed!\n", BRIGHT_RED, RESET,
-				   GREEN, test_names[i], RESET);
+			println("{}FAIL:{} test '{}{}{}' failed!", BRIGHT_RED, RESET, GREEN,
+					test_names[i], RESET);
 			fail_count++;
 		}
 	}
@@ -109,27 +109,27 @@ int execute_tests(unsigned char *name) {
 		(end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec);
 
 	if (fail_count)
-		printf(
+		println(
 			"--------------------------------"
 			"--------------------------------"
 			"--------------------------------"
-			"--------------------\n");
-	printf(
-		"[%s====%s] Tested: %s%i%s | Passing: %s%i%s | Failing: %s%i%s "
-		"(Execution time: %s%f%ss)\n",
+			"--------------------");
+	println(
+		"[{}===={}] Tested: {}{}{} | Passing: {}{}{} Failing: {}{}{} "
+		"(Execution time: {}{}{}s)",
 		BLUE, RESET, YELLOW, test_exe_count, RESET, GREEN,
 		test_exe_count - fail_count, RESET, CYAN, fail_count, RESET, CYAN,
 		time_ns / 1e9, RESET);
 
-	printf(
-		"[%s================================"
+	println(
+		"[{}================================"
 		"================================================"
-		"===================================%s]\n",
+		"==================================={}]",
 		BLUE, RESET);
 
 	if (fail_count != 0)
-		printf("%sFAIL:%s Test suite %s%s%s failed!\n", BRIGHT_RED, RESET,
-			   GREEN, name, RESET);
+		println("{}FAIL:{} Test suite {}{}{} failed!", BRIGHT_RED, RESET, GREEN,
+				name, RESET);
 
 	return fail_count == 0;
 }
@@ -181,8 +181,8 @@ void fail_assert() {
 				else
 					n = 0;
 			}
-			if (strstr(output, "_tfwork_"))
-				printf("Assertion failure: %s", output);
+			if (cstring_strstr(output, "_tfwork_"))
+				println("Assertion failure: {}", output);
 			pclose(fp);
 		}
 #else	// MACOS
@@ -195,7 +195,7 @@ void fail_assert() {
 		addr += offset;
 		addr -= 4;
 		snprintf(address, sizeof(address), "0x%" PRIx64 "", addr);
-		if (strstr(strings[i], "_tfwork_")) {
+		if (i > 0 && cstring_strstr(strings[i - 1], "fail_assert")) {
 			char command[256];
 			snprintf(command, sizeof(command),
 					 "atos -fullPath -o ./.bin/test -l 0x100000000 %s",
@@ -203,9 +203,9 @@ void fail_assert() {
 
 			FILE *fp = popen(command, "r");
 			char buffer[128];
-			printf("Assertion failure: ");
+			println("Assertion failure: ");
 			while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-				printf("%s", buffer);  // Print each line from atos output
+				print("{}", buffer);  // Print each line from atos output
 			}
 
 			pclose(fp);

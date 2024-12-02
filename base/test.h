@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/print_util.h>
+#include <base/util.h>
+
 #define MAX_TESTS 100
 #define MAX_TEST_NAME 1024
 
@@ -20,34 +23,31 @@ extern int fail_count;
 typedef void (*test_fn_ptr)(const unsigned char *);
 extern test_fn_ptr test_arr[MAX_TESTS + 1];
 extern unsigned char test_names[MAX_TESTS][MAX_TEST_NAME + 1];
-int printf(const char *fmt, ...);
 int execute_tests(unsigned char *suite_name);
 void fail_assert();
 
 #define assert(v) \
 	if (!(v)) fail_assert();
 
-#define assert_eq(v1, v2)                                                \
-	if ((v1) != (v2)) {                                                  \
-		if (fail_count == 0)                                             \
-			printf(                                                      \
-				"--------------------------------"                       \
-				"--------------------------------"                       \
-				"--------------------------------"                       \
-				"--------------------\n");                               \
-		_Generic((v1),                                                   \
-			float: printf("(%f != %f) ", ((float)(v1)), ((float)(v2))),  \
-			double: printf("(%f != %f) ", ((float)(v1)), ((float)(v2))), \
-			unsigned char: printf("(%c != %c) ", (unsigned char)(v1),    \
-								  (unsigned char)(v2)),                  \
-			unsigned long long: printf("(%llu != %llu) ",                \
-									   (unsigned long long)(v1),         \
-									   (unsigned long long)(v2)),        \
-			long long: printf("(%lli != %lli) ", (long long)(v1),        \
-							  (long long)(v2)),                          \
-			int: printf("(%i != %i) ", (int)(v1), (int)(v2)),            \
-			default: ({}));                                              \
-		fail_assert();                                                   \
+#define assert_eq(v1, v2)                                                      \
+	if ((v1) != (v2)) {                                                        \
+		if (fail_count == 0)                                                   \
+			println(                                                           \
+				"--------------------------------"                             \
+				"--------------------------------"                             \
+				"--------------------------------"                             \
+				"--------------------");                                       \
+		_Generic((v1),                                                         \
+			float: print("({} != {}) ", ((float)(v1)), ((float)(v2))),         \
+			double: print("({} != {}) ", ((float)(v1)), ((float)(v2))),        \
+			unsigned char: print("({} != {}) ", (unsigned char)(v1),           \
+								 (unsigned char)(v2)),                         \
+			unsigned long long: print("({} != {}) ", (unsigned long long)(v1), \
+									  (unsigned long long)(v2)),               \
+			long long: print("({} != {}) ", (long long)(v1), (long long)(v2)), \
+			int: print("({} != {}) ", (int)(v1), (int)(v2)),                   \
+			default: ({}));                                                    \
+		fail_assert();                                                         \
 	}
 
 #define Suite(name)                         \

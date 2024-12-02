@@ -79,7 +79,7 @@ typedef struct BoxSlabData {
 
 #define set(obj, name, value) object_set_property(&obj, name, &value)
 #define get(obj, name) object_get_property(&obj, name)
-#define remove(obj, name) object_remove_property(&obj, name)
+#define rem(obj, name) object_remove_property(&obj, name)
 
 #define PROC_DEFAULT(code) \
 	default: {             \

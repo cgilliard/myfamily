@@ -20,8 +20,6 @@
 
 // system calls:
 void __attribute__((noreturn)) _exit(int code);
-int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
-				   void *(*start_routine)(void *), void *arg);
 
 void *fam_start_thread() {
 	println("start fam thread");
