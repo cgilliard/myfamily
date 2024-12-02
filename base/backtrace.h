@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#ifndef _BASE_BACKTRACE__
+#define _BASE_BACKTRACE__
 
-Suite(main);
+#define MAX_BACKTRACE_ENTRIES 100
+
+char *backtrace_generate();
+
+#endif	// _BASE_BACKTRACE__

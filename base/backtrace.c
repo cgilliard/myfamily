@@ -12,6 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#include <base/backtrace.h>
+#include <execinfo.h>
+#include <stdlib.h>
 
-Suite(main);
+char *backtrace_generate() {
+	void *array[MAX_BACKTRACE_ENTRIES];
+	int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
+	char **strings = backtrace_symbols(array, size);
+
+	free(strings);
+	return 0;
+}
