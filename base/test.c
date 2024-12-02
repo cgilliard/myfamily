@@ -17,9 +17,21 @@
 Suite(Base);
 
 void test1() {
-	// assert(0);
+	// assert_eq(0, 10);
 }
 
 Test(lock) {
 	test1();
+}
+
+Test(cstring_cat_n) {
+	char buf[100] = {};
+	copy_bytes(buf, "abc", 3);
+	cstring_cat_n(buf, "def", 3);
+	assert(!cstring_compare(buf, "abcdef"));
+}
+
+Test(strtoull) {
+	assert_eq(125, cstring_strtoull("125", 10));
+	assert_eq(8997, cstring_strtoull("0x2325", 16));
 }

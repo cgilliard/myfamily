@@ -138,6 +138,8 @@ void fail_assert() {
 	void *array[MAX_BACKTRACE_ENTRIES];
 	int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
 	char **strings = backtrace_symbols(array, size);
+	char output_last[1024 * 2];
+	output_last[0] = 0;
 
 	for (int i = 0; i < size; i++) {
 		char address[256];
@@ -161,7 +163,7 @@ void fail_assert() {
 				}
 				itt++;
 			}
-			unsigned long long address = strtoul(addr, NULL, 16);
+			unsigned long long address = cstring_strtoull(addr, 16);
 			address -= 8;
 
 			char command[256];
@@ -172,18 +174,19 @@ void fail_assert() {
 			char buffer[128];
 			char output[1024 * 2];
 			int n = sizeof(output);
-			strcpy(output, "");
+			output[0] = 0;
 			while (n && fgets(buffer, sizeof(buffer), fp) != NULL) {
-				strncat(output, buffer, n);
-				int buf_len = strlen(buffer);
+				cstring_cat_n(output, buffer, n);
+				int buf_len = cstring_len(buffer);
 				if (buf_len < n)
 					n -= buf_len;
 				else
 					n = 0;
 			}
-			if (cstring_strstr(output, "_tfwork_"))
-				println("Assertion failure: {}", output);
+			if (cstring_strstr(output_last, "fail_assert"))
+				print("Assertion failure: {}", output);
 			pclose(fp);
+			copy_bytes(output_last, output, cstring_len(output));
 		}
 #else	// MACOS
 		Dl_info info;

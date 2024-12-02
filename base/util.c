@@ -105,3 +105,23 @@ unsigned long long cstring_itoai64(long long num, char *X, int base,
 	} else
 		return cstring_itoau64(num, X, base, capacity);
 }
+
+unsigned long long cstring_strtoull(const char *X, int base) {
+	unsigned long long ret = 0, mul = 1, len = cstring_len(X);
+	while (len-- && X[len] != 'x') {
+		ret +=
+			X[len] > '9' ? ((X[len] - 'a') + 10) * mul : (X[len] - '0') * mul;
+		mul *= base;
+	}
+	return ret;
+}
+
+void cstring_cat_n(char *X, char *Y, unsigned long long n) {
+	X += cstring_len(X);
+	while (n-- && *Y) {
+		*X = *Y;
+		X++;
+		Y++;
+	}
+	*X = 0;
+}

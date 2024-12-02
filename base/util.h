@@ -21,11 +21,12 @@ void set_bytes(unsigned char *dst, unsigned char b, unsigned long long n);
 unsigned long long cstring_len(const char *S);
 int cstring_compare(const char *s1, const char *s2);
 int cstring_compare_n(const char *s1, const char *s2, unsigned long long n);
+void cstring_cat_n(char *s1, char *s2, unsigned long long n);
 const char *cstring_strstr(const char *X, const char *Y);
 void reverse(unsigned char *str, long long end);
 unsigned long long cstring_itoau64(unsigned long long num, char *str, int base,
 								   unsigned long long capacity);
 unsigned long long cstring_itoai64(long long num, char *str, int base,
 								   unsigned long long capacity);
-
+unsigned long long cstring_strtoull(const char *str, int base);
 #endif	// _BASE_UTIL__
