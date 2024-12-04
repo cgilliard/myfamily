@@ -121,7 +121,7 @@ const char *__last_trace_impl__() {
 		addr += offset;
 		addr -= 4;
 		snprintf(address, sizeof(address), "0x%llx", addr);
-		if (i > 1 && cstring_strstr(strings[i - 2], "__last_trace_impl__")) {
+		if (i > 2 && cstring_strstr(strings[i - 3], "__last_trace_impl__")) {
 			char command[256];
 			snprintf(command, sizeof(command),
 					 "atos -fullPath -o ./.bin/test -l 0x100000000 %s",

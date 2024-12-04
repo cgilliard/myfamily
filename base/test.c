@@ -14,10 +14,14 @@
 
 #include <base/test.h>
 
-int printf(const char *fmt, ...);
 Suite(Base);
+
+void test1() {
+	// assert_eq(1, 10);
+}
 
 Test(last_trace) {
 	// const char *lt = last_trace();
 	// assert_eq(1, 0);
+	test1();
 }
