@@ -32,7 +32,7 @@ void *map(u64 pages);
 void unmap(void *addr, u64 pages);
 
 long unsigned int getpagesize();
-void sched_yield();
+int sched_yield(void);
 
 const char *backtrace_full();
 const char *last_trace();

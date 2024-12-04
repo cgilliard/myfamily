@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define offsetof(x, y) __builtin_offsetof(x, y)
 #define UNIQUE_ID __COUNTER__
 #define STRINGIFY(x) #x
 #define EXPAND(x) x

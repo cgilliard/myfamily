@@ -12,9 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/colors.h>
+#define _XOPEN_SOURCE
 #include <base/fam.h>
 #include <base/print_util.h>
-#include <base/proc.h>
 #include <base/sys.h>
-#include <base/util.h>
+#include <pthread.h>
+#include <ucontext.h>
+
+void *fam_start_thread() {
+	println("start fam thread");
+	return 0;
+}
+
+Object send(Channel channel, Object object) {
+	Object ret = $(0);
+	return ret;
+}
+Channel run(Object (*task)(Channel channel)) {
+	Channel channel;
+	return channel;
+}
+Object recv(Channel channel, int timeout_millis) {
+	Object ret = $(0);
+	return ret;
+}
+
+Object init(Object (*task)(Channel channel), int threads) {
+	for (int i = 0; i < threads; i++) {
+		pthread_t th;
+		pthread_create(&th, 0, fam_start_thread, 0);
+	}
+	Object ret = $(0);
+	return ret;
+}
+
+void __attribute__((noreturn)) halt(int code) {
+	_exit(code);
+}

@@ -49,7 +49,80 @@ __int128_t getnanos() {
 }
 
 const char *backtrace_full() {
-	return NULL;
+	void *array[MAX_BACKTRACE_ENTRIES];
+	int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
+	char **strings = backtrace_symbols(array, size);
+	char *ret = map(4);
+	int len_sum = 0;
+	for (int i = 0; i < size; i++) {
+		char address[256];
+#ifdef __linux__
+		int len = cstring_len(strings[i]);
+		int last_plus = -1;
+
+		while (len > 0) {
+			if (strings[i][len] == '+') {
+				last_plus = len;
+				break;
+			}
+			len--;
+		}
+		if (last_plus > 0) {
+			byte *addr = strings[i] + last_plus + 1;
+			int itt = 0;
+			while (addr[itt]) {
+				if (addr[itt] == ')') {
+					addr[itt] = 0;
+					break;
+				}
+				itt++;
+			}
+			u64 address = cstring_strtoull(addr, 16);
+			address -= 8;
+
+			char command[256];
+			snprintf(command, sizeof(command),
+					 "addr2line -f -e ./.bin/test %llx", address);
+
+			void *fp = popen(command, "r");
+			char buffer[128];
+			while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+				int len = cstring_len(buffer);
+				len_sum += len;
+				if (len_sum >= 4 * PAGE_SIZE) break;
+				cstring_cat_n(ret, buffer, cstring_len(buffer));
+			}
+
+			pclose(fp);
+		}
+#elif defined(__APPLE__)
+		Dl_info info;
+		dladdr(array[i], &info);
+		u64 addr = 0x0000000100000000 + info.dli_saddr - info.dli_fbase;
+		u64 offset = (u64)array[i] - (u64)info.dli_saddr;
+		addr += offset;
+		addr -= 4;
+		snprintf(address, sizeof(address), "0x%llx", addr);
+		char command[256];
+		snprintf(command, sizeof(command),
+				 "atos -fullPath -o ./.bin/test -l 0x100000000 %s", address);
+		void *fp = popen(command, "r");
+		char buffer[128];
+
+		while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+			int len = cstring_len(buffer);
+			len_sum += len;
+			if (len_sum >= 4 * PAGE_SIZE) break;
+			cstring_cat_n(ret, buffer, cstring_len(buffer));
+		}
+		pclose(fp);
+#else
+		println("WARN: Unsupported OS: cannot build backtraces");
+#endif
+	}
+
+	if (strings && size) free(strings);
+	return ret;
 }
 const char *__last_trace_impl__() {
 	void *array[MAX_BACKTRACE_ENTRIES];
@@ -141,6 +214,8 @@ const char *__last_trace_impl__() {
 
 			break;
 		}
+#else
+		println("WARN: Unsupported OS: cannot build backtraces");
 #endif	// End MACOS
 	}
 
