@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#define INT64_MAX ((long long)0x7FFFFFFFFFFFFFFFLL)
+#define INT64_MIN (-INT64_MAX - 1)
 
-int printf(const char *fmt, ...);
-Suite(Base);
+#define INT32_MAX ((int)0x7FFFFFFF)
+#define INT32_MIN (-INT32_MAX - 1)
 
-Test(last_trace) {
-	// const char *lt = last_trace();
-	// assert_eq(1, 0);
-}
+#define UINT64_MAX ((unsigned int)0xFFFFFFFFFFFFFFFFULL)
+#define UINT32_MAX ((unsigned int)0xFFFFFFFFULL)

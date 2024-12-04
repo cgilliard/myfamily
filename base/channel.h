@@ -12,12 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#ifndef _BASE_CHANNEL__
+#define _BASE_CHANNEL__
 
-int printf(const char *fmt, ...);
-Suite(Base);
+#define STDIN          \
+	(Channel) {        \
+		.value = { 0 } \
+	}
 
-Test(last_trace) {
-	// const char *lt = last_trace();
-	// assert_eq(1, 0);
-}
+#define STDOUT         \
+	(Channel) {        \
+		.value = { 1 } \
+	}
+
+#define STDERR         \
+	(Channel) {        \
+		.value = { 2 } \
+	}
+
+typedef struct Channel {
+	unsigned char value[32];
+} Channel;
+
+Channel channel();
+
+#endif	// _BASE_CHANNEL__

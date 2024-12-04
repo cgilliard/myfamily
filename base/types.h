@@ -12,12 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#ifndef _BASE_TYPES__
+#define _BASE_TYPES__
 
-int printf(const char *fmt, ...);
-Suite(Base);
+// primitives
+typedef signed long long i64;
+typedef unsigned long long u64;
+typedef int i32;
+typedef unsigned int u32;
+typedef unsigned char byte;
+#define float64 double
 
-Test(last_trace) {
-	// const char *lt = last_trace();
-	// assert_eq(1, 0);
-}
+// booleans
+#define bool _Bool
+#define true (_Bool)1
+#define false (_Bool)0
+
+// NULL
+#ifndef NULL
+#define NULL ((void *)0)
+#endif	// NULL
+
+#endif	// _BASE_TYPES__

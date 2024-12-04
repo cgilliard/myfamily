@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#ifndef _BASE_LOCK__
+#define _BASE_LOCK__
 
-int printf(const char *fmt, ...);
-Suite(Base);
+#define INIT_LOCK (0)
 
-Test(last_trace) {
-	// const char *lt = last_trace();
-	// assert_eq(1, 0);
-}
+typedef long long Lock;
+
+#define lockr(l) lock_read(l)
+#define lockw(l) lock_write(l)
+#define locku(l) lock_upgrade(l)
+#define lockd(l) lock_downgrade(l)
+#define unlock(l) lock_unlock(l)
+
+Lock lock_create();
+void lock_read(Lock *lock);
+void lock_write(Lock *lock);
+void lock_unlock(Lock *lock);
+void lock_upgrade(Lock *lock);
+void lock_downgrade(Lock *lock);
+
+#endif	// _BASE_LOCK__

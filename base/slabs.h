@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#ifndef _BASE_SLABS__
+#define _BASE_SLABS__
 
-int printf(const char *fmt, ...);
-Suite(Base);
+#include <base/object.h>
 
-Test(last_trace) {
-	// const char *lt = last_trace();
-	// assert_eq(1, 0);
-}
+#define SLAB_ALLOCATOR_IMPL_SIZE 128
+typedef struct SlabAllocator {
+	unsigned char impl[SLAB_ALLOCATOR_IMPL_SIZE];
+} SlabAllocator;
+
+#define SLAB_LIST_SIZE 32
+
+Object slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
+						   unsigned int max_free_slabs,
+						   unsigned int max_total_slabs);
+void slab_allocator_cleanup(SlabAllocator *sa);
+void *slab_allocator_allocate(SlabAllocator *sa);
+void slab_allocator_free(SlabAllocator *sa, void *slab);
+
+#endif	// _BASE_SLABS__

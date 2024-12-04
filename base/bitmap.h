@@ -12,12 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#ifndef _BASE_BITMAP__
+#define _BASE_BITMAP__
 
-int printf(const char *fmt, ...);
-Suite(Base);
+#include <base/object.h>
 
-Test(last_trace) {
-	// const char *lt = last_trace();
-	// assert_eq(1, 0);
-}
+#define BITMAP_IMPL_SIZE 32
+typedef struct BitMap {
+	unsigned char impl[BITMAP_IMPL_SIZE];
+} BitMap;
+
+Object bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs);
+Object bitmap_allocate(BitMap *m);
+void bitmap_free(BitMap *m, Object index);
+
+void bitmap_cleanup(BitMap *m);
+Object bitmap_ptr_count(BitMap *m);
+Object bitmap_extend(BitMap *m, void *ptr);
+
+#endif	// _BASE_BITMAP__

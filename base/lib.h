@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-
-int printf(const char *fmt, ...);
-Suite(Base);
-
-Test(last_trace) {
-	// const char *lt = last_trace();
-	// assert_eq(1, 0);
-}
+#include <base/colors.h>
+#include <base/print_util.h>
+#include <base/sys.h>
+#include <base/util.h>

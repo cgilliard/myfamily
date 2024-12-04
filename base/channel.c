@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#include <base/channel.h>
 
-int printf(const char *fmt, ...);
-Suite(Base);
-
-Test(last_trace) {
-	// const char *lt = last_trace();
-	// assert_eq(1, 0);
+Channel channel() {
+	Channel ch;
+	return ch;
 }
