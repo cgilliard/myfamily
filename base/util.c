@@ -135,9 +135,8 @@ int cstring_char_is_alpha_numeric(char ch) {
 }
 int cstring_is_alpha_numeric(const char *X) {
 	if (*X >= '0' && *X <= '9') return 0;
-	while (*X) {
-		if (!cstring_char_is_alpha_numeric(*X)) return 0;
-		X++;
-	}
+	while (*X)
+		if (!cstring_char_is_alpha_numeric(*X++)) return 0;
+
 	return 1;
 }
