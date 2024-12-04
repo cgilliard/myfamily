@@ -122,6 +122,10 @@ long long print_impl(Channel *channel, char *buffer, long long capacity,
 		write_data(fmt + itt, fmt_len - itt);
 	}
 	if (newline) write_data("\n", 1);
-	if (exit) _exit(-1);
+	if (exit) {
+		const char *bt = backtrace_full();
+		write_data(bt, cstring_len(bt));
+		_exit(-1);
+	}
 	return 0;
 }
