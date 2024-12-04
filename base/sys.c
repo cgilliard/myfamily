@@ -57,6 +57,7 @@ const char *__last_trace_impl__() {
 	char **strings = backtrace_symbols(array, size);
 	char output_last[PAGE_SIZE];
 	char output_last_last[PAGE_SIZE];
+	char output_last_last_last[PAGE_SIZE];
 	char *ret = NULL;
 	for (int i = 0; i < size; i++) {
 		char address[256];
@@ -88,7 +89,7 @@ const char *__last_trace_impl__() {
 			snprintf(command, sizeof(command),
 					 "addr2line -f -e ./.bin/test %llx", address);
 
-			FILE *fp = popen(command, "r");
+			void *fp = popen(command, "r");
 			char buffer[128];
 			char output[1024 * 2];
 			int n = sizeof(output);
@@ -103,11 +104,12 @@ const char *__last_trace_impl__() {
 			}
 
 			pclose(fp);
-			if (cstring_strstr(output_last_last, "__last_trace_impl__")) {
+			if (cstring_strstr(output_last_last_last, "__last_trace_impl__")) {
 				ret = map(1);
 				copy_bytes(ret, output, PAGE_SIZE);
 			}
 
+			copy_bytes(output_last_last_last, output_last_last, PAGE_SIZE);
 			copy_bytes(output_last_last, output_last, PAGE_SIZE);
 			copy_bytes(output_last, output, PAGE_SIZE);
 		}

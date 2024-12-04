@@ -21,7 +21,11 @@
 #define _FILE_OFFSET_BITS 64
 
 typedef unsigned long size_t;
+#ifdef __linux__
+typedef long int off_t;
+#elif defined(__APPLE__)
 typedef long long off_t;
+#endif
 typedef long long ssize_t;
 
 void *map(u64 pages);
