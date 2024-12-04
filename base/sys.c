@@ -54,6 +54,7 @@ const char *backtrace_full() {
 	int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
 	char **strings = backtrace_symbols(array, size);
 	char *ret = map(4);
+	bool term = false;
 	int len_sum = 0;
 	for (int i = 0; i < size; i++) {
 		char address[256];
@@ -93,6 +94,10 @@ const char *backtrace_full() {
 					len_sum += len;
 					if (len_sum >= 4 * PAGE_SIZE) break;
 					cstring_cat_n(ret, buffer, cstring_len(buffer));
+					if (term) {
+						i = size;
+						break;
+					}
 				} else if (cstring_is_alpha_numeric(buffer)) {
 					if (len && buffer[len - 1] == '\n') {
 						len--;
@@ -103,8 +108,7 @@ const char *backtrace_full() {
 					if (len_sum >= 4 * PAGE_SIZE) break;
 					cstring_cat_n(ret, buffer, cstring_len(buffer));
 					if (!cstring_compare(buffer, "main ")) {
-						i = size;
-						break;
+						term = true;
 					}
 				}
 			}
