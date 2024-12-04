@@ -102,6 +102,10 @@ const char *backtrace_full() {
 					len_sum += len;
 					if (len_sum >= 4 * PAGE_SIZE) break;
 					cstring_cat_n(ret, buffer, cstring_len(buffer));
+					if (!cstring_compare(buffer, "main ")) {
+						i = size;
+						break;
+					}
 				}
 			}
 
@@ -126,6 +130,10 @@ const char *backtrace_full() {
 			len_sum += len;
 			if (len_sum >= 4 * PAGE_SIZE) break;
 			cstring_cat_n(ret, buffer, cstring_len(buffer));
+			if (cstring_strstr(buffer, "main ") == buffer) {
+				i = size;
+				break;
+			}
 		}
 		pclose(fp);
 #else
