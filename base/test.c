@@ -36,4 +36,5 @@ Test(proc_table) {
 	println("err={}", r2);
 	char *bt = backtrace_full();
 	print("{}", bt);
+	unmap(bt, 3);
 }
