@@ -97,7 +97,8 @@ Object object_function(void *fn) {
 }
 
 Object object_err(int code) {
-	ObjectImpl ret = {.type = Err, .aux = code};
+	char *bt = backtrace_full();
+	ObjectImpl ret = {.type = Err, .aux = code, .value.ptr_value = bt};
 	return *((Object *)&ret);
 }
 
@@ -207,6 +208,10 @@ const void *value_of_checked(const Object *obj, ObjectType expect) {
 	return value_of(obj);
 }
 
+const char *object_bt_ptr(const Object *obj) {
+	return ((ObjectImpl *)obj)->value.ptr_value;
+}
+
 ObjectType object_type(const Object *obj) {
 	check_consumed(obj);
 	return ((ObjectImpl *)obj)->type;
@@ -242,6 +247,9 @@ void object_cleanup(const Object *obj) {
 
 		if (bsd->pages) unmap(bsd->extended, bsd->pages);
 		slab_allocator_free(&object_slabs, impl->value.ptr_value);
+	} else if (((ObjectImpl *)obj)->type == Err) {
+		void *ptr = ((ObjectImpl *)obj)->value.ptr_value;
+		if (ptr) unmap(ptr, 4);
 	}
 }
 

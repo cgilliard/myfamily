@@ -105,8 +105,12 @@ long long print_impl(Channel *channel, char *buffer, long long capacity,
 				}
 			} else if (type == Err) {
 				const char *err_text = $err(p.value.object_value);
+				const char *bt = $backtrace(p.value.object_value);
 				unsigned long long len = cstring_len(err_text);
-				if (len > 0) write_data(err_text, len);
+				if (len) write_data(err_text, len);
+				unsigned long long bt_len = cstring_len(bt);
+				if (len && bt_len) write_data("\n", 1);
+				if (bt_len) write_data(bt, bt_len);
 			} else {
 			}  // TODO: handle other types
 		}

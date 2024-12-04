@@ -34,7 +34,9 @@ Test(proc_table) {
 
 	let r2 = Err(AllocErr);
 	println("err={}", r2);
-	char *bt = backtrace_full();
-	print("{}", bt);
-	unmap(bt, 3);
+	/*
+		char *bt = backtrace_full();
+		print("{}", bt);
+		unmap(bt, 3);
+	*/
 }
