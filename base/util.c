@@ -125,3 +125,21 @@ void cstring_cat_n(char *X, char *Y, unsigned long long n) {
 	}
 	*X = 0;
 }
+
+int cstring_char_is_alpha_numeric(char ch) {
+	if (ch >= 'a' && ch <= 'z') return 1;
+	if (ch >= 'A' && ch <= 'Z') return 1;
+	if (ch >= '0' && ch <= '9') return 1;
+	if (ch == '_' || ch == '\n') return 1;
+	return 0;
+}
+int cstring_is_alpha_numeric(const char *X) {
+	if (*X >= '0' && *X <= '9') return 0;
+	while (*X) {
+		if (cstring_char_is_alpha_numeric(*X))
+			X++;
+		else
+			return 0;
+	}
+	return 1;
+}

@@ -30,6 +30,7 @@ void free(void *addr);
 void *popen(const char *command, const char *rw);
 char *fgets(char *str, int n, void *stream);
 int pclose(void *fp);
+int printf(const char *fmt, ...);
 
 void *map(u64 pages) {
 	if (pages == 0) return NULL;
@@ -88,9 +89,20 @@ const char *backtrace_full() {
 			char buffer[128];
 			while (fgets(buffer, sizeof(buffer), fp) != NULL) {
 				int len = cstring_len(buffer);
-				len_sum += len;
-				if (len_sum >= 4 * PAGE_SIZE) break;
-				cstring_cat_n(ret, buffer, cstring_len(buffer));
+				if (cstring_strstr(buffer, ".c:")) {
+					len_sum += len;
+					if (len_sum >= 4 * PAGE_SIZE) break;
+					cstring_cat_n(ret, buffer, cstring_len(buffer));
+				} else if (cstring_is_alpha_numeric(buffer)) {
+					if (len && buffer[len - 1] == '\n') {
+						len--;
+						buffer[len] = ' ';
+					}
+
+					len_sum += len;
+					if (len_sum >= 4 * PAGE_SIZE) break;
+					cstring_cat_n(ret, buffer, cstring_len(buffer));
+				}
 			}
 
 			pclose(fp);

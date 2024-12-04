@@ -29,5 +29,6 @@ unsigned long long cstring_itoau64(unsigned long long num, char *str, int base,
 unsigned long long cstring_itoai64(long long num, char *str, int base,
 								   unsigned long long capacity);
 unsigned long long cstring_strtoull(const char *str, int base);
+int cstring_is_alpha_numeric(const char *str);
 
 #endif	// _BASE_UTIL__
