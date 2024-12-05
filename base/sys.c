@@ -93,11 +93,13 @@ const char *backtrace_full() {
 				if (cstring_strstr(buffer, ".c:")) {
 					len_sum += len;
 					if (len_sum >= 4 * PAGE_SIZE) break;
-					cstring_cat_n(ret, buffer, cstring_len(buffer));
 					if (term) {
+						if (buffer[len - 1] == '\n') buffer[len - 1] = 0;
+						cstring_cat_n(ret, buffer, cstring_len(buffer));
 						i = size;
 						break;
 					}
+					cstring_cat_n(ret, buffer, cstring_len(buffer));
 				} else if (cstring_is_alpha_numeric(buffer)) {
 					if (len && buffer[len - 1] == '\n') {
 						len--;
@@ -133,11 +135,13 @@ const char *backtrace_full() {
 			int len = cstring_len(buffer);
 			len_sum += len;
 			if (len_sum >= 4 * PAGE_SIZE) break;
-			cstring_cat_n(ret, buffer, cstring_len(buffer));
 			if (cstring_strstr(buffer, "main ") == buffer) {
+				if (len && buffer[len - 1] == '\n') buffer[len - 1] = 0;
+				cstring_cat_n(ret, buffer, cstring_len(buffer));
 				i = size;
 				break;
 			}
+			cstring_cat_n(ret, buffer, cstring_len(buffer));
 		}
 		pclose(fp);
 #else
