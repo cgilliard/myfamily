@@ -11,3 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#ifndef _BASE_CPSRNG__
+#define _BASE_CPSRNG__
+
+#include <base/types.h>
+
+void cpsrng_reseed();
+void cpsrng_rand_byte(byte *v);
+void cpsrng_rand_i64(i64 *v);
+void cpsrng_rand_int(int *v);
+void cpsrng_rand_bytes(void *v, unsigned long long size);
+
+#ifdef TEST
+void cpsrng_test_seed(byte iv[16], byte key[32]);
+#endif	// TEST
+
+#endif	// _BASE_CPSRNG__

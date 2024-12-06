@@ -22,10 +22,10 @@
 #define PROC_TABLE_ARR_LEN 1024
 
 typedef struct ProcTableImpl {
-	OrbTree lottery_tree;
-	OrbTree cpu_time_tree;
 	Process *proc_arr;
-	byte padding[8];
+	Process *proc_scheduler;
+	Process *proc_scheduler_last;
+	u64 proc_scheduler_capacity;
 } ProcTableImpl;
 
 void __attribute__((constructor)) __check_proc_table_sizes() {
@@ -34,75 +34,62 @@ void __attribute__((constructor)) __check_proc_table_sizes() {
 			  sizeof(ProcTableImpl), sizeof(ProcTable));
 }
 
-int proctable_search_cpu_time(OrbTreeNode *cur, const OrbTreeNode *value,
-							  OrbTreeNodePair *retval) {
-	while (cur) {
-		u64 v1 = ((Process *)((byte *)cur - OFFSET_CPU_TIME))->epoch_cpu_time;
-		u64 v2 = ((Process *)((byte *)value - OFFSET_CPU_TIME))->epoch_cpu_time;
-
-		if (v1 == v2) {
-			retval->self = cur;
-			break;
-		} else if (v1 < v2) {
-			retval->parent = cur;
-			retval->is_right = 1;
-			cur = cur->right;
-		} else {
-			retval->parent = cur;
-			retval->is_right = 0;
-			cur = cur->left;
-		}
-		retval->self = cur;
-	}
-	return 0;
-}
-
-int proctable_search_lottery(OrbTreeNode *cur, const OrbTreeNode *value,
-							 OrbTreeNodePair *retval) {
-	while (cur) {
-		u64 v1 = ((Process *)((byte *)cur - OFFSET_LOTTERY))->ticket_start;
-		u64 v2 = ((Process *)((byte *)value - OFFSET_LOTTERY))->ticket_start;
-
-		if (v1 == v2) {
-			retval->self = cur;
-			break;
-		} else if (v1 < v2) {
-			retval->parent = cur;
-			retval->is_right = 1;
-			cur = cur->right;
-		} else {
-			retval->parent = cur;
-			retval->is_right = 0;
-			cur = cur->left;
-		}
-		retval->self = cur;
-	}
-	return 0;
-}
-
 Object proctable_init(ProcTable *table) {
+	u64 needed = sizeof(Process) * PROC_TABLE_ARR_LEN;
+	u64 pages = 1 + (needed / PAGE_SIZE);
+	ProcTableImpl *impl = (ProcTableImpl *)table;
+	impl->proc_arr = map(pages);
+	if (impl->proc_arr == NULL) return Err(AllocErr);
 	return $(0);
 }
 
 Object proctable_add_process(ProcTable *table, Process *proc) {
 	ProcTableImpl *impl = (ProcTableImpl *)table;
-	orbtree_put(&impl->cpu_time_tree, &proc->cpu_time,
-				proctable_search_cpu_time);
-	orbtree_put(&impl->lottery_tree, &proc->lottery, proctable_search_lottery);
-
-	u32 index = *(proc->channel.value + 28) % PROC_TABLE_ARR_LEN;
-
+	u32 index = *(proc->id.value + 28) % PROC_TABLE_ARR_LEN;
+	Process *slot = &impl->proc_arr[index];
+	while (slot->task) slot = slot->hash_list_next;
+	*slot = *proc;
 	return $(0);
 }
 
-Object proctable_remove_process(ProcTable *table, Channel channel) {
-	return $(0);
+Process *proctable_remove_process(ProcTable *table, Channel *channel) {
+	u32 index = *(channel->value + 28) % PROC_TABLE_ARR_LEN;
+	ProcTableImpl *impl = (ProcTableImpl *)table;
+	Process *slot = &impl->proc_arr[index];
+	Process *prev = NULL;
+	while (slot->task) {
+		if (channel_equal(&slot->id, channel)) break;
+		prev = slot;
+		slot = slot->hash_list_next;
+	}
+	if (slot->task) {
+		if (prev)
+			prev->hash_list_next = slot->hash_list_next;
+		else
+			impl->proc_arr[index] = *(slot->hash_list_next);
+		return slot;
+	}
+	return NULL;
 }
 
-Process *proctable_get_process(const ProcTable *table, Channel channel) {
+Process *proctable_get_process(const ProcTable *table, Channel *channel) {
+	u32 index = *(channel->value + 28) % PROC_TABLE_ARR_LEN;
+	ProcTableImpl *impl = (ProcTableImpl *)table;
+	Process *slot = &impl->proc_arr[index];
+	while (slot->task) {
+		if (channel_equal(&slot->id, channel)) return slot;
+		slot = slot->hash_list_next;
+	}
 	return NULL;
 }
 
 Object proctable_reset_epoch(ProcTable *table) {
 	return $(0);
+}
+
+void proctable_cleanup(ProcTable *table) {
+	u64 needed = sizeof(Process) * PROC_TABLE_ARR_LEN;
+	u64 pages = 1 + (needed / PAGE_SIZE);
+	ProcTableImpl *impl = (ProcTableImpl *)table;
+	if (impl->proc_arr) unmap(impl->proc_arr, pages);
 }

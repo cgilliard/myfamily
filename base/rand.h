@@ -12,6 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#ifndef _CRYPTO_RAND__
+#define _CRYPTO_RAND__
 
-Suite(crypto);
+#include <base/types.h>
+
+int rand_bytes(void *buf, i64 length);
+
+#ifdef TEST
+extern bool _debug_getentropy_err;
+#endif	// TEST
+
+#endif	// _CRYPTO_RAND__

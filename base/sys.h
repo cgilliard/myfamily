@@ -33,6 +33,7 @@ void unmap(void *addr, u64 pages);
 
 long unsigned int getpagesize();
 int sched_yield(void);
+int getentropy(void *buffer, size_t length);
 
 const char *backtrace_full();
 const char *last_trace();
@@ -43,5 +44,9 @@ ssize_t read(int fd, void *buf, size_t count);
 int snprintf(char *buf, unsigned long capacity, const char *fmt, ...);
 void __attribute__((noreturn)) _exit(int code);
 __int128_t getnanos();
+
+#ifdef TEST
+extern u64 _alloc_sum;
+#endif	// TEST
 
 #endif	// _BASE_SYS__

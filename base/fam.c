@@ -15,29 +15,49 @@
 #define _XOPEN_SOURCE
 #include <base/fam.h>
 #include <base/print_util.h>
+#include <base/proc.h>
 #include <base/sys.h>
 #include <pthread.h>
 #include <ucontext.h>
 
+ProcTable proc_tab;
+
+Object system_idle_task(Channel channel) {
+	loop sched_yield();
+}
+#define SYSTEM_IDLE_STACK_SIZE 1024
+byte system_idle_stack_base[SYSTEM_IDLE_STACK_SIZE];
+Process system_idle = {.task = system_idle_task,
+					   .stack_base = system_idle_stack_base,
+					   .stack_size = SYSTEM_IDLE_STACK_SIZE,
+					   .state = Runnable};
+
 void *fam_start_thread() {
-	println("start fam thread");
 	return 0;
 }
 
 Object send(Channel channel, Object object) {
-	Object ret = $(0);
+	let ret = $(0);
 	return ret;
 }
+
 Channel run(Object (*task)(Channel channel)) {
 	Channel channel;
 	return channel;
 }
+
 Object recv(Channel channel, int timeout_millis) {
-	Object ret = $(0);
+	let ret = $(0);
 	return ret;
 }
 
 Object init(Object (*task)(Channel channel), int threads) {
+	ObjectNc res1 = proctable_init(&proc_tab);
+	if ($is_err(res1)) return res1;
+
+	ObjectNc res2 = proctable_add_process(&proc_tab, &system_idle);
+	if ($is_err(res2)) return res2;
+
 	for (int i = 0; i < threads; i++) {
 		pthread_t th;
 		pthread_create(&th, 0, fam_start_thread, 0);
@@ -46,6 +66,9 @@ Object init(Object (*task)(Channel channel), int threads) {
 	return ret;
 }
 
-void __attribute__((noreturn)) halt(int code) {
+void halt(int code) {
+	proctable_cleanup(&proc_tab);
+#ifndef TEST
 	_exit(code);
+#endif	// TEST
 }

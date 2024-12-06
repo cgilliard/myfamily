@@ -22,6 +22,6 @@ Object init(Object (*task)(Channel channel), int threads);
 Channel run(Object (*task)(Channel channel));
 Object send(Channel channel, Object object);
 Object recv(Channel channel, int timeout_millis);
-void __attribute__((noreturn)) halt(int code);
+void halt(int code);
 
 #endif	// _BASE_FAM__

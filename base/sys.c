@@ -36,10 +36,16 @@ void *map(u64 pages) {
 	if (pages == 0) return NULL;
 	void *ret = mmap(NULL, pages * PAGE_SIZE, PROT_READ | PROT_WRITE,
 					 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+#ifdef TEST
+	if (ret) _alloc_sum += pages;
+#endif	// TEST
 	return ret;
 }
 
 void unmap(void *addr, u64 pages) {
+#ifdef TEST
+	_alloc_sum -= pages;
+#endif	// TEST
 	if (pages) munmap(addr, pages * PAGE_SIZE);
 }
 
@@ -299,3 +305,7 @@ void __attribute__((constructor)) __check_sizes() {
 		_exit(-1);
 	}
 }
+
+#ifdef TEST
+u64 _alloc_sum;
+#endif	// TEST

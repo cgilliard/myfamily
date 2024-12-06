@@ -15,6 +15,8 @@
 #ifndef _BASE_CHANNEL__
 #define _BASE_CHANNEL__
 
+#include <base/types.h>
+
 #define STDIN          \
 	(Channel) {        \
 		.value = { 0 } \
@@ -35,5 +37,6 @@ typedef struct Channel {
 } Channel;
 
 Channel channel();
+bool channel_equal(Channel *ch1, Channel *ch2);
 
 #endif	// _BASE_CHANNEL__

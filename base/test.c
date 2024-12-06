@@ -28,15 +28,36 @@ Test(last_trace) {
 
 Test(proc_table) {
 	ProcTable table1 = INIT_PROC_TABLE;
+
 	Process proc1 = {};
 	let r1 = proctable_add_process(&table1, &proc1);
 	assert(!$is_err(r1));
 
-	let r2 = Err(AllocErr);
-	println("err={}", r2);
+	proctable_cleanup(&table1);
+
+	/*
+		let r2 = Err(AllocErr);
+		println("err={}", r2);
+	*/
 	/*
 		char *bt = backtrace_full();
 		print("{}", bt);
 		unmap(bt, 3);
 	*/
+}
+
+Test(object) {
+	let obj1 = $(1);
+	let obj2 = box(1000);
+	let obj3 = Err(AllocErr);
+}
+
+Object test_init_tasks(Channel ch) {
+	return $(0);
+}
+
+Test(proc) {
+	let res = init(test_init_tasks, 4);
+	assert(!$is_err(res));
+	halt(0);
 }

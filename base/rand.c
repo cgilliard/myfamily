@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/channel.h>
-#include <base/cpsrng.h>
+#include <base/rand.h>
+#include <base/sys.h>
+#include <base/types.h>
 
-Channel channel() {
-	Channel ch;
-	cpsrng_rand_bytes(&ch.value, 32);
-	return ch;
-}
+bool _debug_getentropy_err = false;
 
-bool channel_equal(Channel *ch1, Channel *ch2) {
-	int i = 0;
-	while (i < 32 && ch1->value[i] == ch2->value[i]) i++;
-	return i == 32;
+int rand_bytes(void *buf, i64 length) {
+	if (_debug_getentropy_err) return -1;
+	return getentropy(buf, length);
 }

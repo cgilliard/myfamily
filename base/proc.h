@@ -29,19 +29,21 @@
 		_ret__;                                                   \
 	})
 
+typedef enum ProcessState {
+	Running,
+	Runnable,
+	Sleeping,
+} ProcessState;
+
 typedef struct Process {
-	Channel channel;
+	Channel id;
 	Object (*task)(Channel channel);
-	u32 process_priority;
 	u32 state;
-	u64 epoch_cpu_time;
 	void *stack_base;
 	size_t stack_size;
-	u64 ticket_start;
-	u64 ticket_len;
-	OrbTreeNode cpu_time;
-	OrbTreeNode lottery;
+	Channel wait_channel;
 	struct Process *hash_list_next;
+	struct Process *group;
 } Process;
 
 #define PROC_TABLE_SIZE 32
@@ -51,8 +53,9 @@ typedef struct ProcTable {
 
 Object proctable_init(ProcTable *table);
 Object proctable_add_process(ProcTable *table, Process *proc);
-Process *proctable_get_process(const ProcTable *table, Channel channel);
-Object proctable_remove_process(ProcTable *table, Channel channel);
+Process *proctable_get_process(const ProcTable *table, Channel *channel);
+Process *proctable_remove_process(ProcTable *table, Channel *channel);
 Object proctable_reset_epoch(ProcTable *table);
+void proctable_cleanup(ProcTable *table);
 
 #endif	// _BASE_PROC__

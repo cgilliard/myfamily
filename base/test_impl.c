@@ -42,7 +42,11 @@ int execute_tests(char *suite_name) {
 				copy_bytes(test_dir + 3, test_names[i], test_name_len);
 				copy_bytes(test_dir + 3 + test_name_len, ".fam", 4);
 				test_dir[4 + 3 + test_name_len] = 0;
+				u64 alloc_sum_pre = _alloc_sum;
 				test_arr[i](test_dir);
+				if (alloc_sum_pre != _alloc_sum)
+					println("Alloc sum is not equal. Memory leak?");
+				assert_eq(alloc_sum_pre, _alloc_sum);
 			}
 		} else {
 			println("{}FAIL:{} test '{}{}{}' failed!", BRIGHT_RED, RESET, GREEN,
