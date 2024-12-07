@@ -25,6 +25,13 @@
 #include <ucontext.h>
 #include <unistd.h>
 
+#ifndef SA_RESTART
+#define SA_RESTART 0x10000000  // The value that is often used for SA_RESTART
+#endif
+
+int pthread_kill(pthread_t thread, int sig);
+int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
+
 Lock fam_lock = INIT_LOCK;
 TaskTable task_tab;
 pthread_t *task_threads;
