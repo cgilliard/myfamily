@@ -63,9 +63,9 @@ void check_consumed(const Object *obj) {
 
 Object object_move(Object *obj) {
 	if (object_type(obj) != Box) return *obj;
-	Object ret = *obj;
+	let r = *obj;
 	(*(ObjectImpl *)obj).no_cleanup = (*(ObjectImpl *)obj).consumed = 1;
-	return ret;
+	return r;
 }
 
 Object object_ref(Object *obj) {
@@ -77,34 +77,34 @@ Object object_ref(Object *obj) {
 }
 
 Object object_int(long long value) {
-	ObjectImpl ret = {.type = Int, .value.int_value = value};
-	return *((Object *)&ret);
+	ObjectImpl r = {.type = Int, .value.int_value = value};
+	return *((Object *)&r);
 }
 
 Object object_uint(unsigned long long value) {
-	ObjectImpl ret = {.type = UInt, .value.uint_value = value};
-	return *((Object *)&ret);
+	ObjectImpl r = {.type = UInt, .value.uint_value = value};
+	return *((Object *)&r);
 }
 
 Object object_float(double value) {
-	ObjectImpl ret = {.type = Float, .value.float_value = value};
-	return *((Object *)&ret);
+	ObjectImpl r = {.type = Float, .value.float_value = value};
+	return *((Object *)&r);
 }
 
 Object object_function(void *fn) {
-	ObjectImpl ret = {.type = Function, .value.ptr_value = fn};
-	return *((Object *)&ret);
+	ObjectImpl r = {.type = Function, .value.ptr_value = fn};
+	return *((Object *)&r);
 }
 
 Object object_err(int code) {
 	char *bt = backtrace_full();
-	ObjectImpl ret = {.type = Err, .aux = code, .value.ptr_value = bt};
-	return *((Object *)&ret);
+	ObjectImpl r = {.type = Err, .aux = code, .value.ptr_value = bt};
+	return *((Object *)&r);
 }
 
 Object object_string(const char *s) {
-	ObjectImpl ret = {.type = Err, .value.code_value = NotYetImplemented};
-	return *((Object *)&ret);
+	ObjectImpl r = {.type = Err, .value.code_value = NotYetImplemented};
+	return *((Object *)&r);
 }
 
 Object box(long long size) {
@@ -129,8 +129,8 @@ Object box(long long size) {
 		BoxSlabData *bsd = slab;
 		bsd->ref_count = 1;
 	}
-	ObjectImpl ret = {.type = Box, .value.ptr_value = slab};
-	return *((Object *)&ret);
+	ObjectImpl r = {.type = Box, .value.ptr_value = slab};
+	return *((Object *)&r);
 }
 
 Object box_resize(Object *obj, long long size) {

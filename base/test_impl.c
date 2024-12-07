@@ -24,6 +24,22 @@ char target_test[MAX_TEST_NAME + 1];
 extern char **environ;
 test_fn_ptr test_arr[MAX_TESTS + 1];
 
+static void __attribute__((constructor)) get_target_test() {
+	target_test[0] = 0;
+	for (int i = 0; environ[i] != 0; i++) {
+		char *env_var = environ[i];
+		if (!cstring_compare_n("TEST_FILTER=", env_var, 12)) {
+			int env_var_len = cstring_len(env_var);
+			if (env_var_len > 12) {
+				int len = env_var_len + 12;
+				if (len > MAX_TEST_NAME) len = MAX_TEST_NAME;
+				copy_bytes(target_test, env_var + 12, len);
+				break;
+			}
+		}
+	}
+}
+
 int execute_tests(char *suite_name) {
 	__int128_t start, end;
 	char success[test_count];

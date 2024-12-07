@@ -26,14 +26,26 @@ Test(last_trace) {
 	test1();
 }
 
-Test(proc_table) {
-	ProcTable table1 = INIT_PROC_TABLE;
+Object test_init_task_table(Channel *ch) {
+	println("init tt");
+	return $(0);
+}
 
-	Process proc1 = {};
-	let r1 = proctable_add_process(&table1, &proc1);
+Test(task_table) {
+	TaskTable table1 = INIT_TASK_TABLE;
+	Channel ch1 = {0}, ch2 = {1}, ch3 = {2};
+
+	Task task1 = {.id = ch1}, task2 = {.id = ch2}, task3 = {.id = ch3};
+	let r1 = tasktable_add_task(&table1, &task1);
 	assert(!$is_err(r1));
+	let r2 = tasktable_add_task(&table1, &task2);
 
-	proctable_cleanup(&table1);
+	Task *t2_out = tasktable_remove_task(&table1, &task2.id);
+	assert(channel_equal(&t2_out->id, &task2.id));
+
+	let r3 = tasktable_add_task(&table1, &task3);
+
+	tasktable_cleanup(&table1);
 
 	/*
 		let r2 = Err(AllocErr);
@@ -52,12 +64,12 @@ Test(object) {
 	let obj3 = Err(AllocErr);
 }
 
-Object test_init_tasks(Channel ch) {
+Object test_init_tasks(Channel *ch) {
 	return $(0);
 }
 
-Test(proc) {
-	let res = init(test_init_tasks, 4);
+Test(task) {
+	let res = init(test_init_tasks, 1);
 	assert(!$is_err(res));
 	halt(0);
 }

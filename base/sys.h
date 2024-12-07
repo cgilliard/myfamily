@@ -26,12 +26,21 @@ typedef long int off_t;
 #elif defined(__APPLE__)
 typedef long long off_t;
 #endif
+
+#ifdef __APPLE__
+typedef long ssize_t;
+#else
 typedef long long ssize_t;
+#endif
 
 void *map(u64 pages);
 void unmap(void *addr, u64 pages);
 
+#ifdef __linux__
 long unsigned int getpagesize();
+#elif defined(__APPLE__)
+int getpagesize();
+#endif
 int sched_yield(void);
 int getentropy(void *buffer, size_t length);
 

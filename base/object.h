@@ -113,6 +113,7 @@ typedef struct BoxSlabData {
 #define $uint(obj) (*(unsigned long long *)value_of_checked(&obj, UInt))
 #define let const Object
 #define var Object
+#define ret ObjectNc
 
 Object object_int(long long value);
 Object object_uint(unsigned long long value);
