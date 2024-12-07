@@ -30,7 +30,7 @@ typedef long long off_t;
 #ifdef __APPLE__
 typedef long ssize_t;
 #else
-typedef long long ssize_t;
+typedef long int ssize_t;
 #endif
 
 void *map(u64 pages);
