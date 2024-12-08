@@ -18,12 +18,9 @@
 #include <base/print_util.h>
 #include <base/sys.h>
 #include <base/task.h>
-#include <errno.h>
 #include <pthread.h>
 #include <signal.h>
-#include <sys/time.h>
 #include <ucontext.h>
-#include <unistd.h>
 
 #ifndef SA_RESTART
 #define SA_RESTART 0x10000000  // The value that is often used for SA_RESTART
@@ -39,7 +36,7 @@ u64 task_threads_count;
 
 void system_idle_task(void *channel) {
 	loop {
-		sleep(1);
+		os_sleep(1000);
 	}
 }
 
@@ -176,24 +173,28 @@ Object init(Object (*task)(Channel *channel), int threads) {
 	task_threads = map(pages);
 	task_threads_count = threads;
 
-	struct sigaction sa;
-	struct itimerval timer;
+	set_timer(fam_handle_alarm, 100);
 
-	sa.sa_handler = fam_handle_alarm;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	if (sigaction(SIGALRM, &sa, NULL) == -1) {
-		panic("sigaction");
-	}
+	/*
+		struct sigaction sa;
+		struct itimerval timer;
 
-	timer.it_value.tv_sec = 0;
-	timer.it_value.tv_usec = 100000;  // 100ms
-	timer.it_interval.tv_sec = 0;
-	timer.it_interval.tv_usec = 100000;	 // 100ms
+		sa.sa_handler = fam_handle_alarm;
+		sigemptyset(&sa.sa_mask);
+		sa.sa_flags = 0;
+		if (sigaction(SIGALRM, &sa, NULL) == -1) {
+			panic("sigaction");
+		}
 
-	if (setitimer(ITIMER_REAL, &timer, NULL) == -1) {
-		panic("setitimer");
-	}
+		timer.it_value.tv_sec = 0;
+		timer.it_value.tv_usec = 100000;  // 100ms
+		timer.it_interval.tv_sec = 0;
+		timer.it_interval.tv_usec = 100000;	 // 100ms
+
+		if (setitimer(ITIMER_REAL, &timer, NULL) == -1) {
+			panic("setitimer");
+		}
+	*/
 
 	for (u64 i = 0; i < threads; i++) {
 		pthread_create(&task_threads[i], NULL, fam_start_thread, NULL);

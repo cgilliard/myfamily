@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define _XOPEN_SOURCE
 #include <base/sys.h>
 #include <base/util.h>
+#include <signal.h>
 #include <sys/mman.h>
+#include <sys/time.h>
 #include <time.h>
 
 #ifdef __APPLE__
 #include <dlfcn.h>
+#include <mach/mach.h>
 #endif	// __APPLE__
 
 #define MAX_BACKTRACE_ENTRIES 128
@@ -31,6 +35,7 @@ void *popen(const char *command, const char *rw);
 char *fgets(char *str, int n, void *stream);
 int pclose(void *fp);
 int printf(const char *fmt, ...);
+int pthread_threadid_np(pthread_t thread, u64 *thread_id);
 
 void *map(u64 pages) {
 	if (pages == 0) return NULL;
@@ -47,6 +52,47 @@ void unmap(void *addr, u64 pages) {
 	_alloc_sum -= pages;
 #endif	// TEST
 	if (pages) munmap(addr, pages * PAGE_SIZE);
+}
+
+int os_sleep(u64 millis) {
+	struct timespec ts;
+	ts.tv_sec = millis / 1000;				 // seconds
+	ts.tv_nsec = (millis % 1000) * 1000000;	 // nanoseconds
+	int ret = nanosleep(&ts, NULL);
+	return ret;
+}
+
+int set_timer(void (*alarm)(int), u64 millis) {
+	struct sigaction sa;
+	struct itimerval timer;
+
+	sa.sa_handler = alarm;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	if (sigaction(SIGALRM, &sa, NULL) == -1) {
+		return -1;
+	}
+
+	timer.it_value.tv_sec = millis / 1000ULL;
+	timer.it_value.tv_usec = (millis % 1000ULL) * 1000ULL;
+	timer.it_interval.tv_sec = millis / 1000ULL;
+	timer.it_interval.tv_usec = (millis % 1000ULL) * 1000ULL;
+
+	if (setitimer(ITIMER_REAL, &timer, NULL) == -1) {
+		return -1;
+	}
+	return 0;
+}
+
+int unset_timer() {
+	struct itimerval timer = {0};  // Zero out the timer structure
+
+	// Set the timer to zero, effectively stopping it
+	if (setitimer(ITIMER_REAL, &timer, NULL) == -1) {
+		return -1;	// Return error if setting the timer failed
+	}
+
+	return 0;  // Success
 }
 
 __int128_t getnanos() {
@@ -305,6 +351,14 @@ void __attribute__((constructor)) __check_sizes() {
 		_exit(-1);
 	}
 }
+
+#ifdef __APPLE__
+u64 gettid() {
+	u64 thread_id;
+	pthread_threadid_np(NULL, &thread_id);
+	return thread_id;
+}
+#endif	// __APPLE__
 
 #ifdef TEST
 u64 _alloc_sum;

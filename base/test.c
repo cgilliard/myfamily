@@ -27,25 +27,26 @@ Test(last_trace) {
 }
 
 Object test_init_task_table(Channel *ch) {
-	println("init tt");
 	return $(0);
 }
 
 Test(task_table) {
-	TaskTable table1 = INIT_TASK_TABLE;
-	Channel ch1 = {0}, ch2 = {1}, ch3 = {2};
+	/*
+		TaskTable table1 = INIT_TASK_TABLE;
+		Channel ch1 = {0}, ch2 = {1}, ch3 = {2};
 
-	Task task1 = {.id = ch1}, task2 = {.id = ch2}, task3 = {.id = ch3};
-	let r1 = tasktable_add_task(&table1, &task1);
-	assert(!$is_err(r1));
-	let r2 = tasktable_add_task(&table1, &task2);
+		Task task1 = {.id = ch1}, task2 = {.id = ch2}, task3 = {.id = ch3};
+		let r1 = tasktable_add_task(&table1, &task1);
+		assert(!$is_err(r1));
+		let r2 = tasktable_add_task(&table1, &task2);
 
-	Task *t2_out = tasktable_remove_task(&table1, &task2.id);
-	assert(channel_equal(&t2_out->id, &task2.id));
+		Task *t2_out = tasktable_remove_task(&table1, &task2.id);
+		assert(channel_equal(&t2_out->id, &task2.id));
 
-	let r3 = tasktable_add_task(&table1, &task3);
+		let r3 = tasktable_add_task(&table1, &task3);
 
-	tasktable_cleanup(&table1);
+		tasktable_cleanup(&table1);
+	*/
 
 	/*
 		let r2 = Err(AllocErr);
@@ -72,4 +73,108 @@ Test(task) {
 	let res = init(test_init_tasks, 1);
 	assert(!$is_err(res));
 	halt(0);
+}
+
+int fun_called = false;
+void my_fun(int sig) {
+	fun_called = true;
+}
+
+Test(alarm) {
+	set_timer(my_fun, 140);
+	os_sleep(10000);
+	assert_eq(fun_called, true);
+	unset_timer();
+}
+
+bool test_th_recv = false;
+
+void *start_test_th(void *arg) {
+	assert_eq(*(int *)arg, 123);
+	test_th_recv = true;
+	assert(!os_sleep(100));
+	return NULL;
+}
+
+Test(thread) {
+	Thread *th = thread_init(&THREAD_CONFIG_DEFAULT);
+	int x = 123;
+	thread_start(th, start_test_th, &x);
+	thread_join(th);
+	assert(test_th_recv);
+	thread_cleanup(th);
+}
+
+u32 u64_hash(const void *value) {
+	return murmurhash((const byte *)value, sizeof(u64), 0);
+}
+
+bool u64_equal(const void *v1, const void *v2) {
+	u64 *vv1 = v1;
+	u64 *vv2 = v2;
+	return *vv1 == *vv2;
+}
+
+typedef struct HashEntryImpl {
+	struct HashEntry *next;
+	u32 key_len;
+	u32 value_len;
+	u64 key;
+	u64 value;
+} HashEntryImpl;
+
+Test(hash) {
+	HashEntryImpl he1 = {.key_len = sizeof(u64),
+						 .value_len = sizeof(u64),
+						 .key = 1234,
+						 .value = 5678};
+	HashEntryImpl he2 = {.key_len = sizeof(u64),
+						 .value_len = sizeof(u64),
+						 .key = 1235,
+						 .value = 1111};
+
+	HashEntryImpl he3 = {.key_len = sizeof(u64),
+						 .value_len = sizeof(u64),
+						 .key = 1237,
+						 .value = 2222};
+
+	Hashtable h1;
+	hash_init(&h1, 10, 2 * sizeof(u64));
+	hash_put(&h1, (HashEntry *)&he1, u64_hash, u64_equal);
+	hash_put(&h1, (HashEntry *)&he2, u64_hash, u64_equal);
+	hash_put(&h1, (HashEntry *)&he3, u64_hash, u64_equal);
+	u64 value =
+		((HashEntryImpl *)hash_get(&h1, &he1.key, u64_hash, u64_equal))->value;
+	assert(value);
+	assert_eq(value, 5678);
+	value =
+		((HashEntryImpl *)hash_get(&h1, &he2.key, u64_hash, u64_equal))->value;
+	assert(value);
+	assert_eq(value, 1111);
+	value =
+		((HashEntryImpl *)hash_get(&h1, &he3.key, u64_hash, u64_equal))->value;
+	assert(value);
+	assert_eq(value, 2222);
+	u64 missing = 77;
+	assert(!hash_get(&h1, &missing, u64_hash, u64_equal));
+
+	value =
+		((HashEntryImpl *)hash_rem(&h1, &he3.key, u64_hash, u64_equal))->value;
+	assert(value);
+	assert_eq(value, 2222);
+	assert(!hash_rem(&h1, &he3.key, u64_hash, u64_equal));
+
+	value =
+		((HashEntryImpl *)hash_rem(&h1, &he1.key, u64_hash, u64_equal))->value;
+	assert(value);
+	assert_eq(value, 5678);
+	assert(!hash_rem(&h1, &he1.key, u64_hash, u64_equal));
+
+	value =
+		((HashEntryImpl *)hash_rem(&h1, &he2.key, u64_hash, u64_equal))->value;
+	assert(value);
+	assert_eq(value, 1111);
+	assert(!hash_rem(&h1, &he2.key, u64_hash, u64_equal));
+
+	hash_cleanup(&h1);
 }

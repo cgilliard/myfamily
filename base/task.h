@@ -15,14 +15,10 @@
 #ifndef _BASE_TASK__
 #define _BASE_TASK__
 
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 500
-#endif
 #include <base/channel.h>
 #include <base/object.h>
 #include <base/sys.h>
 #include <base/types.h>
-#include <ucontext.h>
 
 #define INIT_TASK_TABLE                                           \
 	({                                                            \
@@ -48,7 +44,6 @@ typedef struct Task {
 	void *stack_base;
 	size_t stack_size;
 	Channel wait_channel;
-	ucontext_t uctx;
 	struct Task *hash_list_next;
 	struct Task *group;
 } Task;

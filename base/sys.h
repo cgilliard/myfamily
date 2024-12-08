@@ -33,14 +33,20 @@ typedef long ssize_t;
 typedef long int ssize_t;
 #endif
 
+typedef int pid_t;
+
 void *map(u64 pages);
 void unmap(void *addr, u64 pages);
+int os_sleep(u64 millis);
+int set_timer(void (*alarm)(int), u64 millis);
+int unset_timer();
 
 #ifdef __linux__
 long unsigned int getpagesize();
 #elif defined(__APPLE__)
 int getpagesize();
 #endif
+
 int sched_yield(void);
 int getentropy(void *buffer, size_t length);
 
