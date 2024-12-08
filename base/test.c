@@ -88,19 +88,21 @@ Test(alarm) {
 }
 
 bool test_th_recv = false;
+int test_return = 45;
 
 void *start_test_th(void *arg) {
 	assert_eq(*(int *)arg, 123);
-	test_th_recv = true;
 	assert(!os_sleep(100));
-	return NULL;
+	test_th_recv = true;
+	return &test_return;
 }
 
 Test(thread) {
 	Thread *th = thread_init(&THREAD_CONFIG_DEFAULT);
 	int x = 123;
 	thread_start(th, start_test_th, &x);
-	thread_join(th);
+	int *check = thread_join(th);
+	assert_eq(*check, 45);
 	assert(test_th_recv);
 	thread_cleanup(th);
 }
@@ -177,4 +179,28 @@ Test(hash) {
 	assert(!hash_rem(&h1, &he2.key, u64_hash, u64_equal));
 
 	hash_cleanup(&h1);
+}
+
+volatile int test_signal_state = 0;
+
+void test_handler() {
+	test_signal_state++;
+}
+
+void *test_signal(void *arg) {
+	assert(!thread_register_handler(test_handler));
+	test_signal_state++;
+	while (test_signal_state != 2);
+	return NULL;
+}
+
+Test(thread_signal) {
+	Thread *th = thread_init(&THREAD_CONFIG_DEFAULT);
+	thread_start(th, test_signal, NULL);
+	while (!test_signal_state);
+	assert(!thread_signal(th));
+	test_signal_state++;
+	while (test_signal_state != 3);
+
+	thread_cleanup(th);
 }

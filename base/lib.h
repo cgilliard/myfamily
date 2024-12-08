@@ -15,6 +15,7 @@
 #include <base/colors.h>
 #include <base/fam.h>
 #include <base/hash.h>
+#include <base/lock.h>
 #include <base/murmurhash.h>
 #include <base/print_util.h>
 #include <base/sys.h>

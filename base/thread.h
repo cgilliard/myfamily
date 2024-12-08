@@ -24,20 +24,19 @@ typedef struct ThreadConfig {
 } ThreadConfig;
 
 static const ThreadConfig THREAD_CONFIG_DEFAULT = {
-	.guard_size = -1,		// Default of -1 indicates PAGE_SIZE.
-	.stack_address = NULL,	// Default of NULL will allocate the stack_address.
+	.guard_size = -1,			   // Default of -1 indicates PAGE_SIZE.
 	.stack_size = 2 * 1024 * 1024  // 2mb
 };
 
 typedef struct Thread Thread;
 
-typedef void (*ThreadSignalHandler)(int tid);
+typedef void (*ThreadSignalHandler)();
 typedef void *(*ThreadFunction)(void *arg);
 
 Thread *thread_init(ThreadConfig *config);
 void thread_cleanup(Thread *th);
 int thread_start(Thread *th, ThreadFunction func, void *arg);
-void thread_register_handler(ThreadSignalHandler handler);
+int thread_register_handler(ThreadSignalHandler handler);
 int thread_signal(Thread *th);
 void *thread_join(Thread *th);
 u64 thread_id();
