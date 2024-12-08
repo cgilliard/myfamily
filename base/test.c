@@ -181,26 +181,27 @@ Test(hash) {
 	hash_cleanup(&h1);
 }
 
-volatile int test_signal_state = 0;
+int test_signal_state = 0;
 
 void test_handler() {
-	test_signal_state++;
+	AADD(&test_signal_state, 1);
 }
 
 void *test_signal(void *arg) {
 	assert(!thread_register_handler(test_handler));
-	test_signal_state++;
-	while (test_signal_state != 2);
+	AADD(&test_signal_state, 1);
+	os_sleep(10000);
 	return NULL;
 }
 
 Test(thread_signal) {
 	Thread *th = thread_init(&THREAD_CONFIG_DEFAULT);
 	thread_start(th, test_signal, NULL);
-	while (!test_signal_state);
+	while (ALOAD(&test_signal_state) == 0);
 	assert(!thread_signal(th));
-	test_signal_state++;
-	while (test_signal_state != 3);
-
+	AADD(&test_signal_state, 1);
+	while (ALOAD(&test_signal_state) != 3);
+	thread_join(th);
 	thread_cleanup(th);
+	assert_eq(ALOAD(&test_signal_state), 3);
 }
