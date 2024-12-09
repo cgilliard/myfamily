@@ -15,4 +15,26 @@
 #ifndef _BASE_TASK__
 #define _BASE_TASK__
 
+#include <base/channel.h>
+#include <base/types.h>
+
+typedef struct TaskId {
+	byte id[32];
+} TaskId;
+
+typedef enum TaskState {
+	TaskRunnable,
+	TaskRunning,
+	TaskZombie,
+} TaskState;
+
+typedef struct Task {
+	TaskId id;
+	void (*task)(void *channel);
+	u32 state;
+	void *stack_base;
+	u64 stack_size;
+
+} Task;
+
 #endif	// _BASE_TASK__

@@ -39,12 +39,12 @@ __attribute__((aligned(32))) typedef struct ThreadImpl {
 } ThreadImpl;
 
 Object object_thread(u64 stack_size) {
-	u64 pages = 1 + ((stack_size + sizeof(ThreadImpl)) - 1) / PAGE_SIZE;
-	ThreadImpl *ti = map(pages);
-	if (ti == NULL) return Err(AllocErr);
+	void *mem = map(1);
+	if (mem == NULL) return Err(AllocErr);
+	ThreadImpl *ti = (ThreadImpl *)((byte *)mem + sizeof(BoxSlabData));
 	ti->stack_size = stack_size;
 	ASTORE(&ti->ref_count, 1);
-	ObjectImpl val = {.type = Thread, .value.ptr_value = ti};
+	ObjectImpl val = {.type = Thread, .value.ptr_value = mem};
 	return *(Object *)&val;
 }
 
@@ -94,9 +94,11 @@ void *object_thread_start_fn(void *arg) {
 	return NULL;
 }
 
+int perror(char *);
 Object object_thread_start(Object *obj, Object *arg) {
 	ObjectImpl *impl = (ObjectImpl *)obj;
-	ThreadImpl *ti = impl->value.ptr_value;
+	ThreadImpl *ti =
+		(ThreadImpl *)((byte *)impl->value.ptr_value + sizeof(BoxSlabData));
 
 	let fn = get(*obj, "run");
 	if ($is_err(fn)) return Err(NotFound);
@@ -129,7 +131,8 @@ Object object_thread_signal(const Object *obj) {
 	if (obj == NULL) return Err(IllegalArgument);
 
 	ObjectImpl *impl = (ObjectImpl *)obj;
-	ThreadImpl *ti = impl->value.ptr_value;
+	ThreadImpl *ti =
+		(ThreadImpl *)((byte *)impl->value.ptr_value + sizeof(BoxSlabData));
 
 	int code;
 	if ((code = pthread_kill(ti->th, SIGUSR1))) println("code={}", code);
@@ -137,7 +140,8 @@ Object object_thread_signal(const Object *obj) {
 }
 Object object_thread_join(Object *obj) {
 	ObjectImpl *impl = (ObjectImpl *)obj;
-	ThreadImpl *ti = impl->value.ptr_value;
+	ThreadImpl *ti =
+		(ThreadImpl *)((byte *)impl->value.ptr_value + sizeof(BoxSlabData));
 	pthread_join(ti->th, NULL);
 	ASTORE(&ti->state, ThreadJoined);
 	return ti->arg;
@@ -161,18 +165,20 @@ u64 thread_id() {
 
 Object object_thread_ref(Object *obj) {
 	ObjectImpl *impl = (ObjectImpl *)obj;
-	ThreadImpl *ti = impl->value.ptr_value;
+	ThreadImpl *ti =
+		(ThreadImpl *)((byte *)impl->value.ptr_value + sizeof(BoxSlabData));
 	AADD(&ti->ref_count, 1);
 	return *obj;
 }
 
 void object_thread_cleanup(const Object *obj) {
 	ObjectImpl *impl = (ObjectImpl *)obj;
-	ThreadImpl *ti = impl->value.ptr_value;
+	ThreadImpl *ti =
+		(ThreadImpl *)((byte *)impl->value.ptr_value + sizeof(BoxSlabData));
 	int ref_count = ASUB(&ti->ref_count, 1);
 	if (ref_count == 1) {
 		if (ALOAD(&ti->state) == ThreadZombie) pthread_detach(ti->th);
 		u64 pages = 1 + ((ti->stack_size + sizeof(ThreadImpl)) - 1) / PAGE_SIZE;
-		unmap(impl->value.ptr_value, pages);
+		unmap(impl->value.ptr_value, 1);
 	}
 }

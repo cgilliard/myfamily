@@ -275,6 +275,9 @@ int object_search_ordered(OrbTreeNode *cur, const OrbTreeNode *value,
 
 Object object_get_property(const Object *obj, const char *name) {
 	check_consumed(obj);
+	ObjectType type = object_type(obj);
+	if (type != Box && type != Thread)
+		panic("properties can only be used on Box and Thread");
 	ObjectProperty op = {.name = name};
 	OrbTreeNodePair retval = {};
 	ObjectImpl *impl = (ObjectImpl *)obj;
@@ -290,6 +293,9 @@ Object object_get_property(const Object *obj, const char *name) {
 Object object_set_property(Object *obj, const char *name, const Object *value) {
 	check_consumed(obj);
 	check_consumed(value);
+	ObjectType type = object_type(obj);
+	if (type != Box && type != Thread)
+		panic("properties can only be used on Box and Thread");
 
 	ObjectProperty *opptr = slab_allocator_allocate(&object_slabs);
 	opptr->name = name;
@@ -307,6 +313,9 @@ Object object_set_property(Object *obj, const char *name, const Object *value) {
 
 Object object_remove_property(Object *obj, const char *name) {
 	check_consumed(obj);
+	ObjectType type = object_type(obj);
+	if (type != Box && type != Thread)
+		panic("properties can only be used on Box and Thread");
 
 	ObjectProperty op = {.name = name};
 	ObjectImpl *impl = (ObjectImpl *)obj;
