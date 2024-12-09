@@ -28,7 +28,7 @@ SlabAllocator object_slabs;
 typedef struct ObjectProperty {
 	OrbTreeNode ordered;
 	const char *name;
-	unsigned long long seqno;
+	u64 seqno;
 	OrbTreeNode seq;
 	Object value;
 } ObjectProperty;
@@ -68,12 +68,12 @@ Object object_ref(Object *obj) {
 	}
 }
 
-Object object_int(long long value) {
+Object object_int(i64 value) {
 	ObjectImpl r = {.type = Int, .value.int_value = value};
 	return *((Object *)&r);
 }
 
-Object object_uint(unsigned long long value) {
+Object object_uint(u64 value) {
 	ObjectImpl r = {.type = UInt, .value.uint_value = value};
 	return *((Object *)&r);
 }
@@ -99,14 +99,14 @@ Object object_string(const char *s) {
 	return *((Object *)&r);
 }
 
-Object box(long long size) {
+Object box(i64 size) {
 	void *slab = slab_allocator_allocate(&object_slabs);
 	if (slab == 0) return Err(AllocErr);
 
 	if (size > OBJ_BOX_USER_DATA_SIZE) {
 		set_bytes(slab + sizeof(BoxSlabData), '\0', OBJ_BOX_USER_DATA_SIZE);
 		BoxSlabData *bsd = slab;
-		long long needed = size - OBJ_BOX_USER_DATA_SIZE;
+		i64 needed = size - OBJ_BOX_USER_DATA_SIZE;
 		bsd->pages = (needed + PAGE_SIZE - 1) / PAGE_SIZE;
 		bsd->extended = map(bsd->pages);
 		if (bsd->extended == 0) {
@@ -125,7 +125,7 @@ Object box(long long size) {
 	return *((Object *)&r);
 }
 
-Object box_resize(Object *obj, long long size) {
+Object box_resize(Object *obj, i64 size) {
 	check_consumed(obj);
 	ObjectType type = object_type(obj);
 	if (type != Box) panic("Expected box found type: {}", ObjectText[type]);
@@ -138,8 +138,8 @@ Object box_resize(Object *obj, long long size) {
 			bsd->extended = 0;
 		}
 	} else {
-		long long needed = size - OBJ_BOX_USER_DATA_SIZE;
-		long long pages = (needed + PAGE_SIZE - 1) / PAGE_SIZE;
+		i64 needed = size - OBJ_BOX_USER_DATA_SIZE;
+		i64 pages = (needed + PAGE_SIZE - 1) / PAGE_SIZE;
 		if (pages > bsd->pages) {
 			void *naddr = map(pages);
 			if (naddr == 0) return Err(AllocErr);
@@ -149,7 +149,7 @@ Object box_resize(Object *obj, long long size) {
 			bsd->extended = naddr;
 			bsd->pages = pages;
 		} else if (pages < bsd->pages) {
-			unmap(((unsigned char *)bsd->extended) + pages * PAGE_SIZE,
+			unmap(((byte *)bsd->extended) + pages * PAGE_SIZE,
 				  bsd->pages - pages);
 		}
 	}
@@ -172,10 +172,10 @@ void *box_get_short_bytes(const Object *obj) {
 	if (type != Box) panic("Expected box found type: {}", ObjectText[type]);
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	void *ptr = impl->value.ptr_value;
-	return (unsigned char *)ptr + sizeof(BoxSlabData);
+	return (byte *)ptr + sizeof(BoxSlabData);
 }
 
-unsigned long long box_get_page_count(const Object *obj) {
+u64 box_get_page_count(const Object *obj) {
 	check_consumed(obj);
 	ObjectType type = object_type(obj);
 	if (type != Box) panic("Expected box found type: {}", ObjectText[type]);
@@ -251,9 +251,9 @@ int object_search_ordered(OrbTreeNode *cur, const OrbTreeNode *value,
 						  OrbTreeNodePair *retval) {
 	while (cur) {
 		const char *v1 =
-			((ObjectProperty *)((unsigned char *)cur - OFFSET_ORDERED))->name;
+			((ObjectProperty *)((byte *)cur - OFFSET_ORDERED))->name;
 		const char *v2 =
-			((ObjectProperty *)((unsigned char *)value - OFFSET_ORDERED))->name;
+			((ObjectProperty *)((byte *)value - OFFSET_ORDERED))->name;
 
 		int c = cstring_compare(v1, v2);
 		if (c == 0) {

@@ -21,7 +21,32 @@ typedef unsigned long long u64;
 typedef int i32;
 typedef unsigned int u32;
 typedef unsigned char byte;
-#define float64 double
+typedef double f64;
+typedef __int128_t i128;
+typedef __uint128_t u128;
+
+#ifdef __linux__
+long unsigned int getpagesize();
+#elif defined(__APPLE__)
+int getpagesize();
+#endif
+#define PAGE_SIZE (getpagesize())
+#define _FILE_OFFSET_BITS 64
+
+typedef unsigned long size_t;
+#ifdef __linux__
+typedef long int off_t;
+#elif defined(__APPLE__)
+typedef i64 off_t;
+#endif
+
+#ifdef __APPLE__
+typedef long ssize_t;
+#else
+typedef long int ssize_t;
+#endif
+
+typedef int pid_t;
 
 // booleans
 #define bool _Bool

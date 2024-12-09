@@ -28,9 +28,9 @@
 
 /*****************************************************************************/
 // state - array holding the intermediate results during decryption.
-typedef unsigned char state_t[4][4];
+typedef byte state_t[4][4];
 
-static const unsigned char sbox[256] = {
+static const byte sbox[256] = {
 	// 0     1    2      3     4    5     6     7      8    9     A      B    C
 	// D     E     F
 	0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b,
@@ -59,16 +59,16 @@ static const unsigned char sbox[256] = {
 // The round constant word array, Rcon[i], contains the values given by
 // x to the power (i-1) being powers of x (x is denoted as {02}) in the field
 // GF(2^8)
-static const unsigned char Rcon[11] = {0x8d, 0x01, 0x02, 0x04, 0x08, 0x10,
-									   0x20, 0x40, 0x80, 0x1b, 0x36};
+static const byte Rcon[11] = {0x8d, 0x01, 0x02, 0x04, 0x08, 0x10,
+							  0x20, 0x40, 0x80, 0x1b, 0x36};
 
 #define getSBoxValue(num) (sbox[(num)])
 
 // This function produces Nb(Nr+1) round keys. The round keys are used in each
 // round to decrypt the states.
-static void KeyExpansion(unsigned char *RoundKey, const unsigned char *Key) {
+static void KeyExpansion(byte *RoundKey, const byte *Key) {
 	unsigned i, j, k;
-	unsigned char tempa[4];	 // Used for the column/row operations
+	byte tempa[4];	// Used for the column/row operations
 
 	// The first round key is the key itself.
 	for (i = 0; i < Nk; ++i) {
@@ -89,20 +89,20 @@ static void KeyExpansion(unsigned char *RoundKey, const unsigned char *Key) {
 		}
 
 		if (i % Nk == 0) {
-			// This function shifts the 4 unsigned chars in a word to the left
+			// This function shifts the 4 bytes in a word to the left
 			// once. [a0,a1,a2,a3] becomes [a1,a2,a3,a0]
 
 			// Function RotWord()
 			{
-				const unsigned char chartmp = tempa[0];
+				const byte chartmp = tempa[0];
 				tempa[0] = tempa[1];
 				tempa[1] = tempa[2];
 				tempa[2] = tempa[3];
 				tempa[3] = chartmp;
 			}
 
-			// SubWord() is a function that takes a four-unsigned char input
-			// word and applies the S-box to each of the four unsigned chars to
+			// SubWord() is a function that takes a four-byte input
+			// word and applies the S-box to each of the four bytes to
 			// produce an output word.
 
 			// Function Subword()
@@ -133,21 +133,19 @@ static void KeyExpansion(unsigned char *RoundKey, const unsigned char *Key) {
 	}
 }
 
-void AES_init_ctx_iv(struct AES_ctx *ctx, const unsigned char *key,
-					 const unsigned char *iv) {
+void AES_init_ctx_iv(struct AES_ctx *ctx, const byte *key, const byte *iv) {
 	KeyExpansion(ctx->RoundKey, key);
 	copy_bytes(ctx->Iv, iv, AES_BLOCKLEN);
 }
 
-void AES_ctx_set_iv(struct AES_ctx *ctx, const unsigned char *iv) {
+void AES_ctx_set_iv(struct AES_ctx *ctx, const byte *iv) {
 	copy_bytes(ctx->Iv, iv, AES_BLOCKLEN);
 }
 
 // This function adds the round key to state.
 // The round key is added to the state by an XOR function.
-static void AddRoundKey(unsigned char round, state_t *state,
-						const unsigned char *RoundKey) {
-	unsigned char i, j;
+static void AddRoundKey(byte round, state_t *state, const byte *RoundKey) {
+	byte i, j;
 	for (i = 0; i < 4; ++i) {
 		for (j = 0; j < 4; ++j) {
 			(*state)[i][j] ^= RoundKey[(round * Nb * 4) + (i * Nb) + j];
@@ -158,7 +156,7 @@ static void AddRoundKey(unsigned char round, state_t *state,
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
 static void SubBytes(state_t *state) {
-	unsigned char i, j;
+	byte i, j;
 	for (i = 0; i < 4; ++i) {
 		for (j = 0; j < 4; ++j) {
 			(*state)[j][i] = getSBoxValue((*state)[j][i]);
@@ -170,7 +168,7 @@ static void SubBytes(state_t *state) {
 // Each row is shifted with different offset.
 // Offset = Row number. So the first row is not shifted.
 static void ShiftRows(state_t *state) {
-	unsigned char temp;
+	byte temp;
 
 	// Rotate first row 1 columns to left
 	temp = (*state)[0][1];
@@ -196,14 +194,14 @@ static void ShiftRows(state_t *state) {
 	(*state)[1][3] = temp;
 }
 
-static unsigned char xtime(unsigned char x) {
+static byte xtime(byte x) {
 	return ((x << 1) ^ (((x >> 7) & 1) * 0x1b));
 }
 
 // MixColumns function mixes the columns of the state matrix
 static void MixColumns(state_t *state) {
-	unsigned char i;
-	unsigned char Tmp, Tm, t;
+	byte i;
+	byte Tmp, Tm, t;
 	for (i = 0; i < 4; ++i) {
 		t = (*state)[i][0];
 		Tmp = (*state)[i][0] ^ (*state)[i][1] ^ (*state)[i][2] ^ (*state)[i][3];
@@ -223,8 +221,8 @@ static void MixColumns(state_t *state) {
 }
 
 // Cipher is the main function that encrypts the PlainText.
-static void Cipher(state_t *state, const unsigned char *RoundKey) {
-	unsigned char round = 0;
+static void Cipher(state_t *state, const byte *RoundKey) {
+	byte round = 0;
 
 	// Add the First round key to the state before starting the rounds.
 	AddRoundKey(0, state, RoundKey);
@@ -248,11 +246,10 @@ static void Cipher(state_t *state, const unsigned char *RoundKey) {
 
 /* Symmetrical operation: same function for encrypting as for decrypting. Note
  * any IV/nonce should never be reused with the same key */
-void AES_CTR_xcrypt_buffer(struct AES_ctx *ctx, unsigned char *buf,
-						   unsigned long long length) {
-	unsigned char buffer[AES_BLOCKLEN];
+void AES_CTR_xcrypt_buffer(struct AES_ctx *ctx, byte *buf, u64 length) {
+	byte buffer[AES_BLOCKLEN];
 
-	unsigned long long i;
+	u64 i;
 	int bi;
 	for (i = 0, bi = AES_BLOCKLEN; i < length; ++i, ++bi) {
 		if (bi == AES_BLOCKLEN) /* we need to regen xor compliment in buffer */

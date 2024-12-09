@@ -36,7 +36,7 @@ int no_color() {
 	return false;
 }
 
-unsigned char *get_dimmed() {
+const char *get_dimmed() {
 	if (no_color()) {
 		return "";
 	} else {
@@ -44,7 +44,7 @@ unsigned char *get_dimmed() {
 	}
 }
 
-unsigned char *get_red() {
+const char *get_red() {
 	if (no_color()) {
 		return "";
 	} else {
@@ -52,7 +52,7 @@ unsigned char *get_red() {
 	}
 }
 
-unsigned char *get_bright_red() {
+const char *get_bright_red() {
 	if (no_color()) {
 		return "";
 	} else {
@@ -60,7 +60,7 @@ unsigned char *get_bright_red() {
 	}
 }
 
-unsigned char *get_green() {
+const char *get_green() {
 	if (no_color()) {
 		return "";
 	} else {
@@ -68,7 +68,7 @@ unsigned char *get_green() {
 	}
 }
 
-unsigned char *get_yellow() {
+const char *get_yellow() {
 	if (no_color()) {
 		return "";
 	} else {
@@ -76,7 +76,7 @@ unsigned char *get_yellow() {
 	}
 }
 
-unsigned char *get_cyan() {
+const char *get_cyan() {
 	if (no_color()) {
 		return "";
 	} else {
@@ -84,7 +84,7 @@ unsigned char *get_cyan() {
 	}
 }
 
-unsigned char *get_magenta() {
+const char *get_magenta() {
 	if (no_color()) {
 		return "";
 	} else {
@@ -92,7 +92,7 @@ unsigned char *get_magenta() {
 	}
 }
 
-unsigned char *get_blue() {
+const char *get_blue() {
 	if (no_color()) {
 		return "";
 	} else {
@@ -100,7 +100,7 @@ unsigned char *get_blue() {
 	}
 }
 
-unsigned char *get_reset() {
+const char *get_reset() {
 	if (no_color()) {
 		return "";
 	} else {

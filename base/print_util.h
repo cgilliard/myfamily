@@ -33,8 +33,8 @@ typedef enum PrintType {
 typedef struct Printable {
 	PrintType type;
 	union {
-		long long int_value;
-		unsigned long long uint_value;
+		i64 int_value;
+		u64 uint_value;
 		double float_value;
 		Object object_value;
 		char *string_value;
@@ -52,20 +52,17 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 #define BUILD_PRINTABLE(ignore, v)                                             \
 	_Generic((v),                                                              \
 		Object: (const Printable){.type = PrintTypeObject,                     \
-								  .value.object_value = (__int128_t)(v)},      \
+								  .value.object_value = (i128)(v)},            \
 		int: (const Printable){.type = PrintTypeInt,                           \
-							   .value.int_value = (long long)(v)},             \
-		long long: (const Printable){.type = PrintTypeInt,                     \
-									 .value.int_value = (long long)(v)},       \
+							   .value.int_value = (i64)(v)},                   \
+		i64: (const Printable){.type = PrintTypeInt,                           \
+							   .value.int_value = (i64)(v)},                   \
 		unsigned int: (const Printable){.type = PrintTypeUInt,                 \
-										.value.uint_value =                    \
-											(unsigned long long)(v)},          \
+										.value.uint_value = (u64)(v)},         \
 		unsigned long: (const Printable){.type = PrintTypeUInt,                \
-										 .value.uint_value =                   \
-											 (unsigned long long)(v)},         \
-		unsigned long long: (const Printable){.type = PrintTypeUInt,           \
-											  .value.uint_value =              \
-												  (unsigned long long)(v)},    \
+										 .value.uint_value = (u64)(v)},        \
+		u64: (const Printable){.type = PrintTypeUInt,                          \
+							   .value.uint_value = (u64)(v)},                  \
 		double: (const Printable){.type = PrintTypeFloat,                      \
 								  .value.float_value =                         \
 									  _Generic((v), double: v, default: 0.0)}, \
@@ -76,13 +73,13 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 								   .value.string_value = _Generic((v),         \
 								   const char *: (v),                          \
 								   char *: (v),                                \
-								   unsigned char *: (v),                       \
-								   const unsigned char *: (v),                 \
+								   byte *: (v),                                \
+								   const byte *: (v),                          \
 								   default: 0)})
 
-long long print_impl(Channel *channel, char *buffer, long long capacity,
-					 int newline, int exit, const char *prefix, const char *fmt,
-					 ...);
+i64 print_impl(Channel *channel, char *buffer, i64 capacity, int newline,
+			   int exit, const char *prefix, const char *fmt, ...);
+i64 sprint_impl(char *buffer, i64 capacity, const char *fmt, ...);
 
 #define panic(fmt, ...)                                                  \
 	print_impl(&STDERR, 0, 0, 1, 1, "Panic: ",                           \
@@ -102,7 +99,10 @@ long long print_impl(Channel *channel, char *buffer, long long capacity,
 				   FOR_EACH(BUILD_PRINTABLE, ignore, (, ), __VA_ARGS__), \
 			   __termination_print_pair__)
 
-#define sprint(buffer, capacity, fmt, ...) \
-	print_impl(0, buffer, capacity, 0, 0, 0, fmt, ##__VA_ARGS__)
+#define sprint(buffer, capacity, fmt, ...)                                \
+	sprint_impl(buffer, capacity,                                         \
+				fmt __VA_OPT__(, )                                        \
+					FOR_EACH(BUILD_PRINTABLE, ignore, (, ), __VA_ARGS__), \
+				__termination_print_pair__)
 
 #endif	// _BASE_PRINT_UTIL__

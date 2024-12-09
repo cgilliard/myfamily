@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/atomic.h>
 #include <base/colors.h>
-#include <base/fam.h>
-#include <base/hash.h>
-#include <base/lock.h>
-#include <base/murmurhash.h>
 #include <base/print_util.h>
 #include <base/sys.h>
-#include <base/task.h>
 #include <base/util.h>

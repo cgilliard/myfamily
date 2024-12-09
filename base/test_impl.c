@@ -41,7 +41,7 @@ static void __attribute__((constructor)) get_target_test() {
 }
 
 int execute_tests(char *suite_name) {
-	__int128_t start, end;
+	i128 start, end;
 	char success[test_count];
 	start = getnanos();
 	int test_exe_count = 0;

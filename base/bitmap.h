@@ -19,7 +19,7 @@
 
 #define BITMAP_IMPL_SIZE 32
 typedef struct BitMap {
-	unsigned char impl[BITMAP_IMPL_SIZE];
+	byte impl[BITMAP_IMPL_SIZE];
 } BitMap;
 
 Object bitmap_init(BitMap *m, int bitmap_ptr_pages, void *ptrs);

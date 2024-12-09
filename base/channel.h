@@ -33,7 +33,7 @@
 	}
 
 typedef struct Channel {
-	unsigned char value[32];
+	byte value[32];
 } Channel;
 
 Channel channel();

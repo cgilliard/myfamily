@@ -22,19 +22,19 @@
 
 #define MAX_BITMAPS 256
 #define PAGE_SIZE (getpagesize())
-#define BITS_LEN (getpagesize() / sizeof(unsigned long long))
+#define BITS_LEN (getpagesize() / sizeof(u64))
 
 int bitmap_index;
 
 typedef struct BitMapCtx {
-	long long index;
+	i64 index;
 } BitMapCtx;
 
 _Thread_local BitMapCtx bitmap_ctx[MAX_BITMAPS] = {};
 
 typedef struct BitMapImpl {
-	long long **ptrs;
-	long long ptr_count;
+	i64 **ptrs;
+	i64 ptr_count;
 	Lock lock;
 	int bitmap_ptr_pages;
 	int index;
@@ -70,9 +70,9 @@ Object bitmap_allocate(BitMap *m) {
 	BitMapCtx *ctx = &bitmap_ctx[impl->index];
 
 	int found;
-	unsigned long long updated, initial, x;
-	long long *cur = impl->ptrs[ctx->index / BITS_LEN];
-	long long *first = cur;
+	u64 updated, initial, x;
+	i64 *cur = impl->ptrs[ctx->index / BITS_LEN];
+	i64 *first = cur;
 	while (cur) {
 		do {
 			initial = ALOAD(&cur[ctx->index % BITS_LEN]);
@@ -97,17 +97,17 @@ Object bitmap_allocate(BitMap *m) {
 }
 
 void bitmap_free(BitMap *m, Object obj) {
-	unsigned long long index = $uint(obj);
+	u64 index = $uint(obj);
 	BitMapImpl *impl = (BitMapImpl *)m;
 	BitMapCtx *ctx = &bitmap_ctx[impl->index];
 
-	unsigned long long x = 1 << (index & 0x3F);
+	u64 x = 1 << (index & 0x3F);
 	index >>= 6;
 
 	if (index < ctx->index) ctx->index = index;
 
-	long long *cur = impl->ptrs[index / BITS_LEN];
-	unsigned long long initial, updated;
+	i64 *cur = impl->ptrs[index / BITS_LEN];
+	u64 initial, updated;
 
 	do {
 		initial = ALOAD(&cur[index % BITS_LEN]);
@@ -120,7 +120,7 @@ void bitmap_free(BitMap *m, Object obj) {
 }
 
 void bitmap_cleanup(BitMap *m) {
-	long long *cur = ((BitMapImpl *)m)->ptrs[0];
+	i64 *cur = ((BitMapImpl *)m)->ptrs[0];
 	int i = 0;
 	while (cur) {
 		unmap(cur, 1);

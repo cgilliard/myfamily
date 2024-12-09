@@ -17,29 +17,24 @@
 
 #define RED 1
 #define BLACK 0
-#define SET_NODE(node, color, parent, rightv, leftv)             \
-	({                                                           \
-		node->parent_color =                                     \
-			(OrbTreeNode *)((unsigned long long)parent | color); \
-		node->right = rightv;                                    \
-		node->left = leftv;                                      \
+#define SET_NODE(node, color, parent, rightv, leftv)               \
+	({                                                             \
+		node->parent_color = (OrbTreeNode *)((u64)parent | color); \
+		node->right = rightv;                                      \
+		node->left = leftv;                                        \
 	})
-#define IS_RED(node) (node && ((unsigned long long)node->parent_color & 0x1))
+#define IS_RED(node) (node && ((u64)node->parent_color & 0x1))
 #define IS_BLACK(node) !IS_RED(node)
-#define SET_BLACK(node)   \
-	(node->parent_color = \
-		 (OrbTreeNode *)((unsigned long long)node->parent_color & ~RED))
-#define SET_RED(node)     \
-	(node->parent_color = \
-		 (OrbTreeNode *)((unsigned long long)node->parent_color | RED))
+#define SET_BLACK(node) \
+	(node->parent_color = (OrbTreeNode *)((u64)node->parent_color & ~RED))
+#define SET_RED(node) \
+	(node->parent_color = (OrbTreeNode *)((u64)node->parent_color | RED))
 #define SET_RIGHT(node, rightv) node->right = rightv
 #define SET_LEFT(node, leftv) node->left = leftv
-#define SET_PARENT(node, parentv)                      \
-	(node->parent_color =                              \
-		 (OrbTreeNode *)((unsigned long long)parentv + \
-						 ((unsigned long long)node->parent_color & 0x1)))
-#define PARENT(node) \
-	((OrbTreeNode *)((unsigned long long)node->parent_color & ~0x1))
+#define SET_PARENT(node, parentv) \
+	(node->parent_color =         \
+		 (OrbTreeNode *)((u64)parentv + ((u64)node->parent_color & 0x1)))
+#define PARENT(node) ((OrbTreeNode *)((u64)node->parent_color & ~0x1))
 #define RIGHT(node) node->right
 #define LEFT(node) node->left
 #define SET_ROOT(tree, node) tree->root = node
@@ -124,8 +119,7 @@ void orbtree_insert_fixup(OrbTree *tree, OrbTreeNode *k) {
 
 void orbtree_insert_transplant(OrbTreeNode *prev, OrbTreeNode *next,
 							   int is_right) {
-	copy_bytes((unsigned char *)next, (unsigned char *)prev,
-			   sizeof(OrbTreeNode));
+	copy_bytes((byte *)next, (byte *)prev, sizeof(OrbTreeNode));
 	OrbTreeNode *parent = PARENT(next);
 	if (parent != 0) {
 		if (is_right)

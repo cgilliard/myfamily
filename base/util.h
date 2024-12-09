@@ -15,20 +15,19 @@
 #ifndef _BASE_UTIL__
 #define _BASE_UTIL__
 
-void copy_bytes(unsigned char *dest, const unsigned char *src,
-				unsigned long long n);
-void set_bytes(unsigned char *dst, unsigned char b, unsigned long long n);
-unsigned long long cstring_len(const char *S);
+#include <base/types.h>
+
+void copy_bytes(byte *dest, const byte *src, u64 n);
+void set_bytes(byte *dst, byte b, u64 n);
+u64 cstring_len(const char *S);
 int cstring_compare(const char *s1, const char *s2);
-int cstring_compare_n(const char *s1, const char *s2, unsigned long long n);
-void cstring_cat_n(char *s1, char *s2, unsigned long long n);
+int cstring_compare_n(const char *s1, const char *s2, u64 n);
+void cstring_cat_n(char *s1, char *s2, u64 n);
 const char *cstring_strstr(const char *X, const char *Y);
-void reverse(unsigned char *str, long long end);
-unsigned long long cstring_itoau64(unsigned long long num, char *str, int base,
-								   unsigned long long capacity);
-unsigned long long cstring_itoai64(long long num, char *str, int base,
-								   unsigned long long capacity);
-unsigned long long cstring_strtoull(const char *str, int base);
+void reverse(byte *str, i64 end);
+u64 cstring_itoau64(u64 num, char *str, int base, u64 capacity);
+u64 cstring_itoai64(i64 num, char *str, int base, u64 capacity);
+u64 cstring_strtoull(const char *str, int base);
 int cstring_is_alpha_numeric(const char *str);
 
 #endif	// _BASE_UTIL__

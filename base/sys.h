@@ -17,35 +17,11 @@
 
 #include <base/types.h>
 
-#define PAGE_SIZE (getpagesize())
-#define _FILE_OFFSET_BITS 64
-
-typedef unsigned long size_t;
-#ifdef __linux__
-typedef long int off_t;
-#elif defined(__APPLE__)
-typedef long long off_t;
-#endif
-
-#ifdef __APPLE__
-typedef long ssize_t;
-#else
-typedef long int ssize_t;
-#endif
-
-typedef int pid_t;
-
 void *map(u64 pages);
 void unmap(void *addr, u64 pages);
 int os_sleep(u64 millis);
-int set_timer(void (*alarm)(int), u64 millis);
+int set_timer(void (*)(int), u64 millis);
 int unset_timer();
-
-#ifdef __linux__
-long unsigned int getpagesize();
-#elif defined(__APPLE__)
-int getpagesize();
-#endif
 
 int sched_yield(void);
 int getentropy(void *buffer, size_t length);
@@ -58,7 +34,7 @@ ssize_t read(int fd, void *buf, size_t count);
 
 int snprintf(char *buf, unsigned long capacity, const char *fmt, ...);
 void __attribute__((noreturn)) _exit(int code);
-__int128_t getnanos();
+i128 getnanos();
 
 #ifdef TEST
 extern u64 _alloc_sum;

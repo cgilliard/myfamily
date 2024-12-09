@@ -21,7 +21,7 @@ void cpsrng_reseed();
 void cpsrng_rand_byte(byte *v);
 void cpsrng_rand_i64(i64 *v);
 void cpsrng_rand_int(int *v);
-void cpsrng_rand_bytes(void *v, unsigned long long size);
+void cpsrng_rand_bytes(void *v, u64 size);
 
 #ifdef TEST
 void cpsrng_test_seed(byte iv[16], byte key[32]);

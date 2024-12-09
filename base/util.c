@@ -15,16 +15,15 @@
 #include <base/limits.h>
 #include <base/util.h>
 
-void copy_bytes(unsigned char *X, const unsigned char *Y,
-				unsigned long long x) {
+void copy_bytes(byte *X, const byte *Y, u64 x) {
 	while (x--) *(X)++ = *(Y)++;
 }
 
-void set_bytes(unsigned char *X, unsigned char x, unsigned long long y) {
+void set_bytes(byte *X, byte x, u64 y) {
 	while (y--) *(X++) = x;
 }
 
-unsigned long long cstring_len(const char *X) {
+u64 cstring_len(const char *X) {
 	const char *Y = X;
 	while (*X) X++;
 	return X - Y;
@@ -40,7 +39,7 @@ int cstring_compare(const char *X, const char *Y) {
 	return 0;
 }
 
-int cstring_compare_n(const char *X, const char *Y, unsigned long long n) {
+int cstring_compare_n(const char *X, const char *Y, u64 n) {
 	while (*X == *Y && n && *X) {
 		n--;
 		X++;
@@ -63,24 +62,22 @@ const char *cstring_strstr(const char *X, const char *Y) {
 	return 0;
 }
 
-void swap(unsigned char *X, unsigned long long x, unsigned long long y) {
-	unsigned char t = X[x];
+void swap(byte *X, u64 x, u64 y) {
+	byte t = X[x];
 	X[x] = X[y];
 	X[y] = t;
 }
 
-void reverse(unsigned char *X, long long length) {
-	long long start = 0, end = length - 1;
+void reverse(byte *X, i64 length) {
+	i64 start = 0, end = length - 1;
 	while (start < end) swap(X, start++, end--);
 }
 
-unsigned long long cstring_itoau64(unsigned long long num, char *X, int base,
-								   unsigned long long capacity) {
-	unsigned long long length = 0, i = 1;
-	for (unsigned long long num_copy = num; num_copy; num_copy /= base)
-		length++;
+u64 cstring_itoau64(u64 num, char *X, int base, u64 capacity) {
+	u64 length = 0, i = 1;
+	for (u64 num_copy = num; num_copy; num_copy /= base) length++;
 	while (capacity && num) {
-		unsigned long long rem = num % base;
+		u64 rem = num % base;
 		X[length - i++] = (rem > 9) ? (rem - 10) + 'A' : rem + '0';
 		num /= base;
 		capacity--;
@@ -90,8 +87,7 @@ unsigned long long cstring_itoau64(unsigned long long num, char *X, int base,
 	return length;
 }
 
-unsigned long long cstring_itoai64(long long num, char *X, int base,
-								   unsigned long long capacity) {
+u64 cstring_itoai64(i64 num, char *X, int base, u64 capacity) {
 	if (num < 0) {
 		if (num == INT64_MIN)
 			num = INT64_MAX;
@@ -106,8 +102,8 @@ unsigned long long cstring_itoai64(long long num, char *X, int base,
 		return cstring_itoau64(num, X, base, capacity);
 }
 
-unsigned long long cstring_strtoull(const char *X, int base) {
-	unsigned long long ret = 0, mul = 1, len = cstring_len(X);
+u64 cstring_strtoull(const char *X, int base) {
+	u64 ret = 0, mul = 1, len = cstring_len(X);
 	while (len-- && X[len] != 'x') {
 		ret +=
 			X[len] > '9' ? ((X[len] - 'a') + 10) * mul : (X[len] - '0') * mul;
@@ -116,7 +112,7 @@ unsigned long long cstring_strtoull(const char *X, int base) {
 	return ret;
 }
 
-void cstring_cat_n(char *X, char *Y, unsigned long long n) {
+void cstring_cat_n(char *X, char *Y, u64 n) {
 	X += cstring_len(X);
 	while (n-- && *Y) {
 		*X = *Y;

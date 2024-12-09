@@ -15,31 +15,31 @@
 #ifndef _BASE_COLORS__
 #define _BASE_COLORS__
 
-unsigned char *get_dimmed();
+const char *get_dimmed();
 #define DIMMED get_dimmed()
 
-unsigned char *get_red();
+const char *get_red();
 #define RED get_red()
 
-unsigned char *get_bright_red();
+const char *get_bright_red();
 #define BRIGHT_RED get_bright_red()
 
-unsigned char *get_green();
+const char *get_green();
 #define GREEN get_green()
 
-unsigned char *get_yellow();
+const char *get_yellow();
 #define YELLOW get_yellow()
 
-unsigned char *get_cyan();
+const char *get_cyan();
 #define CYAN get_cyan()
 
-unsigned char *get_magenta();
+const char *get_magenta();
 #define MAGENTA get_magenta()
 
-unsigned char *get_blue();
+const char *get_blue();
 #define BLUE get_blue()
 
-unsigned char *get_reset();
+const char *get_reset();
 #define RESET get_reset()
 
 #ifdef TEST

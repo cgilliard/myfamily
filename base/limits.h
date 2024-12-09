@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define INT64_MAX ((long long)0x7FFFFFFFFFFFFFFFLL)
+#define INT64_MAX ((i64)0x7FFFFFFFFFFFFFFFLL)
 #define INT64_MIN (-INT64_MAX - 1)
 
 #define INT32_MAX ((int)0x7FFFFFFF)

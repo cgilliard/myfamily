@@ -20,7 +20,7 @@
 #include <base/orbtree.h>
 #include <base/types.h>
 
-typedef __int128_t ObjectNc;
+typedef i128 ObjectNc;
 void object_cleanup(const ObjectNc *obj);
 #define Object \
 	ObjectNc __attribute((warn_unused_result, cleanup(object_cleanup)))
@@ -47,7 +47,7 @@ typedef struct BoxSlabData {
 	OrbTree ordered;
 	OrbTree seq;
 	void *extended;
-	unsigned long long pages;
+	u64 pages;
 	unsigned int ref_count;
 	unsigned int weak_count;
 } BoxSlabData;
@@ -60,23 +60,21 @@ typedef struct BoxSlabData {
 	_Generic((v),                                                              \
 		double: object_float(_Generic((v), double: v, default: 0)),            \
 		float: object_float(_Generic((v), float: v, default: 0)),              \
-		long long: object_int(_Generic((v), long long: v, default: 0)),        \
+		i64: object_int(_Generic((v), i64: v, default: 0)),                    \
 		int: object_int(_Generic((v), int: (v), default: 0)),                  \
-		unsigned long long: object_uint(                                       \
-				 _Generic((v), unsigned long long: v, default: 0)),            \
+		u64: object_uint(_Generic((v), u64: v, default: 0)),                   \
 		unsigned int: object_uint(_Generic((v), unsigned int: v, default: 0)), \
 		char *: object_string(_Generic((v), char *: v, default: 0)),           \
 		const char *: object_string(                                           \
 				 _Generic((v), const char *: v, default: 0)),                  \
-		unsigned char *: object_string(                                        \
-				 _Generic((v), unsigned char *: v, default: 0)),               \
-		const unsigned char *: object_string(                                  \
-				 _Generic((v), const unsigned char *: v, default: 0)),         \
+		byte *: object_string(_Generic((v), byte *: v, default: 0)),           \
+		const byte *: object_string(                                           \
+				 _Generic((v), const byte *: v, default: 0)),                  \
 		default: object_function(_Generic((v),                                 \
 		double: 0,                                                             \
 		int: 0,                                                                \
-		long long: 0,                                                          \
-		unsigned long long: 0,                                                 \
+		i64: 0,                                                                \
+		u64: 0,                                                                \
 		default: v)))
 
 #define set(obj, name, value)                                       \
@@ -114,30 +112,30 @@ typedef struct BoxSlabData {
 
 #define Err(code) object_err(code)
 #define $fn(v) value_of_checked(&v, Function)
-#define $int(obj) (*(long long *)value_of_checked(&obj, Int))
+#define $int(obj) (*(i64 *)value_of_checked(&obj, Int))
 #define $is_err(obj) (object_type(&obj) == Err)
 #define $err(obj) (FamErrText[(object_aux(&obj))])
 #define $backtrace(obj) (object_bt_ptr(&obj))
 #define $kind(obj) (object_aux(&obj))
 #define $float(obj) (*(double *)value_of_checked(&obj, Float))
-#define $uint(obj) (*(unsigned long long *)value_of_checked(&obj, UInt))
+#define $uint(obj) (*(u64 *)value_of_checked(&obj, UInt))
 #define let const Object
 #define var Object
 #define ret ObjectNc
 
-Object object_int(long long value);
-Object object_uint(unsigned long long value);
+Object object_int(i64 value);
+Object object_uint(u64 value);
 Object object_float(double value);
 Object object_function(void *fn);
 Object object_string(const char *v);
 Object object_err(int code);
 const char *object_bt_ptr(const Object *obj);
-Object box(long long size);
-Object box_resize(Object *obj, long long size);
+Object box(i64 size);
+Object box_resize(Object *obj, i64 size);
 unsigned int object_aux(const Object *obj);
 void *box_get_long_bytes(const Object *obj);
 void *box_get_short_bytes(const Object *obj);
-unsigned long long box_get_page_count(const Object *obj);
+u64 box_get_page_count(const Object *obj);
 const void *value_of(const Object *obj);
 const void *value_of_checked(const Object *obj, ObjectType expect);
 const void *value_of_fn(const Object *obj);

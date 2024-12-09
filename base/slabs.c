@@ -28,16 +28,16 @@
 
 typedef struct SlabList {
 	struct SlabList *next;
-	long long id;
-	unsigned char padding[16];
-	unsigned char data[];
+	i64 id;
+	byte padding[16];
+	byte data[];
 } SlabList;
 
 SlabList sl_reserved_impl;
 SlabList *sl_reserved = &sl_reserved_impl;
 
 typedef struct SlabAllocatorImpl {
-	unsigned char ****data;
+	byte ****data;
 	BitMap bm;
 	Lock lock;
 	SlabList *head;
@@ -49,7 +49,7 @@ typedef struct SlabAllocatorImpl {
 	unsigned int max_total_slabs;
 	unsigned int free_slabs;
 	unsigned int total_slabs;
-	unsigned char padding[32];
+	byte padding[32];
 } SlabAllocatorImpl;
 
 void __attribute__((constructor)) __check_slabs_sizes() {
@@ -68,7 +68,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 	}
 
 	let bobj = bitmap_allocate(&impl->bm);
-	unsigned long long id = $uint(bobj);
+	u64 id = $uint(bobj);
 	if (id == -1) {
 		void *addr = map(1);
 		if (addr == 0) return 0;
@@ -78,7 +78,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		id = $uint(v);
 	}
 	if (id < 0) return 0;
-	long long next = id >> (__builtin_ctz(PAGE_SIZE / impl->sl_size));
+	i64 next = id >> (__builtin_ctz(PAGE_SIZE / impl->sl_size));
 	unsigned int entries = ((1U << (__builtin_ctz(PAGE_SIZE / impl->sl_size))));
 	int offset = (id % entries) * impl->sl_size;
 	int i = next >> (2 * SHIFT_PER_LEVEL);
@@ -94,7 +94,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		unlock(&impl->lock);
 		lockw(&impl->lock);
 		if (impl->data == 0) {
-			impl->data = (unsigned char ****)map(1);
+			impl->data = (byte ****)map(1);
 			if (impl->data == 0) alloc_err = 1;
 		}
 		unlock(&impl->lock);
@@ -105,7 +105,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		unlock(&impl->lock);
 		lockw(&impl->lock);
 		if (impl->data[i] == 0) {
-			impl->data[i] = (unsigned char ***)map(1);
+			impl->data[i] = (byte ***)map(1);
 			if (impl->data[i] == 0) alloc_err = 1;
 		}
 		unlock(&impl->lock);
@@ -116,7 +116,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		unlock(&impl->lock);
 		lockw(&impl->lock);
 		if (impl->data[i][j] == 0) {
-			impl->data[i][j] = (unsigned char **)map(1);
+			impl->data[i][j] = (byte **)map(1);
 			if (impl->data[i][j] == 0) alloc_err = 1;
 		}
 		unlock(&impl->lock);
@@ -127,7 +127,7 @@ SlabList *slab_allocator_grow(SlabAllocatorImpl *impl) {
 		unlock(&impl->lock);
 		lockw(&impl->lock);
 		if (impl->data[i][j][k] == 0) {
-			impl->data[i][j][k] = (unsigned char *)map(1);
+			impl->data[i][j][k] = (byte *)map(1);
 			if (impl->data[i][j][k] == 0) alloc_err = 1;
 		}
 		unlock(&impl->lock);
@@ -193,20 +193,17 @@ void slab_allocator_cleanup(SlabAllocator *sa) {
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 	bitmap_cleanup(&impl->bm);
 	if (impl->data) {
-		for (int i = 0;
-			 i < PAGE_SIZE / sizeof(unsigned char *) && impl->data[i]; i++) {
-			for (int j = 0;
-				 j < PAGE_SIZE / sizeof(unsigned char *) && impl->data[i][j];
+		for (int i = 0; i < PAGE_SIZE / sizeof(byte *) && impl->data[i]; i++) {
+			for (int j = 0; j < PAGE_SIZE / sizeof(byte *) && impl->data[i][j];
 				 j++) {
-				for (int k = 0; k < PAGE_SIZE / sizeof(unsigned char *) &&
-								impl->data[i][j][k];
-					 k++)
-					unmap((unsigned char *)impl->data[i][j][k], 1);
-				unmap((unsigned char *)impl->data[i][j], 1);
+				for (int k = 0;
+					 k < PAGE_SIZE / sizeof(byte *) && impl->data[i][j][k]; k++)
+					unmap((byte *)impl->data[i][j][k], 1);
+				unmap((byte *)impl->data[i][j], 1);
 			}
-			unmap((unsigned char *)impl->data[i], 1);
+			unmap((byte *)impl->data[i], 1);
 		}
-		unmap((unsigned char *)impl->data, 1);
+		unmap((byte *)impl->data, 1);
 	}
 }
 
@@ -219,8 +216,7 @@ void *slab_allocator_allocate(SlabAllocator *sa) {
 		next = head->next;
 		if (head == impl->head) {
 			if (head == tail) {
-				return ((unsigned char *)slab_allocator_grow(impl) +
-						sizeof(SlabList));
+				return ((byte *)slab_allocator_grow(impl) + sizeof(SlabList));
 			} else {
 				ret = head;
 				if (CAS_SEQ(&impl->head, &head, next)) break;
@@ -229,13 +225,13 @@ void *slab_allocator_allocate(SlabAllocator *sa) {
 	}
 	ASUB(&impl->free_slabs, 1);
 	ASTORE(&ret->next, sl_reserved);
-	return ((unsigned char *)ret + sizeof(SlabList));
+	return ((byte *)ret + sizeof(SlabList));
 }
 
 void slab_allocator_free(SlabAllocator *sa, void *ptr) {
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
-	SlabList *slptr = (SlabList *)((unsigned char *)ptr - sizeof(SlabList)),
-			 *tail, *next;
+	SlabList *slptr = (SlabList *)((byte *)ptr - sizeof(SlabList)), *tail,
+			 *next;
 	if (!CAS(&slptr->next, &sl_reserved, 0)) {
 		panic("Double free attempt! id={}", slptr->id);
 	}

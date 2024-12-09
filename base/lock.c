@@ -37,8 +37,8 @@ void lock_read(Lock *lock) {
 	if (stack_level >= MAX_LOCK_LEVEL)
 		panic("too many lock levels: MAX={}", MAX_LOCK_LEVEL);
 	_lock_is_write__[stack_level++] = 0;
-	unsigned long long state;
-	unsigned long long state_update;
+	u64 state;
+	u64 state_update;
 	int itt = 0;
 	// obtain read lock
 	do {
@@ -53,8 +53,8 @@ void lock_write(Lock *lock) {
 	if (stack_level >= MAX_LOCK_LEVEL)
 		panic("too many lock levels: MAX={}", MAX_LOCK_LEVEL);
 	_lock_is_write__[stack_level++] = 1;
-	unsigned long long state;
-	unsigned long long state_update;
+	u64 state;
+	u64 state_update;
 	int itt = 0;
 	// obtain write lock
 	do {
@@ -73,8 +73,8 @@ void lock_write(Lock *lock) {
 }
 
 void lock_unlock(Lock *lock) {
-	unsigned long long state;
-	unsigned long long state_update;
+	u64 state;
+	u64 state_update;
 	int itt = 0;
 	do {
 		if (itt++) sched_yield();
@@ -93,8 +93,8 @@ void lock_unlock(Lock *lock) {
 
 void lock_upgrade(Lock *lock) {
 	_lock_is_write__[stack_level] = 1;
-	unsigned long long state;
-	unsigned long long state_update;
+	u64 state;
+	u64 state_update;
 	int itt = 0;
 	// obtain upgrade lock
 	do {
@@ -115,8 +115,8 @@ void lock_upgrade(Lock *lock) {
 
 void lock_downgrade(Lock *lock) {
 	_lock_is_write__[stack_level] = 0;
-	unsigned long long state;
-	unsigned long long state_update;
+	u64 state;
+	u64 state_update;
 	int itt = 0;
 
 	// remove our write lock and add read lock at the same time

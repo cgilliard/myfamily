@@ -19,7 +19,7 @@
 
 #define SLAB_ALLOCATOR_IMPL_SIZE 128
 typedef struct SlabAllocator {
-	unsigned char impl[SLAB_ALLOCATOR_IMPL_SIZE];
+	byte impl[SLAB_ALLOCATOR_IMPL_SIZE];
 } SlabAllocator;
 
 #define SLAB_LIST_SIZE 32

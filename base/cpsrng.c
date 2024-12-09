@@ -62,7 +62,7 @@ void cpsrng_rand_int(int *v) {
 // note: not thread safe as user must ensure thread safety. This allows for
 // flexible usage in a single thread, no locking is needed. In multi-threaded
 // environments, locking may be used.
-void cpsrng_rand_bytes(void *v, unsigned long long size) {
+void cpsrng_rand_bytes(void *v, u64 size) {
 	AES_CTR_xcrypt_buffer(&aes_ctx, (byte *)v, size);
 }
 

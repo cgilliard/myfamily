@@ -43,20 +43,20 @@
 #ifndef _BASE_AES__
 #define _BASE_AES__
 
+#include <base/types.h>
+
 #define AES_BLOCKLEN 16
 #define AES_KEYLEN 32
 #define AES_keyExpSize 240
 
 struct AES_ctx {
-	unsigned char RoundKey[AES_keyExpSize];
-	unsigned char Iv[AES_BLOCKLEN];
+	byte RoundKey[AES_keyExpSize];
+	byte Iv[AES_BLOCKLEN];
 };
 
-void AES_init_ctx_iv(struct AES_ctx *ctx, const unsigned char *key,
-					 const unsigned char *iv);
-void AES_ctx_set_iv(struct AES_ctx *ctx, const unsigned char *iv);
+void AES_init_ctx_iv(struct AES_ctx *ctx, const byte *key, const byte *iv);
+void AES_ctx_set_iv(struct AES_ctx *ctx, const byte *iv);
 
-void AES_CTR_xcrypt_buffer(struct AES_ctx *ctx, unsigned char *buf,
-						   unsigned long long length);
+void AES_CTR_xcrypt_buffer(struct AES_ctx *ctx, byte *buf, u64 length);
 
 #endif	// _BASE_AES__

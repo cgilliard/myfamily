@@ -18,7 +18,6 @@
 #endif	// __linux__
 #include <base/sys.h>
 #include <base/util.h>
-#include <pthread.h>
 #include <signal.h>
 #include <sys/mman.h>
 #include <sys/time.h>
@@ -43,7 +42,6 @@ void *popen(const char *command, const char *rw);
 char *fgets(char *str, int n, void *stream);
 int pclose(void *fp);
 int printf(const char *fmt, ...);
-int pthread_threadid_np(pthread_t thread, u64 *thread_id);
 
 void *map(u64 pages) {
 	if (pages == 0) return NULL;
@@ -103,10 +101,10 @@ int unset_timer() {
 	return 0;  // Success
 }
 
-__int128_t getnanos() {
+i128 getnanos() {
 	struct timespec now;
 	clock_gettime(CLOCK_MONOTONIC, &now);
-	return (__int128_t)now.tv_sec * (__int128_t)1e9 + (__int128_t)now.tv_nsec;
+	return (i128)now.tv_sec * (i128)1e9 + (i128)now.tv_nsec;
 }
 
 const char *backtrace_full() {
@@ -336,12 +334,12 @@ static void check_arch(char *type, int actual, int expected) {
 void __attribute__((constructor)) __check_sizes() {
 	char buf[30] = {};
 	arch(int, 4);
-	arch(long long, 8);
-	arch(unsigned long long, 8);
+	arch(i64, 8);
+	arch(u64, 8);
 	arch(unsigned long, 8);
-	arch(__uint128_t, 16);
+	arch(u128, 16);
 	arch(char, 1);
-	arch(unsigned char, 1);
+	arch(byte, 1);
 	arch(float, 4);
 	arch(double, 8);
 	if (__SIZEOF_SIZE_T__ != 8) {
@@ -359,14 +357,6 @@ void __attribute__((constructor)) __check_sizes() {
 		_exit(-1);
 	}
 }
-
-#ifdef __APPLE__
-u64 gettid() {
-	u64 thread_id;
-	pthread_threadid_np(NULL, &thread_id);
-	return thread_id;
-}
-#endif	// __APPLE__
 
 #ifdef TEST
 u64 _alloc_sum;

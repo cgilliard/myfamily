@@ -17,9 +17,9 @@
 
 typedef struct ObjectImpl {
 	union {
-		unsigned char bytes[8];
-		long long int_value;
-		unsigned long long uint_value;
+		byte bytes[8];
+		i64 int_value;
+		u64 uint_value;
 		double float_value;
 		int code_value;
 		void *ptr_value;
