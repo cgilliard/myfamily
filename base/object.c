@@ -15,6 +15,7 @@
 #include <base/err.h>
 #include <base/limits.h>
 #include <base/object.h>
+#include <base/object_impl.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
 #include <base/sys.h>
@@ -23,21 +24,6 @@
 #define OFFSET_ORDERED 0
 
 SlabAllocator object_slabs;
-
-typedef struct ObjectImpl {
-	union {
-		unsigned char bytes[8];
-		long long int_value;
-		unsigned long long uint_value;
-		double float_value;
-		int code_value;
-		void *ptr_value;
-	} value;
-	unsigned int type : 4;
-	unsigned int no_cleanup : 1;
-	unsigned int consumed : 1;
-	unsigned int aux;
-} ObjectImpl;
 
 typedef struct ObjectProperty {
 	OrbTreeNode ordered;
@@ -62,18 +48,24 @@ void check_consumed(const Object *obj) {
 }
 
 Object object_move(Object *obj) {
-	if (object_type(obj) != Box) return *obj;
+	ObjectType type = object_type(obj);
+	if (type != Box && type != Thread) return *obj;
 	let r = *obj;
 	(*(ObjectImpl *)obj).no_cleanup = (*(ObjectImpl *)obj).consumed = 1;
 	return r;
 }
 
 Object object_ref(Object *obj) {
-	if (object_type(obj) != Box) return *obj;
-	ObjectImpl *impl = (ObjectImpl *)obj;
-	BoxSlabData *bsd = impl->value.ptr_value;
-	bsd->ref_count++;
-	return *obj;
+	ObjectType type = object_type(obj);
+	if (type != Box && type != Thread) return *obj;
+	if (type == Thread) {
+		return object_thread_ref(obj);
+	} else {
+		ObjectImpl *impl = (ObjectImpl *)obj;
+		BoxSlabData *bsd = impl->value.ptr_value;
+		bsd->ref_count++;
+		return *obj;
+	}
 }
 
 Object object_int(long long value) {
@@ -241,7 +233,7 @@ void object_cleanup(const Object *obj) {
 
 		Object drop = object_get_property(obj, "drop");
 		if (!$is_err(drop)) {
-			void (*drop_impl)(Object *) = (void (*)(Object *))$fn(&drop);
+			void (*drop_impl)(Object *) = (void (*)(Object *))$fn(drop);
 			drop_impl(obj);
 		}
 
@@ -250,6 +242,8 @@ void object_cleanup(const Object *obj) {
 	} else if (((ObjectImpl *)obj)->type == Err) {
 		void *ptr = ((ObjectImpl *)obj)->value.ptr_value;
 		if (ptr) unmap(ptr, 4);
+	} else if (((ObjectImpl *)obj)->type == Thread) {
+		object_thread_cleanup(obj);
 	}
 }
 

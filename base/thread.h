@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
 #ifndef _BASE_THREAD__
 #define _BASE_THREAD__
 
@@ -24,7 +25,6 @@ typedef struct ThreadConfig {
 } ThreadConfig;
 
 static const ThreadConfig THREAD_CONFIG_DEFAULT = {
-	.guard_size = -1,			   // Default of -1 indicates PAGE_SIZE.
 	.stack_size = 2 * 1024 * 1024  // 2mb
 };
 
@@ -42,3 +42,4 @@ void *thread_join(Thread *th);
 u64 thread_id();
 
 #endif	// _BASE_THREAD__
+*/

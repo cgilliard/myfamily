@@ -97,6 +97,7 @@ void *start_test_th(void *arg) {
 	return &test_return;
 }
 
+/*
 Test(thread) {
 	Thread *th = thread_init(&THREAD_CONFIG_DEFAULT);
 	int x = 123;
@@ -106,6 +107,7 @@ Test(thread) {
 	assert(test_th_recv);
 	thread_cleanup(th);
 }
+*/
 
 u32 u64_hash(const void *value) {
 	return murmurhash((const byte *)value, sizeof(u64), 0);
@@ -181,6 +183,56 @@ Test(hash) {
 	hash_cleanup(&h1);
 }
 
+int thread_test_complete = 0;
+
+Object test_run(Object *arg) {
+	// confirm passed in param
+	assert_eq($int(*arg), 3);
+	// wait to ensure join works
+	os_sleep(300);
+	// update global var to indicate completion
+	ASTORE(&thread_test_complete, 1);
+	// return 99 to test return
+	return $(99);
+}
+
+Test(thread) {
+	// create a thread with 4096 byte stack
+	var th1 = $thread(4096);
+	// set the 'run' function for the thread
+	let res1 = set(th1, "run", test_run);
+	// check for error
+	assert(!$is_err(res1));
+	// create an argument
+	let arg = $(3);
+	// confirm that the complete variable is 0
+	assert_eq(ALOAD(&thread_test_complete), 0);
+	// start the thread with the specified argument
+	let res2 = $start(th1, arg);
+	// check for error
+	assert(!$is_err(res2));
+	// join the thread
+	let res3 = $join(th1);
+	// check for error
+	assert(!$is_err(res3));
+	// assert that the value returned is as expected
+	assert_eq($int(res3), 99);
+	// confirm the complete variable was set
+	assert_eq(ALOAD(&thread_test_complete), 1);
+
+	/*
+		// create thread
+		var th2 = $thread(4096);
+		// try to start thread without specifying 'run' function.
+		let res4 = $start(th2, arg);
+		// error occurs
+		assert($is_err(res4));
+		// kind NotFound
+		assert_eq($kind(res4), NotFound);
+	*/
+}
+
+/*
 int test_signal_state = 0;
 
 void test_handler() {
@@ -205,3 +257,4 @@ Test(thread_signal) {
 	thread_cleanup(th);
 	assert_eq(ALOAD(&test_signal_state), 3);
 }
+*/

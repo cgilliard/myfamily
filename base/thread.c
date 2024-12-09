@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
 #include <base/hash.h>
 #include <base/limits.h>
 #include <base/lock.h>
@@ -49,9 +50,9 @@ void __attribute__((constructor)) __init_thread_hash() {
 
 typedef struct ThreadImpl {
 	pthread_t th;
-	u64 guard_size;
 	u64 stack_size;
 	void *stack;
+	bool joined;
 } ThreadImpl;
 
 u32 thread_hash(const void *key) {
@@ -68,7 +69,6 @@ Thread *thread_init(ThreadConfig *config) {
 	if (config->stack_size % PAGE_SIZE || config->stack_size == 0) return NULL;
 	ThreadImpl *ret = map(2 + config->stack_size / PAGE_SIZE);
 	if (ret == NULL) return NULL;
-	ret->guard_size = config->guard_size < 0 ? PAGE_SIZE : config->guard_size;
 	ret->stack_size = config->stack_size;
 	ret->stack = ((byte *)ret) + PAGE_SIZE;
 	return (Thread *)ret;
@@ -87,10 +87,6 @@ int thread_start(Thread *th, ThreadFunction func, void *arg) {
 	ThreadImpl *impl = (ThreadImpl *)th;
 	pthread_attr_t attr;
 	if (pthread_attr_init(&attr)) return -1;
-	if (pthread_attr_setguardsize(&attr, impl->guard_size)) {
-		pthread_attr_destroy(&attr);
-		return -1;
-	}
 	if (pthread_attr_setstack(&attr, impl->stack, impl->stack_size)) {
 		pthread_attr_destroy(&attr);
 		return -1;
@@ -145,6 +141,7 @@ void *thread_join(Thread *th) {
 	void *ret;
 	ThreadImpl *impl = (ThreadImpl *)th;
 	pthread_join(impl->th, &ret);
+	impl->joined = true;
 	return ret;
 }
 
@@ -158,4 +155,113 @@ u64 thread_id() {
 	println("WARN: unsupported platform! Cannot determine tid.");
 #endif
 	return thread_id;
+}
+*/
+
+#include <base/atomic.h>
+#include <base/object.h>
+#include <base/object_impl.h>
+#include <base/print_util.h>
+#include <base/sys.h>
+#include <pthread.h>
+
+typedef enum ThreadState {
+	ThreadRunnable,
+	ThreadRunning,
+	ThreadZombie,
+	ThreadJoined,
+} ThreadState;
+
+typedef struct ThreadImpl {
+	pthread_t th;
+	u64 stack_size;
+	ObjectNc arg;
+	ThreadFn start_fn;
+	int state;
+	int ref_count;
+	ObjectNc ref;
+} ThreadImpl;
+
+void __attribute__((constructor)) __check_thread_impl_size() {
+	if ((sizeof(ThreadImpl) % 16) != 0)
+		panic("ThreadImpl must be aligned to 16 bytes! size was {}.",
+			  sizeof(ThreadImpl));
+}
+
+Object object_thread(u64 stack_size) {
+	u64 pages = 1 + ((stack_size + sizeof(ThreadImpl)) - 1) / PAGE_SIZE;
+	ThreadImpl *ti = map(pages);
+	if (ti == NULL) return Err(AllocErr);
+	ti->stack_size = stack_size;
+	ASTORE(&ti->ref_count, 1);
+	ObjectImpl val = {.type = Thread, .value.ptr_value = ti};
+	return *(Object *)&val;
+}
+
+void *object_thread_start_fn(void *arg) {
+	ThreadImpl *ti = arg;
+	ThreadFn fn = ti->start_fn;
+	Object varg = object_move(&ti->arg);
+	ASTORE(&ti->state, ThreadRunning);
+	ti->arg = fn(&varg);
+	ASTORE(&ti->state, ThreadZombie);
+	object_cleanup(&ti->ref);
+	return NULL;
+}
+
+Object object_thread_start(Object *obj, Object *arg) {
+	let fn = get(*obj, "run");
+	if ($is_err(fn)) return Err(NotFound);
+	ThreadFn start_fn = $fn(fn);
+	if (start_fn == NULL) return Err(IllegalState);
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	ThreadImpl *ti = impl->value.ptr_value;
+	ti->start_fn = start_fn;
+	ti->arg = object_move(arg);
+	ti->state = ThreadRunnable;
+	ti->ref = object_ref(obj);
+
+	pthread_attr_t attr;
+	if (pthread_attr_init(&attr)) return Err(AllocErr);
+	if (pthread_attr_setstacksize(&attr, ti->stack_size)) {
+		pthread_attr_destroy(&attr);
+		return Err(IllegalArgument);
+	}
+
+	int ret = pthread_create(&ti->th, &attr, object_thread_start_fn, ti);
+	pthread_attr_destroy(&attr);
+	while (ALOAD(&ti->state) == ThreadRunnable) sched_yield();
+	return $(0);
+}
+
+Object object_thread_signal(const Object *th) {
+	return $(0);
+}
+Object object_thread_join(Object *obj) {
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	ThreadImpl *ti = impl->value.ptr_value;
+	pthread_join(ti->th, NULL);
+	ASTORE(&ti->state, ThreadJoined);
+	return ti->arg;
+}
+u64 object_thread_id(const Object *th) {
+	return 0;
+}
+
+Object object_thread_ref(Object *obj) {
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	ThreadImpl *ti = impl->value.ptr_value;
+	AADD(&ti->ref_count, 1);
+	return *obj;
+}
+
+void object_thread_cleanup(const Object *obj) {
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	ThreadImpl *ti = impl->value.ptr_value;
+	int ref_count = ASUB(&ti->ref_count, 1);
+	if (ref_count == 1) {
+		if (ALOAD(&ti->state) == ThreadZombie) pthread_detach(ti->th);
+		u64 pages = 1 + ((ti->stack_size + sizeof(ThreadImpl)) - 1) / PAGE_SIZE;
+		unmap(impl->value.ptr_value, pages);
+	}
 }

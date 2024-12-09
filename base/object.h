@@ -18,6 +18,7 @@
 #include <base/err.h>
 #include <base/macro_util.h>
 #include <base/orbtree.h>
+#include <base/types.h>
 
 typedef __int128_t ObjectNc;
 void object_cleanup(const ObjectNc *obj);
@@ -36,6 +37,7 @@ void object_cleanup(const ObjectNc *obj);
 	Float, \
 	Box, \
 	Function, \
+	Thread, \
 	Err
 // clang-format on
 
@@ -77,7 +79,15 @@ typedef struct BoxSlabData {
 		unsigned long long: 0,                                                 \
 		default: v)))
 
-#define set(obj, name, value) object_set_property(&obj, name, &value)
+#define set(obj, name, value)                                       \
+	_Generic((value),                                               \
+		Object: object_set_property(                                \
+				 &obj, name,                                        \
+				 _Generic((value), Object: &value, default: NULL)), \
+		default: ({                                                 \
+				 ret _fn__ = object_function(value);                \
+				 object_set_property(&obj, name, &_fn__);           \
+			 }))
 #define get(obj, name) object_get_property(&obj, name)
 #define rem(obj, name) object_remove_property(&obj, name)
 
@@ -103,7 +113,7 @@ typedef struct BoxSlabData {
 	})
 
 #define Err(code) object_err(code)
-#define $fn(v) value_of_checked(v, Function)
+#define $fn(v) value_of_checked(&v, Function)
 #define $int(obj) (*(long long *)value_of_checked(&obj, Int))
 #define $is_err(obj) (object_type(&obj) == Err)
 #define $err(obj) (FamErrText[(object_aux(&obj))])
@@ -137,5 +147,22 @@ Object object_set_property(Object *obj, const char *name, const Object *value);
 Object object_remove_property(Object *obj, const char *name);
 Object object_move(Object *obj);
 Object object_ref(Object *obj);
+
+// Threading
+#define $thread(stack_size) object_thread(stack_size)
+#define $start(th, arg)                    \
+	({                                     \
+		let _obj__ = object_move(&arg);    \
+		object_thread_start(&th, &_obj__); \
+	})
+#define $join(th) object_thread_join(&th)
+typedef Object (*ThreadFn)(Object *arg);
+Object object_thread(u64 stack_size);
+Object object_thread_start(Object *obj, Object *arg);
+Object object_thread_signal(const Object *obj);
+Object object_thread_ref(Object *obj);
+Object object_thread_join(Object *obj);
+void object_thread_cleanup(const Object *obj);
+u64 object_thread_id(const Object *obj);
 
 #endif	// _BASE_OBJECT__
