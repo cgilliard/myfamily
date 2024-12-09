@@ -15,49 +15,4 @@
 #ifndef _BASE_TASK__
 #define _BASE_TASK__
 
-#include <base/channel.h>
-#include <base/object.h>
-#include <base/sys.h>
-#include <base/types.h>
-
-#define INIT_TASK_TABLE                                           \
-	({                                                            \
-		TaskTable _ret__ = {};                                    \
-		let _res__ = tasktable_init(&_ret__);                     \
-		if ($is_err(_res__))                                      \
-			panic("Could not initialize task table: {}", _res__); \
-		_ret__;                                                   \
-	})
-
-typedef enum TaskState {
-	Initializable,
-	Running,
-	Runnable,
-	Sleeping,
-} TaskState;
-
-typedef struct Task {
-	Channel id;
-	void (*task)(void *channel);
-	u32 state;
-	size_t task_scheduler_index;
-	void *stack_base;
-	size_t stack_size;
-	Channel wait_channel;
-	struct Task *hash_list_next;
-	struct Task *group;
-} Task;
-
-#define TASK_TABLE_SIZE 40
-typedef struct TaskTable {
-	byte impl[TASK_TABLE_SIZE];
-} TaskTable;
-
-Object tasktable_init(TaskTable *table);
-Object tasktable_add_task(TaskTable *table, Task *task);
-Task *tasktable_get_task(const TaskTable *table, Channel *channel);
-Task *tasktable_remove_task(TaskTable *table, Channel *channel);
-Task *tasktable_pick_random_runnable(TaskTable *table);
-void tasktable_cleanup(TaskTable *table);
-
 #endif	// _BASE_TASK__

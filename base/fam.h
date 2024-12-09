@@ -20,7 +20,7 @@
 
 Object init(Object (*task)(Channel *channel), int threads);
 Channel run(Object (*task)(Channel *channel));
-Object send(Channel channel, Object object);
+Object send(Channel channel, Object *object);
 Object recv(Channel channel, int timeout_millis);
 void halt(int code);
 
