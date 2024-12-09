@@ -18,14 +18,14 @@ Suite(base);
 
 Test(print) {
 	char buf[100];
-	/*
-		assert_eq(sprint(buf, 100, "abc={}", 1), snprintf(buf, 100, "abc=%i",
-	   1)); assert_eq(sprint(buf, 100, "abc={}", (u64)134), snprintf(buf, 100,
-	   "abc=%llu", (u64)134));
-	*/
+	assert_eq(sprint(buf, 100, "abc={}", 1), snprintf(buf, 100, "abc=%i", 1));
+	assert_eq(sprint(buf, 100, "abc={}", (u64)134),
+			  snprintf(buf, 100, "abc=%llu", (u64)134));
 	let x = $(1);
+	let y = $(1.5);
 	assert_eq(sprint(buf, 100, "abc={},def={},ghi={},jkl={},mno={},xyz=0",
-					 (u64)134, -33, 1.5, "abcdefghi", x),
+					 (u64)134, -33, y, "abcdefghi", x),
 			  snprintf(buf, 100, "abc=%llu,def=%i,ghi=%f,jkl=%s,mno=1,xyz=0",
 					   (u64)134, -33, 1.5, "abcdefghi"));
+	//	println("test={}", (char)'a');
 }

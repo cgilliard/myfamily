@@ -27,6 +27,7 @@ typedef enum PrintType {
 	PrintTypeFloat,
 	PrintTypeString,
 	PrintTypeObject,
+	PrintTypeByte,
 	PrintTypeTerm,
 } PrintType;
 
@@ -48,35 +49,28 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 #pragma clang diagnostic ignored \
 	"-Wincompatible-pointer-types-discards-qualifiers"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma clang diagnostic ignored "-Wint-conversion"
 
-#define BUILD_PRINTABLE(ignore, v)                                             \
-	_Generic((v),                                                              \
-		Object: (const Printable){.type = PrintTypeObject,                     \
-								  .value.object_value = (i128)(v)},            \
-		int: (const Printable){.type = PrintTypeInt,                           \
-							   .value.int_value = (i64)(v)},                   \
-		i64: (const Printable){.type = PrintTypeInt,                           \
-							   .value.int_value = (i64)(v)},                   \
-		unsigned int: (const Printable){.type = PrintTypeUInt,                 \
-										.value.uint_value = (u64)(v)},         \
-		unsigned long: (const Printable){.type = PrintTypeUInt,                \
-										 .value.uint_value = (u64)(v)},        \
-		u64: (const Printable){.type = PrintTypeUInt,                          \
-							   .value.uint_value = (u64)(v)},                  \
-		double: (const Printable){.type = PrintTypeFloat,                      \
-								  .value.float_value =                         \
-									  _Generic((v), double: v, default: 0.0)}, \
-		float: (const Printable){.type = PrintTypeFloat,                       \
-								 .value.float_value =                          \
-									 _Generic((v), float: v, default: 0.0)},   \
-		default: (const Printable){.type = PrintTypeString,                    \
-								   .value.string_value = _Generic((v),         \
-								   const char *: (v),                          \
-								   char *: (v),                                \
-								   byte *: (v),                                \
-								   const byte *: (v),                          \
-								   default: 0)})
-
+#define BUILD_PRINTABLE(ignore, v)                                      \
+	_Generic((v),                                                       \
+		Object: (const Printable){.type = PrintTypeObject,              \
+								  .value.object_value = (i128)(v)},     \
+		char: (const Printable){.type = PrintTypeInt,                   \
+								.value.int_value = (i64)(v)},           \
+		byte: (const Printable){.type = PrintTypeInt,                   \
+								.value.int_value = (i64)(v)},           \
+		int: (const Printable){.type = PrintTypeInt,                    \
+							   .value.int_value = (i64)(v)},            \
+		i64: (const Printable){.type = PrintTypeInt,                    \
+							   .value.int_value = (i64)(v)},            \
+		unsigned int: (const Printable){.type = PrintTypeUInt,          \
+										.value.uint_value = (u64)(v)},  \
+		unsigned long: (const Printable){.type = PrintTypeUInt,         \
+										 .value.uint_value = (u64)(v)}, \
+		u64: (const Printable){.type = PrintTypeUInt,                   \
+							   .value.uint_value = (u64)(v)},           \
+		default: (const Printable){.type = PrintTypeString,             \
+								   .value.string_value = (v)})
 i64 print_impl(Channel *channel, char *buffer, i64 capacity, int newline,
 			   int exit, const char *prefix, const char *fmt, ...);
 i64 sprint_impl(char *buffer, i64 capacity, const char *fmt, ...);

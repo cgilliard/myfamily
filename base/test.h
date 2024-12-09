@@ -59,18 +59,16 @@ void fail_assert();
 #define assert(v) \
 	if (!(v)) fail_assert();
 
-#define assert_eq(v1, v2)                                               \
-	if ((v1) != (v2)) {                                                 \
-		if (fail_count == 0) println(BREAK);                            \
-		_Generic((v1),                                                  \
-			float: print("({} != {}) ", ((float)(v1)), ((float)(v2))),  \
-			double: print("({} != {}) ", ((float)(v1)), ((float)(v2))), \
-			byte: print("({} != {}) ", (byte)(v1), (byte)(v2)),         \
-			u64: print("({} != {}) ", (u64)(v1), (u64)(v2)),            \
-			i64: print("({} != {}) ", (i64)(v1), (i64)(v2)),            \
-			int: print("({} != {}) ", (int)(v1), (int)(v2)),            \
-			default: ({}));                                             \
-		fail_assert();                                                  \
+#define assert_eq(v1, v2)                                       \
+	if ((v1) != (v2)) {                                         \
+		if (fail_count == 0) println(BREAK);                    \
+		_Generic((v1),                                          \
+			byte: print("({} != {}) ", (byte)(v1), (byte)(v2)), \
+			u64: print("({} != {}) ", (u64)(v1), (u64)(v2)),    \
+			i64: print("({} != {}) ", (i64)(v1), (i64)(v2)),    \
+			int: print("({} != {}) ", (int)(v1), (int)(v2)),    \
+			default: ({}));                                     \
+		fail_assert();                                          \
 	}
 
 #endif	// _BASE_TEST__

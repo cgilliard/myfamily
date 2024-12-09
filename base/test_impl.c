@@ -79,12 +79,14 @@ int execute_tests(char *suite_name) {
 			"--------------------------------"
 			"--------------------------------"
 			"--------------------");
+	double time_secs = time_ns / 1e9;
+	Object time_obj = $(time_secs);
 	println(
 		"[{}===={}] Tested: {}{}{} | Passing: {}{}{} Failing: {}{}{} "
 		"(Execution time: {}{}{}s)",
 		BLUE, RESET, YELLOW, test_exe_count, RESET, GREEN,
 		test_exe_count - fail_count, RESET, CYAN, fail_count, RESET, CYAN,
-		time_ns / 1e9, RESET);
+		time_obj, RESET);
 
 	println(
 		"[{}================================"
