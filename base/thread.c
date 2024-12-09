@@ -289,6 +289,10 @@ Object object_thread_join(Object *obj) {
 	return ti->arg;
 }
 
+#ifdef __linux__
+int gettid();
+#endif	// __linux__
+
 u64 thread_id() {
 	u64 thread_id = 0;
 #ifdef __APPLE__

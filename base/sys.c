@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define _XOPEN_SOURCE
+#ifdef __linux__
+#define _XOPEN_SOURCE 700
+#define _POSIX_C_SOURCE 200112L
+#endif	// __linux__
 #include <base/sys.h>
 #include <base/util.h>
+#include <pthread.h>
 #include <signal.h>
 #include <sys/mman.h>
 #include <sys/time.h>
@@ -24,6 +28,10 @@
 #include <dlfcn.h>
 #include <mach/mach.h>
 #endif	// __APPLE__
+
+#ifndef MAP_ANONYMOUS
+#define MAP_ANONYMOUS 0x20
+#endif
 
 #define MAX_BACKTRACE_ENTRIES 128
 

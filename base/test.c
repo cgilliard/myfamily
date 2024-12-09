@@ -30,35 +30,6 @@ Object test_init_task_table(Channel *ch) {
 	return $(0);
 }
 
-Test(task_table) {
-	/*
-		TaskTable table1 = INIT_TASK_TABLE;
-		Channel ch1 = {0}, ch2 = {1}, ch3 = {2};
-
-		Task task1 = {.id = ch1}, task2 = {.id = ch2}, task3 = {.id = ch3};
-		let r1 = tasktable_add_task(&table1, &task1);
-		assert(!$is_err(r1));
-		let r2 = tasktable_add_task(&table1, &task2);
-
-		Task *t2_out = tasktable_remove_task(&table1, &task2.id);
-		assert(channel_equal(&t2_out->id, &task2.id));
-
-		let r3 = tasktable_add_task(&table1, &task3);
-
-		tasktable_cleanup(&table1);
-	*/
-
-	/*
-		let r2 = Err(AllocErr);
-		println("err={}", r2);
-	*/
-	/*
-		char *bt = backtrace_full();
-		print("{}", bt);
-		unmap(bt, 3);
-	*/
-}
-
 Test(object) {
 	let obj1 = $(1);
 	let obj2 = box(1000);
@@ -96,18 +67,6 @@ void *start_test_th(void *arg) {
 	test_th_recv = true;
 	return &test_return;
 }
-
-/*
-Test(thread) {
-	Thread *th = thread_init(&THREAD_CONFIG_DEFAULT);
-	int x = 123;
-	thread_start(th, start_test_th, &x);
-	int *check = thread_join(th);
-	assert_eq(*check, 45);
-	assert(test_th_recv);
-	thread_cleanup(th);
-}
-*/
 
 u32 u64_hash(const void *value) {
 	return murmurhash((const byte *)value, sizeof(u64), 0);
@@ -197,8 +156,8 @@ Object test_run(Object *arg) {
 }
 
 Test(thread) {
-	// create a thread with 4096 byte stack
-	var th1 = $thread(4096);
+	// create a thread with 16384 byte stack
+	var th1 = $thread(16384);
 	// set the 'run' function for the thread
 	let res1 = set(th1, "run", test_run);
 	// check for error
@@ -211,6 +170,7 @@ Test(thread) {
 	let res2 = $start(th1, arg);
 	// check for error
 	assert(!$is_err(res2));
+
 	// join the thread
 	let res3 = $join(th1);
 	// check for error
@@ -221,7 +181,7 @@ Test(thread) {
 	assert_eq(ALOAD(&thread_test_complete), 1);
 
 	// create thread
-	var th2 = $thread(4096);
+	var th2 = $thread(16384);
 	// try to start thread without specifying 'run' function.
 	let res4 = $start(th2, arg);
 	// error occurs
@@ -242,7 +202,7 @@ void test_handler() {
 }
 
 Test(thread_signal) {
-	var th1 = $thread(4096);
+	var th1 = $thread(16384);
 	let res1 = set(th1, "run", test_run2);
 	let res2 = set(th1, "handler", test_handler);
 	let arg = $(0);
@@ -254,30 +214,3 @@ Test(thread_signal) {
 	let res5 = $join(th1);
 	assert_eq(ALOAD(&test_handler_count), 2);
 }
-
-/*
-int test_signal_state = 0;
-
-void test_handler() {
-	AADD(&test_signal_state, 1);
-}
-
-void *test_signal(void *arg) {
-	assert(!thread_register_handler(test_handler));
-	AADD(&test_signal_state, 1);
-	os_sleep(10000);
-	return NULL;
-}
-
-Test(thread_signal) {
-	Thread *th = thread_init(&THREAD_CONFIG_DEFAULT);
-	thread_start(th, test_signal, NULL);
-	while (ALOAD(&test_signal_state) == 0);
-	assert(!thread_signal(th));
-	AADD(&test_signal_state, 1);
-	while (ALOAD(&test_signal_state) != 3);
-	thread_join(th);
-	thread_cleanup(th);
-	assert_eq(ALOAD(&test_signal_state), 3);
-}
-*/
