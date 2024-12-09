@@ -164,6 +164,7 @@ u64 thread_id() {
 #include <base/print_util.h>
 #include <base/sys.h>
 #include <pthread.h>
+#include <signal.h>
 
 typedef enum ThreadState {
 	ThreadRunnable,
@@ -172,21 +173,16 @@ typedef enum ThreadState {
 	ThreadJoined,
 } ThreadState;
 
-typedef struct ThreadImpl {
+__attribute__((aligned(32))) typedef struct ThreadImpl {
 	pthread_t th;
 	u64 stack_size;
 	ObjectNc arg;
 	ThreadFn start_fn;
+	void (*handler)();
 	int state;
 	int ref_count;
 	ObjectNc ref;
 } ThreadImpl;
-
-void __attribute__((constructor)) __check_thread_impl_size() {
-	if ((sizeof(ThreadImpl) % 16) != 0)
-		panic("ThreadImpl must be aligned to 16 bytes! size was {}.",
-			  sizeof(ThreadImpl));
-}
 
 Object object_thread(u64 stack_size) {
 	u64 pages = 1 + ((stack_size + sizeof(ThreadImpl)) - 1) / PAGE_SIZE;
@@ -198,24 +194,65 @@ Object object_thread(u64 stack_size) {
 	return *(Object *)&val;
 }
 
+_Thread_local void (*tl_handler)();
+
+void object_nop() {
+}
+
+void object_handler() {
+	tl_handler();
+	struct sigaction sa;
+	sa.sa_handler = object_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGUSR1, &sa, NULL);
+
+	sigset_t set;
+	sigemptyset(&set);
+	sigaddset(&set, SIGUSR1);
+	pthread_sigmask(SIG_UNBLOCK, &set, NULL);
+}
+
 void *object_thread_start_fn(void *arg) {
 	ThreadImpl *ti = arg;
 	ThreadFn fn = ti->start_fn;
+	tl_handler = ti->handler;
+	if (!tl_handler) tl_handler = object_nop;
+
+	struct sigaction sa;
+	sa.sa_handler = object_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGUSR1, &sa, NULL);
+
 	Object varg = object_move(&ti->arg);
 	ASTORE(&ti->state, ThreadRunning);
 	ti->arg = fn(&varg);
+
+	// disable signals once we finish
+	sigset_t set;
+	sigemptyset(&set);
+	sigaddset(&set, SIGUSR1);
+	pthread_sigmask(SIG_BLOCK, &set, NULL);
+
 	ASTORE(&ti->state, ThreadZombie);
 	object_cleanup(&ti->ref);
 	return NULL;
 }
 
 Object object_thread_start(Object *obj, Object *arg) {
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	ThreadImpl *ti = impl->value.ptr_value;
+
 	let fn = get(*obj, "run");
 	if ($is_err(fn)) return Err(NotFound);
 	ThreadFn start_fn = $fn(fn);
 	if (start_fn == NULL) return Err(IllegalState);
-	ObjectImpl *impl = (ObjectImpl *)obj;
-	ThreadImpl *ti = impl->value.ptr_value;
+	let handler = get(*obj, "handler");
+	void (*handler_fn)() = NULL;
+	if (!$is_err(handler)) handler_fn = $fn(handler);
+	if (handler_fn) ti->handler = handler_fn;
+
 	ti->start_fn = start_fn;
 	ti->arg = object_move(arg);
 	ti->state = ThreadRunnable;
@@ -234,7 +271,14 @@ Object object_thread_start(Object *obj, Object *arg) {
 	return $(0);
 }
 
-Object object_thread_signal(const Object *th) {
+Object object_thread_signal(const Object *obj) {
+	if (obj == NULL) return Err(IllegalArgument);
+
+	ObjectImpl *impl = (ObjectImpl *)obj;
+	ThreadImpl *ti = impl->value.ptr_value;
+
+	int code;
+	if ((code = pthread_kill(ti->th, SIGUSR1))) println("code={}", code);
 	return $(0);
 }
 Object object_thread_join(Object *obj) {
@@ -244,8 +288,17 @@ Object object_thread_join(Object *obj) {
 	ASTORE(&ti->state, ThreadJoined);
 	return ti->arg;
 }
-u64 object_thread_id(const Object *th) {
-	return 0;
+
+u64 thread_id() {
+	u64 thread_id = 0;
+#ifdef __APPLE__
+	pthread_threadid_np(NULL, &thread_id);
+#elif defined(__linux__)
+	thread_id = gettid();
+#else
+	println("WARN: unsupported platform! Cannot determine tid.");
+#endif
+	return thread_id;
 }
 
 Object object_thread_ref(Object *obj) {

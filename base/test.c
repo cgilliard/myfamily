@@ -220,16 +220,39 @@ Test(thread) {
 	// confirm the complete variable was set
 	assert_eq(ALOAD(&thread_test_complete), 1);
 
-	/*
-		// create thread
-		var th2 = $thread(4096);
-		// try to start thread without specifying 'run' function.
-		let res4 = $start(th2, arg);
-		// error occurs
-		assert($is_err(res4));
-		// kind NotFound
-		assert_eq($kind(res4), NotFound);
-	*/
+	// create thread
+	var th2 = $thread(4096);
+	// try to start thread without specifying 'run' function.
+	let res4 = $start(th2, arg);
+	// error occurs
+	assert($is_err(res4));
+	// kind NotFound
+	assert_eq($kind(res4), NotFound);
+}
+
+int test_handler_count = 0;
+
+Object test_run2(Object *arg) {
+	while (ALOAD(&test_handler_count) != 2) sched_yield();
+	return $(0);
+}
+
+void test_handler() {
+	AADD(&test_handler_count, 1);
+}
+
+Test(thread_signal) {
+	var th1 = $thread(4096);
+	let res1 = set(th1, "run", test_run2);
+	let res2 = set(th1, "handler", test_handler);
+	let arg = $(0);
+	$start(th1, arg);
+	assert_eq(ALOAD(&test_handler_count), 0);
+	let res3 = $signal(th1);
+	while (ALOAD(&test_handler_count) != 1) sched_yield();
+	let res4 = $signal(th1);
+	let res5 = $join(th1);
+	assert_eq(ALOAD(&test_handler_count), 2);
 }
 
 /*

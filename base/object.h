@@ -156,6 +156,7 @@ Object object_ref(Object *obj);
 		object_thread_start(&th, &_obj__); \
 	})
 #define $join(th) object_thread_join(&th)
+#define $signal(th) object_thread_signal(&th);
 typedef Object (*ThreadFn)(Object *arg);
 Object object_thread(u64 stack_size);
 Object object_thread_start(Object *obj, Object *arg);
