@@ -25,11 +25,15 @@ typedef void (*test_fn_ptr)(const char *);
 extern test_fn_ptr test_arr[MAX_TESTS + 1];
 extern char test_names[MAX_TESTS][MAX_TEST_NAME + 1];
 int execute_tests(char *suite_name);
-#define BREAK                          \
-	"--------------------------------" \
-	"--------------------------------" \
-	"--------------------------------" \
-	"--------------------\n"
+#define BREAK    \
+	"----------" \
+	"----------" \
+	"----------" \
+	"----------" \
+	"----------" \
+	"----------" \
+	"----------" \
+	"------------"
 
 void fail_assert();
 

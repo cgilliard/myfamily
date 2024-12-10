@@ -73,7 +73,7 @@ int execute_tests(char *suite_name) {
 	}
 
 	double time_ns = getnanos() - start;
-	if (fail_count) printf("%s", BREAK);
+	if (fail_count) printf("%s\n", BREAK);
 	printf(
 		"[%s====%s] Tested: %s%i%s | Passing: %s%i%s Failing: %s%i%s "
 		"(Execution time: %s%f%ss)\n",
