@@ -49,7 +49,7 @@ static const Printable __termination_print_pair__ = {.type = PrintTypeTerm};
 #pragma clang diagnostic ignored \
 	"-Wincompatible-pointer-types-discards-qualifiers"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-#pragma clang diagnostic ignored "-Wint-conversion"
+#pragma GCC diagnostic ignored "-Wint-conversion"
 
 #define BUILD_PRINTABLE(ignore, v)                                      \
 	_Generic((v),                                                       \
