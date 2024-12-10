@@ -41,7 +41,6 @@ void free(void *addr);
 void *popen(const char *command, const char *rw);
 char *fgets(char *str, int n, void *stream);
 int pclose(void *fp);
-int printf(const char *fmt, ...);
 
 void *map(u64 pages) {
 	if (pages == 0) return NULL;
@@ -101,13 +100,13 @@ int unset_timer() {
 	return 0;  // Success
 }
 
-i128 getnanos() {
+__int128_t getnanos() {
 	struct timespec now;
 	clock_gettime(CLOCK_MONOTONIC, &now);
-	return (i128)now.tv_sec * (i128)1e9 + (i128)now.tv_nsec;
+	return (__int128_t)now.tv_sec * (__int128_t)1e9 + (__int128_t)now.tv_nsec;
 }
 
-const char *backtrace_full() {
+char *backtrace_full() {
 	void *array[MAX_BACKTRACE_ENTRIES];
 	int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
 	char **strings = backtrace_symbols(array, size);
@@ -190,6 +189,10 @@ const char *backtrace_full() {
 		char buffer[128];
 
 		while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+			if (cstring_strstr(buffer, "+") != NULL) {
+				i = size;
+				break;
+			}
 			int len = cstring_len(buffer);
 			len_sum += len;
 			if (len_sum >= 4 * PAGE_SIZE) break;
@@ -203,14 +206,15 @@ const char *backtrace_full() {
 		}
 		pclose(fp);
 #else
-		println("WARN: Unsupported OS: cannot build backtraces");
+		char *unsupported = "WARN: Unsupported OS: cannot build backtraces\n";
+		write(2, unsupported, cstring_len(unsupported));
 #endif
 	}
 
 	if (strings && size) free(strings);
 	return ret;
 }
-const char *__last_trace_impl__() {
+char *__last_trace_impl__() {
 	void *array[MAX_BACKTRACE_ENTRIES];
 	int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
 	char **strings = backtrace_symbols(array, size);
@@ -301,15 +305,16 @@ const char *__last_trace_impl__() {
 			break;
 		}
 #else
-		println("WARN: Unsupported OS: cannot build backtraces");
-#endif	// End MACOS
+		char *unsupported = "WARN: Unsupported OS: cannot build backtraces\n";
+		write(2, unsupported, cstring_len(unsupported));
+#endif	// End OS
 	}
 
 	if (strings && size) free(strings);
 	return ret;
 }
 
-const char *last_trace() {
+char *last_trace() {
 	return __last_trace_impl__();
 }
 
@@ -337,7 +342,7 @@ void __attribute__((constructor)) __check_sizes() {
 	arch(i64, 8);
 	arch(u64, 8);
 	arch(unsigned long, 8);
-	arch(u128, 16);
+	arch(__uint128_t, 16);
 	arch(char, 1);
 	arch(byte, 1);
 	arch(float, 4);

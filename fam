@@ -37,7 +37,7 @@ if [ "$test" = 1 ] || [ "$coverage" = 1 ] || [ "$fasttest" = 1 ]; then
 	else
 		./fam --with-cc=$cc --with-extra="$extra" --skip-final || exit 1;
 	fi
-	echo "[${BLUE}===================================================================================================================${RESET}]";
+	echo "[${BLUE}================================================================================${RESET}]";
 	if [ "$filter" != "" ]; then
 		export TEST_FILTER=$filter;
 	else

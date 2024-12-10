@@ -18,25 +18,19 @@
 // primitives
 typedef signed long long i64;
 typedef unsigned long long u64;
+typedef __uint128_t u128;
+typedef __int128_t i128;
 typedef int i32;
 typedef unsigned int u32;
 typedef unsigned char byte;
 typedef double f64;
-typedef __int128_t i128;
-typedef __uint128_t u128;
-
-#ifdef __linux__
-long unsigned int getpagesize();
-#elif defined(__APPLE__)
-int getpagesize();
-#endif
-#define PAGE_SIZE (getpagesize())
-#define _FILE_OFFSET_BITS 64
+typedef float f32;
+typedef _Bool bool;
 
 typedef unsigned long size_t;
 #ifdef __linux__
 typedef long int off_t;
-#elif defined(__APPLE__)
+#else
 typedef i64 off_t;
 #endif
 

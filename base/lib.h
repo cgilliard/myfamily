@@ -13,6 +13,5 @@
 // limitations under the License.
 
 #include <base/colors.h>
-#include <base/print_util.h>
 #include <base/sys.h>
 #include <base/util.h>

@@ -41,7 +41,7 @@ static void __attribute__((constructor)) get_target_test() {
 }
 
 int execute_tests(char *suite_name) {
-	i128 start, end;
+	__int128_t start, end;
 	char success[test_count];
 	start = getnanos();
 	int test_exe_count = 0;
@@ -61,47 +61,47 @@ int execute_tests(char *suite_name) {
 				u64 alloc_sum_pre = _alloc_sum;
 				test_arr[i](test_dir);
 				if (alloc_sum_pre != _alloc_sum)
-					println("Alloc sum is not equal. Memory leak?");
+					printf("Alloc sum is not equal. Memory leak?\n");
 				assert_eq(alloc_sum_pre, _alloc_sum);
 			}
 		} else {
-			println("{}FAIL:{} test '{}{}{}' failed!", BRIGHT_RED, RESET, GREEN,
-					test_names[i], RESET);
+			printf("%sFAIL:%s test '%s%s%s' failed!\n", BRIGHT_RED, RESET,
+				   GREEN, test_names[i], RESET);
 
 			fail_count++;
 		}
 	}
 
 	double time_ns = getnanos() - start;
-	if (fail_count)
-		println(
-			"--------------------------------"
-			"--------------------------------"
-			"--------------------------------"
-			"--------------------");
-	println(
-		"[{}===={}] Tested: {}{}{} | Passing: {}{}{} Failing: {}{}{} "
-		"(Execution time: {}{}{}s)",
+	if (fail_count) printf("%s", BREAK);
+	printf(
+		"[%s====%s] Tested: %s%i%s | Passing: %s%i%s Failing: %s%i%s "
+		"(Execution time: %s%f%ss)\n",
 		BLUE, RESET, YELLOW, test_exe_count, RESET, GREEN,
 		test_exe_count - fail_count, RESET, CYAN, fail_count, RESET, CYAN,
-		$(time_ns / 1e9), RESET);
+		time_ns / 1e9, RESET);
 
-	println(
-		"[{}================================"
-		"================================================"
-		"==================================={}]",
+	printf(
+		"[%s=========="
+		"=========="
+		"=========="
+		"=========="
+		"=========="
+		"=========="
+		"=========="
+		"==========%s]\n",
 		BLUE, RESET);
 
 	if (fail_count != 0)
-		println("{}FAIL:{} Test suite {}{}{} failed!", BRIGHT_RED, RESET, GREEN,
-				suite_name, RESET);
+		printf("%sFAIL:%s Test suite %s%s%s failed!", BRIGHT_RED, RESET, GREEN,
+			   suite_name, RESET);
 
-	return fail_count == 0;
+	return fail_count != 0;
 }
 
 void fail_assert() {
-	const char *lt = last_trace();
-	print("Assertion failure: {}", lt);
+	char *lt = last_trace();
+	printf("Assertion failure: %s", lt);
 	if (lt) unmap(lt, 1);
 	longjmp(test_jmp, 1);
 }

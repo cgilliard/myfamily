@@ -17,17 +17,24 @@
 
 #include <base/types.h>
 
+#ifdef __linux__
+long unsigned int getpagesize();
+#elif defined(__APPLE__)
+int getpagesize();
+#endif
+#define PAGE_SIZE (getpagesize())
+
 void *map(u64 pages);
 void unmap(void *addr, u64 pages);
 int os_sleep(u64 millis);
-int set_timer(void (*)(int), u64 millis);
+int set_timer(void (*alarm)(int), u64 millis);
 int unset_timer();
 
 int sched_yield(void);
 int getentropy(void *buffer, size_t length);
 
-const char *backtrace_full();
-const char *last_trace();
+char *backtrace_full();
+char *last_trace();
 
 ssize_t write(int fd, const void *buf, size_t count);
 ssize_t read(int fd, void *buf, size_t count);
